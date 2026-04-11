@@ -46,15 +46,14 @@ Without this layer, operational efficiency and executive confidence are limited,
 ## 3. Outcome Definition
 
 ### Business Outcomes
-- Operations team can triage and close air quality issues faster.
-- Executives can identify top risks and required actions in ≤5 minutes.
+- Operations team can execute rule-driven reporting with high reliability and low manual effort.
+- Executives can identify top risks and required actions across the portfolio in ≤5 minutes.
 - Customer trust increases via transparent, traceable certification status.
 
 ### Product Outcomes
-- All dashboard views are role-appropriate (Executive, Operations, Analyst).
+- All dashboard views are role-appropriate (FJ Executive, Analyst / Operations, Customer).
 - Every insight on the dashboard is traceable to a `rule_version` and `citation_id`.
-- Alert-to-closure workflow is visible and audit-ready.
-- Intervention tracker shows before/after comparison with confidence labels.
+- The interface is strictly a reporting tool — no task management or alert queues.
 
 ---
 
@@ -63,25 +62,23 @@ Without this layer, operational efficiency and executive confidence are limited,
 | Persona | Role | Key Needs | Pain Points |
 |---|---|---|---|
 | **Executive / Decision Maker** | Customer or internal leadership | Quick risk summary, certification status, recommended actions | Raw IAQ numbers are uninterpretable |
-| **Operations Manager** | Internal FJ staff | Site/zone health at a glance, alert queue, action ownership | No centralised alert tracking today |
-| **Internal Analyst** | FJ analyst | Data upload, rule-based findings, report draft generation | Manual inconsistency, slow report cycle |
-| **Internal Reviewer / Approver** | Jay Choy or designated reviewer | Audit trail, confidence labels, QA checklist, sign-off | Unclear rationale behind recommendations |
+| **Analyst / Operations** | FJ analyst and operations | Data upload, rule-based findings, report draft generation | Manual inconsistency, slow report cycle |
 
 ---
 
 ## 5. Scope Boundaries
 
 ### In Scope
-- Role-based dashboard modes: Executive, Operations, Analyst
+- Role-based dashboard modes: FJ Executive, Analyst / Operations, Customer
 - Site-level and Zone/Floor-level views
-- Cross-site comparison view
-- Critical parameter alert queue with owner, due date, and closure status
-- Intervention Tracker: before/after snapshots with confidence labels and confounder notes
+- Cross-site comparison view (Leaderboard)
 - Daily summary card: top 3 risks, top 3 actions, verification due date
 - Report version history and comparison view (Phase 2)
 - Customer portal certification status view (Phase 3, post-gate)
 
 ### Out of Scope (current cycle)
+- In-app ticketing, alert lifecycle management, and action owner tracking
+- Intervention Tracker UI (before/after comparison tools)
 - Non-IAQ parameters outside current certification scope
 - Any feature that removes or weakens rule/citation governance controls
 - Customer self-service report editing
@@ -95,17 +92,16 @@ Without this layer, operational efficiency and executive confidence are limited,
 | Principle | Meaning |
 |---|---|
 | **Evidence before aesthetics** | Every dashboard metric must be traceable to an approved rulebook entry. |
-| **Explainable scoring** | No black-box scoring. All threshold bands and interpretations are rule-version-pinned. |
+| **Transparent Weighted Scoring** | The FJ SafeSpace Wellness Index is calculated using a 0-100% equation where parameter weights (e.g., CO2 25%) and exact thresholds are driven strictly by the active Rulebook version as the anchor base. |
 | **Internal reliability first** | Executive and customer views are Phase 2/3; internal operations view ships first. |
 | **Versioned logic** | Reproducibility: same reading + same rule version = same dashboard output. |
 | **No manual override** | No threshold override is permitted in production, on any dashboard view, under any circumstance. |
-| **Insufficient Evidence is a valid and visible state** | Must be preserved and surfaced to users — never silently upgraded. |
 
 ---
 
 ## 7. Functional Requirements by Phase
 
-### Phase 1 — Upload + Findings + Internal Analyst View
+### Phase 1 — Upload + Findings + Analyst / Operations View
 
 | ID | Requirement |
 |---|---|
@@ -117,31 +113,27 @@ Without this layer, operational efficiency and executive confidence are limited,
 | FR-D6 | Reviewer QA checklist is accessible and completion-gated before report approval. |
 | FR-D7 | All findings displayed include `rule_version` and `citation_id` — non-negotiable. |
 
-### Phase 2 — Internal Dashboard v2 (Operations + Executive Views)
+### Phase 2 — Internal Dashboard v2 (FJ Executive Portfolio)
 
 | ID | Requirement |
 |---|---|
-| FR-D8 | Role-based dashboard modes: Executive, Operations, Analyst — separate view layouts. |
-| FR-D9 | **Site-level summary cards**: IAQ health score by site, top risk parameter, certification status, last scan date. |
-| FR-D10 | **Zone/Floor-level drill-down**: parameter readings per zone, status per metric, trend sparklines. |
-| FR-D11 | **Cross-site comparison view**: rank sites by number of P1 (Critical) breach count, secondary sort by P2 count. Display as `P1: N \| P2: N \| P3: N` per site — no composite score. |
-| FR-D12 | **Critical parameter queue**: filterable list of all parameters currently in breach, with owner, due date, and closure status. |
-| FR-D13 | **Alert Center**: failed parameter list with owner assignment, due date, closure status, and audit trail. |
-| FR-D14 | **Intervention Tracker**: before/after reading snapshots with: confidence label, confounder notes, time delta, and rule citation. |
-| FR-D15 | **Daily Summary Card**: top 3 risks, top 3 recommended actions, next verification due date. |
-| FR-D16 | **Report version history**: list of all reports per site with version, rule version used, reviewer, and approval date. |
-| FR-D17 | **Trend visualisation**: time-series chart per parameter showing pre/post intervention comparison. |
-| FR-D18 | **Source currency status** is visible on every page that references a certification finding: `{Current Verified / Partial Extract / Version Unverified / Superseded}`. |
+| FR-D8 | Role-based dashboard views: FJ Executive, Analyst / Operations — sharing components but differing in cross-tenant scope. |
+| FR-D9 | **Site-level summary cards**: FJ SafeSpace Wellness Index (0-100%), certification status, last scan date. |
+| FR-D10 | **Zone/Floor-level drill-down**: parameter readings per zone, benchmark proximity, trend sparklines. |
+| FR-D11 | **Cross-site Leaderboard**: filterable view ranking sites by Wellness Index Score. |
+| FR-D12 | **Daily Summary Card**: top 3 risks, top 3 recommended actions, next verification due date. |
+| FR-D13 | **Report version history**: list of all reports per site with version, rule version used, reviewer, and approval date. |
+| FR-D14 | **Source currency status** is visible on every page that references a certification finding: `{Current Verified / Partial Extract / Version Unverified / Superseded}`. |
 
 ### Phase 3 — Customer Portal + Live Dashboard
 
 | ID | Requirement |
 |---|---|
-| FR-D19 | Role-based authentication with tenant data separation (customer only sees their sites). |
-| FR-D20 | Customer portal view: certification status (Pass / Conditional / Fail / Insufficient Evidence), next renewal date, corrective action status. |
-| FR-D21 | Live uHoo API ingestion (polling/webhook per API feasibility sprint outcome). |
-| FR-D22 | Renewal reminders and recertification workflow trigger (in-app notification + email). |
-| FR-D23 | Legal/medical disclaimer visible on all customer-facing pages (approved wording required before go-live). |
+| FR-D15 | Role-based authentication with tenant data separation (customer only sees their sites). |
+| FR-D16 | Customer portal view: certification status (Healthy Workplace Certified / Healthy Space Verified / Improvement Recommended), and download links for Certificate, Verification Summary, and Entrance Decal. |
+| FR-D17 | Live uHoo API ingestion (polling/webhook per API feasibility sprint outcome). |
+| FR-D18 | Renewal reminders and recertification workflow trigger (in-app notification + email). |
+| FR-D19 | Legal/medical disclaimer visible on all customer-facing pages (approved wording required before go-live). |
 
 ---
 
@@ -152,7 +144,8 @@ Without this layer, operational efficiency and executive confidence are limited,
 | NFR-D1 | **Reproducibility**: identical input + identical rule version must always produce identical dashboard output. |
 | NFR-D2 | **Traceability**: every metric card, finding, and alert links to its rule and citation source. |
 | NFR-D3 | **Performance**: dashboard page load <3 seconds; report draft generation <2 minutes (Phase 1). |
-| NFR-D4 | **Security**: Phase 1/2 internal-only. Phase 3 requires role-based auth and tenant isolation. |
+| NFR-D4 | **Security (Phase 1/2)**: No authentication required. Runs on internal laptop only — not network-accessible to customers. No login, no sessions, no tokens. |
+| NFR-D4b | **Security (Phase 3)**: Role-based auth via Clerk. JWT with `tenant_id` claim. Tenant data strictly isolated. Customer role cannot access another tenant's data. |
 | NFR-D5 | **Availability target (Phase 3)**: 99.5% uptime at Phase 3 launch (planned maintenance windows excluded). Roadmap to 99.9% post-stabilisation; 12-month review trigger. |
 | NFR-D6 | **Accessibility**: Executive view must be comprehensible to a non-technical stakeholder within 5 minutes without assistance. |
 
@@ -174,26 +167,21 @@ These requirements distinguish FJDashboard from commodity IAQ dashboards and mus
 
 ## 10. Dashboard Views — Design Specifications
 
-### 10.1 Executive View
-- One-page summary card per site: certification status, top 3 risks, top 3 actions, next verification date.
-- Risk traffic-light colour coding (Pass = green, Conditional = amber, Fail = red, Insufficient Evidence = grey).
-- Time to comprehend top risks: ≤5 minutes target.
+### 10.1 FJ Executive View
+- Dashboard shell matches Customer Portal exactly, but with `tenant_id` unlocked.
+- Cross-site Leaderboard: rank all buildings across all customers by Wellness Index.
+- One-page summary card per site: Wellness Index, certification status, top 3 actions, next verification date.
+- Status traffic-light colour coding (Certified = green, Verified = amber, Improvement Recommended = red).
 
-### 10.2 Operations View
-- Alert Center: sortable, filterable list of all open parameter breaches across sites.
-- Columns: Site, Zone, Parameter, Current Value, Threshold, Status, Owner, Due Date, Days Open.
-- Intervention Tracker: before/after reading cards with confidence label and confounder notes.
-- Cross-site comparison table: sites ranked by worst IAQ parameter.
-
-### 10.3 Analyst View
+### 10.2 Analyst / Operations View
 - Upload queue and parse validation status.
 - Findings panel per metric: value, threshold band, rule interpretation, citation, confidence, action priority.
 - Report draft builder with QA checklist gate.
 - Source currency status badge on each citation.
 
-### 10.4 Customer Portal View (Phase 3)
-- Certification status card: Pass / Conditional / Fail / Insufficient Evidence.
-- Corrective action tracker (view only — customers cannot modify thresholds or findings).
+### 10.3 Customer Portal View (Phase 3)
+- Certification status card: Healthy Workplace Certified / Healthy Space Verified / Improvement Recommended.
+- View-only report (Verification Summary, Certificate, Decal). Customers cannot modify thresholds or findings.
 - Next renewal date and recertification workflow prompt.
 - Legal/medical disclaimer prominently displayed.
 
@@ -210,8 +198,6 @@ The FJDashboard reads from the following core entities (defined in FJ SafeSpace 
 | **Rulebook Entry** | `rule_id`, `rule_version`, `citation_unit_ids[]`, `approval_status` |
 | **Citation Unit** | `citation_unit_id`, `source_id`, `exact_excerpt`, `extraction_confidence` |
 | **Reference Source** | `source_id`, `title`, `status` (active / superseded), `source_currency_status` |
-| **Alert** | `parameter`, `site`, `zone`, `owner`, `due_date`, `closure_status` |
-| **Intervention** | `before_snapshot`, `after_snapshot`, `confidence_label`, `confounder_notes`, `rule_citation` |
 | **Report** | `report_version`, `rule_version_used`, `citation_ids_used`, `reviewer_sign_off` |
 
 ---
@@ -220,8 +206,6 @@ The FJDashboard reads from the following core entities (defined in FJ SafeSpace 
 
 ### Operational KPIs
 - Time-from-upload to dashboard update (target: <2 hours, Phase 2).
-- Alert resolution rate (% of alerts closed within due date).
-- Intervention tracker coverage (% of interventions with before/after pairs logged).
 
 ### Quality KPIs
 - % dashboard findings with complete `rule_version` + `citation_id`.
@@ -245,7 +229,7 @@ The FJDashboard reads from the following core entities (defined in FJ SafeSpace 
 
 ### Gate 2 → 3 (Phase 2 to Phase 3 unlock)
 - uHoo API feasibility validated.
-- Security/auth design and tenant isolation approved.
+- Security/auth design (Clerk + tenant isolation) approved.
 - Support model for customer access defined.
 - Legal/medical disclaimer wording approved by designated authority.
 - Executive dashboard ≤5-minute comprehension target validated in dry-run (NPE and CAG sites).
@@ -324,6 +308,8 @@ The FJDashboard product release is **complete only after Jay Choy sign-off** on:
 ---
 
 *Derived from FJ SafeSpace PRD v0.4 (2026-03-30) and Product Excellence Addendum (Section 25, 2026-04-11). Parent document remains the authoritative source for platform-wide governance, certification policy, and data model definitions.*
+
+**Locked stack decisions (2026-04-12):** Full-stack Next.js (Option A) — no separate backend. No auth for Phase 1/2 (internal laptop only). No background job processing — synchronous upload/report pipeline. Auth deferred to Phase 3 (Clerk). PDF generation via Gotenberg. Hosting: Vercel (frontend) + Render (backend + PostgreSQL) + Cloudflare R2 (file storage).*
 
 ---
 
