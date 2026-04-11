@@ -20,7 +20,7 @@
 | File storage | Cloudflare R2 |
 | Auth | No auth for Phase 1/2 (internal laptop only). Clerk for Phase 3. |
 | Background jobs | None — synchronous processing throughout |
-| PDF generation | Gotenberg (open-source Docker microservice) |
+| PDF generation | WeasyPrint (Native Python HTML-to-PDF library) |
 | Hosting | Vercel (frontend) + Render (FastAPI + PostgreSQL) + Cloudflare R2 (files) |
 
 ---

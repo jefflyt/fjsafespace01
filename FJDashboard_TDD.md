@@ -63,7 +63,7 @@
 [Report Generation]
   └──▶ POST /api/reports/generate
         ├── compose HTML from findings
-        ├── HTML→PDF via Gotenberg
+        ├── HTML→PDF via WeasyPrint
         ├── store PDF binary in PostgreSQL (`bytea`)
         ├── store Report record in DB
         └── return download URL
@@ -102,12 +102,13 @@
 | **ORM** | SQLModel | 0.x | SQLAlchemy wrapper |
 | **Database** | PostgreSQL | 16.x | Render managed DB |
 | **File storage** | PostgreSQL `bytea` | — | Direct DB binary storage (Lean MVP) |
-| **PDF generation** | Gotenberg | 8.x | Docker sidecar; HTML→PDF via HTTP API |
+| **PDF generation** | WeasyPrint | 62.x | Native Python HTML→PDF rendering library |
 | **Auth (Phase 1/2)** | None | — | Internal laptop only; no login |
 | **Auth (Phase 3)** | Clerk | 5.x | Org = tenant; JWT; Next.js middleware native |
 | **Email notifications** | Resend | — | In-app via Notification DB table + polling |
-| **Charts** | Recharts | 2.x | Trend sparklines; time-series charts |
-| **Styling** | Tailwind CSS | 3.x | Utility-first; dark/light mode |
+| **State / Fetching (Frontend)** | TanStack Query | 5.x | Server state polling and caching |
+| **Charts** | Tremor / Shadcn | — | Premium dashboard visualizations |
+| **Styling** | Tailwind + Shadcn UI | — | Radix-based accessible components |
 | **Deployment (Phase 1/2)** | localhost | — | `npm run dev` on analyst machine |
 | **Deployment (Phase 3)** | Vercel | — | Auto-deploy on push to `main` |
 
@@ -376,7 +377,7 @@ POST /api/reports/generate
     1. Fetch findings for upload
     2. Validate QA gates — fail fast on first violation
     3. Compose HTML report from template
-    4. POST HTML to Gotenberg → receive PDF bytes
+    4. Render HTML to PDF via WeasyPrint library
     5. Save PDF bytes to Report.pdfBinaryData in PostgreSQL
     6. Write Report record to DB
   Returns 200: { reportId, status: "DRAFT_GENERATED", previewUrl }
@@ -446,7 +447,7 @@ Applied in `POST /api/reports/generate` before any processing begins:
 
 ```
 app/
-├── layout.tsx                          ← root layout (fonts, Tailwind, nav shell)
+├── layout.tsx                          ← root layout (fonts, Tailwind, Shadcn UI, nav shell)
 ├── page.tsx                            ← redirect → /dashboard
 │
 ├── dashboard/
@@ -498,7 +499,7 @@ backend/
 | `SourceCurrencyBadge` | `components/shared/` | Colour-coded badge + advisory tag for non-`CURRENT_VERIFIED` |
 | `QAChecklist` | `components/analyst/` | Gated checklist — blocks approval button until all items checked |
 | `DailySummaryCard` | `components/dashboard/` | Top 3 risks + actions + next verification date |
-| `TrendChart` | `components/shared/` | Recharts line chart — pre/post intervention comparison |
+| `TrendChart` | `components/shared/` | Tremor / Shadcn chart — pre/post intervention comparison |
 | `UploadForm` | `components/analyst/` | CSV file input + site selector + parse result display |
 | `ReportPreview` | `components/analyst/` | Rendered report sections; approval action button |
 | `NotificationBell` | `components/shared/` | Unread count badge + dropdown list |
@@ -587,7 +588,7 @@ backend/
 
 ## 8. Testing Strategy
 
-### 8.1 Backend Unit Tests (PyTest) & Frontend Unit Tests (Jest)
+### 8.1 Backend Unit Tests (PyTest) & Frontend Unit Tests (Vitest)
 
 | Test | Description |
 |---|---|
@@ -605,7 +606,7 @@ backend/
 | Cross-site comparison sort | Sites returned sorted by wellnessIndexScore DESC; |
 | Rulebook read-only | `PUT/POST/DELETE /api/rulebook/*` returns `405` |
 | Report QA gate block | `POST /api/reports/generate` returns `422` when a QA gate rule is violated |
-| Gotenberg integration | `POST` to Gotenberg with test HTML returns valid PDF bytes |
+| WeasyPrint integration | Render test HTML string to WeasyPrint and assert output is valid PDF bytes |
 | PDF Storage | PDF bytes successfully saved to `Report.pdfBinaryData` |
 
 ### 8.3 QA Gate Automation (CI)
@@ -627,8 +628,8 @@ backend/
 | Scenario | Target | Tool |
 |---|---|---|
 | Dashboard page load | < 3 seconds | Playwright perf API / Lighthouse |
-| Report generation | < 2 minutes | Jest timer assertion on synchronous handler |
-| Upload + parse (1,000 rows) | < 30 seconds | Jest integration test |
+| Report generation | < 2 minutes | PyTest timer assertion on synchronous handler |
+| Upload + parse (1,000 rows) | < 30 seconds | PyTest integration test |
 
 ### 8.6 Phase 3 Security Tests
 
@@ -645,10 +646,9 @@ backend/
 
 | Component | Setup |
 |---|---|
-| Next.js app | `npm run dev` (localhost:3000) |
+| Next.js app | `pnpm run dev` (localhost:3000) |
 | FastAPI Backend | `fastapi dev backend/app/main.py` (localhost:8000) |
 | PostgreSQL | Docker (`docker-compose up`) or Render free tier |
-| Gotenberg | `docker run -p 3001:3001 gotenberg/gotenberg:8` |
 | Environment | `.env` (Backend) & `.env.local` (Frontend) |
 | Migrations | `alembic upgrade head` |
 
@@ -667,11 +667,6 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
-  gotenberg:
-    image: gotenberg/gotenberg:8
-    ports:
-      - "3001:3001"
-
 volumes:
   pgdata:
 ```
@@ -683,7 +678,6 @@ volumes:
 | Next.js Frontend | Vercel | Auto-deploy on push to `main` |
 | FastAPI Backend | Render (Web Service) | Handles rule engine and connects to Postgres |
 | PostgreSQL | Render (managed DB)| Automated daily backups; SSL enforced; pgBouncer connection pooling |
-| Gotenberg | Render (Docker) | Private Web Service; internal URL only; `restart: always` |
 | File storage | PostgreSQL Base | Stored as bytea blob natively in the app database |
 | Auth | Clerk | Org creation = tenant onboarding; JWKS endpoint auto-configured |
 | Email | Resend | Verified sender domain required before Phase 3 go-live |
@@ -715,12 +709,12 @@ volumes:
 - [ ] Set up `docker-compose.yml` for local development
 - [ ] Confirm `APPROVER_EMAIL` value with Jeff / Jay Choy
 - [ ] Obtain sample datasets: NPE site CSV and CAG site CSV for dry-run tests
-- [ ] Test Gotenberg with a sample HTML report template — verify PDF output quality
+- [ ] Test WeasyPrint with a sample HTML report template — verify PDF output quality
 
 ### 10.2 Before Phase 3 Gate
 
 - [ ] Set up Clerk account; create organisation structure matching FJ customer list
-- [ ] Configure Render production environment (managed DB, Gotenberg service, cron)
+- [ ] Configure Render production environment (managed DB, cron)
 - [ ] Complete Clerk middleware integration (`middleware.ts`)
 - [ ] Conduct penetration test for tenant isolation (AC-D15)
 - [ ] Obtain legal/medical disclaimer wording approval — Jay Choy sign-off (AC-D16)
@@ -746,7 +740,8 @@ volumes:
 | 2 | FJDashboard PSD-02 v0.2 | `FJDashboard_PSD.md` (2026-04-12) |
 | 3 | Next.js App Router docs | https://nextjs.org/docs/app |
 | 4 | Prisma docs | https://www.prisma.io/docs |
-| 5 | Gotenberg docs | https://gotenberg.dev |
+| 5 | WeasyPrint docs | https://weasyprint.org/ |
 | 6 | Clerk Next.js docs | https://clerk.com/docs/nextjs |
-| 8 | Recharts docs | https://recharts.org |
-| 9 | TanStack Table docs | https://tanstack.com/table |
+| 7 | Shadcn UI docs | https://ui.shadcn.com |
+| 8 | Tremor docs | https://tremor.so |
+| 9 | TanStack Query docs | https://tanstack.com/query/latest |
