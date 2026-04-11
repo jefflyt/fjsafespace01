@@ -100,7 +100,7 @@
 | **Backend Language**| Python | 3.12+ | Pydantic data validation |
 | **Frontend Language**| TypeScript | 5.x | End-to-end type safety |
 | **ORM** | SQLModel | 0.x | SQLAlchemy wrapper |
-| **Database** | PostgreSQL | 16.x | Render managed DB |
+| **Database** | Supabase | 15.x | Managed PostgreSQL platform with AI MCP support |
 | **File storage** | PostgreSQL `bytea` | — | Direct DB binary storage (Lean MVP) |
 | **PDF generation** | WeasyPrint | 62.x | Native Python HTML→PDF rendering library |
 | **Auth (Phase 1/2)** | None | — | Internal laptop only; no login |
@@ -648,7 +648,7 @@ backend/
 |---|---|
 | Next.js app | `pnpm run dev` (localhost:3000) |
 | FastAPI Backend | `fastapi dev backend/app/main.py` (localhost:8000) |
-| PostgreSQL | Docker (`docker-compose up`) or Render free tier |
+| PostgreSQL | Supabase Local Dev (`supabase start`) or Docker |
 | Environment | `.env` (Backend) & `.env.local` (Frontend) |
 | Migrations | `alembic upgrade head` |
 
@@ -677,7 +677,7 @@ volumes:
 |---|---|---|
 | Next.js Frontend | Vercel | Auto-deploy on push to `main` |
 | FastAPI Backend | Render (Web Service) | Handles rule engine and connects to Postgres |
-| PostgreSQL | Render (managed DB)| Automated daily backups; SSL enforced; pgBouncer connection pooling |
+| Supabase | Supabase (managed DB) | Automated daily backups; SSL enforced; pgBouncer connection pooling |
 | File storage | PostgreSQL Base | Stored as bytea blob natively in the app database |
 | Auth | Clerk | Org creation = tenant onboarding; JWKS endpoint auto-configured |
 | Email | Resend | Verified sender domain required before Phase 3 go-live |
