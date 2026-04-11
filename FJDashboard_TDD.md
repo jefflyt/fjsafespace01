@@ -27,9 +27,9 @@
 
 ### 1.1 Architecture Style
 
-- **Full-stack Next.js** (App Router) with server-side rendering and React Server Components.
-- No separate backend service — all business logic lives in Next.js Route Handlers and Server Actions.
-- Database access via **Prisma ORM** connected to managed PostgreSQL on Render.
+- **Decoupled Architecture**: Next.js App Router for frontend UI, connecting to a separate Python backend.
+- **FastAPI Backend**: Handles all business logic, CSV parsing, rule evaluation, and PDF orchestration.
+- **Database access via SQLModel** (Python ORM based on SQLAlchemy) connected to managed PostgreSQL on Render.
 - All processing is **synchronous**. No background job queue.
 
 ### 1.2 Component Diagram
@@ -39,12 +39,16 @@
         │
         ▼
 [Next.js App on Vercel]
-  ├── Route Handlers (/api/*)        ← business logic, Prisma queries
-  ├── Server Components              ← SSR for dashboard views
-  └── Client Components             ← interactive tables, charts, forms
-        │
-        ▼
-[PostgreSQL on Render] ←── Prisma ORM
+  ├── Frontend UI (App Router)
+  └── Fetches from API
+
+[FastAPI Backend on Render]
+  ├── REST Endpoints (/api/*)        
+  ├── Parse & Validation Service (Pydantic)
+  ├── Rule Evaluation Service
+  └── PDF Orchestration
+          ↓
+[PostgreSQL on Render] ←── SQLModel / SQLAlchemy
         │
         ├──▶ [Rulebook DB tables]    (read-only from dashboard services)
         └──▶ [Findings / Reports tables]
@@ -59,8 +63,8 @@
 [Report Generation]
   └──▶ POST /api/reports/generate
         ├── compose HTML from findings
-        ├── POST to Gotenberg → PDF bytes
-        ├── upload PDF to Cloudflare R2
+        ├── HTML→PDF via Gotenberg
+        ├── store PDF binary in PostgreSQL (`bytea`)
         ├── store Report record in DB
         └── return download URL
 
@@ -91,15 +95,17 @@
 
 | Layer | Technology | Version | Notes |
 |---|---|---|---|
-| **Architecture** | Next.js App Router | 15.x | Full-stack; SSR + API in one app |
-| **Language** | TypeScript | 5.x | End-to-end type safety |
-| **ORM** | Prisma | 5.x | Schema-first; auto-migrations |
+| **Backend API** | FastAPI | 0.x | Ultra-fast Python framework |
+| **Frontend UI** | Next.js App Router| 15.x | React Server Components |
+| **Backend Language**| Python | 3.12+ | Pydantic data validation |
+| **Frontend Language**| TypeScript | 5.x | End-to-end type safety |
+| **ORM** | SQLModel | 0.x | SQLAlchemy wrapper |
 | **Database** | PostgreSQL | 16.x | Render managed DB |
-| **File storage** | Cloudflare R2 | — | S3-compatible; zero egress fees |
+| **File storage** | PostgreSQL `bytea` | — | Direct DB binary storage (Lean MVP) |
 | **PDF generation** | Gotenberg | 8.x | Docker sidecar; HTML→PDF via HTTP API |
 | **Auth (Phase 1/2)** | None | — | Internal laptop only; no login |
 | **Auth (Phase 3)** | Clerk | 5.x | Org = tenant; JWT; Next.js middleware native |
-| **Email notifications** | SendGrid | — | In-app via Notification DB table + polling |
+| **Email notifications** | Resend | — | In-app via Notification DB table + polling |
 | **Charts** | Recharts | 2.x | Trend sparklines; time-series charts |
 | **Styling** | Tailwind CSS | 3.x | Utility-first; dark/light mode |
 | **Deployment (Phase 1/2)** | localhost | — | `npm run dev` on analyst machine |
@@ -109,11 +115,11 @@
 
 ## 3. Database Schema
 
-> All tables use UUID primary keys. Timestamps are UTC ISO8601. Migrations managed by Prisma Migrate.
+> All tables use UUID primary keys. Timestamps are UTC ISO8601. Migrations managed by Alembic.
 
 ### 3.1 Enums
 
-```prisma
+```python
 enum ParseStatus        { PENDING PROCESSING COMPLETE FAILED }
 enum ParseOutcome       { PASS PASS_WITH_WARNINGS FAIL }
 enum MetricName         { co2_ppm pm25_ugm3 tvoc_ppb temperature_c humidity_rh }
@@ -125,7 +131,7 @@ enum ReviewerStatus     { DRAFT_GENERATED IN_REVIEW REVISION_REQUIRED APPROVED E
 
 ### 3.2 Workflow B Tables (Scan → Report)
 
-```prisma
+```python
 model Site {
   id        String    @id @default(uuid())
   name      String
@@ -203,7 +209,7 @@ model Report {
   reviewerName       String?
   reviewerStatus     ReviewerStatus @default(DRAFT_GENERATED)
   reviewerApprovedAt DateTime?
-  pdfStorageKey      String?        // Cloudflare R2 object key
+  pdfBinaryData      LargeBinary?   // Stored directly as bytea in PostgreSQL
   generatedAt        DateTime       @default(now())
 
   upload Upload @relation(fields: [uploadId], references: [id])
@@ -213,7 +219,7 @@ model Report {
 
 ### 3.3 Workflow A Tables (Reference Vault → Rulebook)
 
-```prisma
+```python
 model ReferenceSource {
   id                       String    @id @default(uuid())
   title                    String
@@ -279,7 +285,7 @@ model RulebookEntry {
 
 ### 3.4 Supporting Tables
 
-```prisma
+```python
 model Tenant {
   id                   String    @id @default(uuid())
   tenantName           String
@@ -311,7 +317,7 @@ model Notification {
 
 ---
 
-## 4. API Contract Design (Next.js Route Handlers)
+## 4. API Contract Design (FastAPI Endpoints)
 
 > All routes live under `/app/api/`. Responses are JSON unless noted.
 > **Phase 1/2:** No auth headers required.
@@ -371,7 +377,7 @@ POST /api/reports/generate
     2. Validate QA gates — fail fast on first violation
     3. Compose HTML report from template
     4. POST HTML to Gotenberg → receive PDF bytes
-    5. Upload PDF to Cloudflare R2 → store object key
+    5. Save PDF bytes to Report.pdfBinaryData in PostgreSQL
     6. Write Report record to DB
   Returns 200: { reportId, status: "DRAFT_GENERATED", previewUrl }
   Returns 422: { gate, message } for each failed QA gate
@@ -391,7 +397,7 @@ PATCH /api/reports/[id]/status
   Returns 200: updated report
 
 GET /api/reports/[id]/export
-  Returns: PDF stream from Cloudflare R2  (Content-Type: application/pdf)
+  Returns: PDF stream from PostgreSQL `bytea` (Content-Type: application/pdf)
 ```
 
 ### 4.6 Rulebook Routes (Read-Only)
@@ -436,7 +442,7 @@ Applied in `POST /api/reports/generate` before any processing begins:
 
 ## 5. Frontend Architecture
 
-### 5.1 App Router Directory Structure
+### 5.1 Next.js Frontend Structure (app directory)
 
 ```
 app/
@@ -462,26 +468,26 @@ app/
 │   ├── page.tsx                        ← Customer portal home
 │   └── status/page.tsx                 ← FJ SafeSpace Wellness Index + certification status
 │
-└── api/
-    ├── uploads/route.ts
-    ├── uploads/[id]/route.ts
-    ├── uploads/[id]/findings/route.ts
-    ├── dashboard/sites/route.ts
-    ├── dashboard/sites/[id]/zones/route.ts
-    ├── dashboard/comparison/route.ts
-    ├── dashboard/summary/route.ts
-    ├── reports/generate/route.ts
-    ├── reports/[id]/route.ts
-    ├── reports/[id]/status/route.ts
-    ├── reports/[id]/export/route.ts
-    ├── rulebook/rules/route.ts
-    ├── rulebook/rules/[id]/route.ts
-    ├── rulebook/sources/route.ts
-    ├── notifications/route.ts
-    └── notifications/[id]/read/route.ts
+└── lib/
+    ├── api.ts                          ← Fetch client for FastAPI backend
+    └── components/                     ← Shared React components
+
+### 5.2 FastAPI Backend Structure (Python)
+
+```
+backend/
+├── app/
+│   ├── main.py                         ← FastAPI application instance
+│   ├── api/
+│   │   ├── routers/                    ← Endpoints (uploads, dashboard, reports, rulebook)
+│   │   └── dependencies.py             ← Auth checks, DB session yielding
+│   ├── services/                       ← Pydantic parsers, rule engine, PDF orchestrator
+│   ├── models/                         ← SQLModel definitions (DB tables)
+│   ├── core/                           ← Config, env variables
+│   └── database.py                     ← SQLAlchemy engine configuration
 ```
 
-### 5.2 Key UI Components
+### 5.3 Key UI Components
 
 | Component | Location | Purpose |
 |---|---|---|
@@ -497,7 +503,7 @@ app/
 | `ReportPreview` | `components/analyst/` | Rendered report sections; approval action button |
 | `NotificationBell` | `components/shared/` | Unread count badge + dropdown list |
 
-### 5.3 Colour Coding
+### 5.4 Colour Coding
 
 **FJ SafeSpace Wellness Index / Certification Outcome:**
 
@@ -523,9 +529,9 @@ app/
 
 ### 6.1 Phase 1/2 — No Authentication
 
-- Application runs on analyst's internal laptop (`localhost:3000`).
+- Application runs on analyst's internal laptop (Next.js on 3000, FastAPI on 8000).
 - **No login page, no session, no JWT.**
-- All API routes are open — no auth middleware.
+- All FastAPI routes are open — no auth middleware.
 - Not deployed to the internet. No customer network access in Phase 1/2.
 - Rulebook mutations blocked at DB permission level (app DB role: `SELECT` only on rulebook tables).
 
@@ -533,14 +539,14 @@ app/
 
 - Clerk middleware defined in `middleware.ts` at project root — protects `/customer/*` routes.
 - **Clerk Organisation = Tenant** (one org per customer).
-- JWT contains: `userId`, `orgId` (= `tenantId`), `role` (`executive|ops|analyst|customer`).
-- All customer-scoped DB queries include `WHERE tenantId = clerkOrgId` via Prisma — cross-tenant access is impossible by design.
+- clerk org ID passed to FastAPI from Next.js via signed JWT.
+- All customer-scoped DB queries include `WHERE tenant_id == clerkOrgId` via SQLModel — cross-tenant access is impossible by design.
 - `tenant_id` sourced from JWT only — never from the request body.
 
 ### 6.3 Approval Role Enforcement (All Phases)
 
 - Jay Choy's approver identity stored in environment variable: `APPROVER_EMAIL`.
-- `PATCH /api/reports/[id]/status → APPROVED` validates reviewer matches `APPROVER_EMAIL`.
+- `PATCH /api/reports/[id]/status → APPROVED` calculates and validates reviewer matches `APPROVER_EMAIL`.
 - Phase 1/2: checked against manually entered reviewer name in UI.
 - Phase 3: checked against Clerk `userId` of signed-in user.
 
@@ -566,7 +572,7 @@ app/
 
 ### 7.2 Email Notifications
 
-- Provider: SendGrid (`SENDGRID_API_KEY` in environment).
+- Provider: Resend (`RESEND_API_KEY` in environment).
 - Triggered synchronously from Route Handlers at the point of event.
 - HTML templates stored in `/lib/email-templates/`.
 
@@ -581,7 +587,7 @@ app/
 
 ## 8. Testing Strategy
 
-### 8.1 Unit Tests (Jest + Testing Library)
+### 8.1 Backend Unit Tests (PyTest) & Frontend Unit Tests (Jest)
 
 | Test | Description |
 |---|---|
@@ -600,7 +606,7 @@ app/
 | Rulebook read-only | `PUT/POST/DELETE /api/rulebook/*` returns `405` |
 | Report QA gate block | `POST /api/reports/generate` returns `422` when a QA gate rule is violated |
 | Gotenberg integration | `POST` to Gotenberg with test HTML returns valid PDF bytes |
-| R2 upload | PDF uploaded to Cloudflare R2; key stored in `Report.pdfStorageKey` |
+| PDF Storage | PDF bytes successfully saved to `Report.pdfBinaryData` |
 
 ### 8.3 QA Gate Automation (CI)
 
@@ -640,10 +646,11 @@ app/
 | Component | Setup |
 |---|---|
 | Next.js app | `npm run dev` (localhost:3000) |
+| FastAPI Backend | `fastapi dev backend/app/main.py` (localhost:8000) |
 | PostgreSQL | Docker (`docker-compose up`) or Render free tier |
 | Gotenberg | `docker run -p 3001:3001 gotenberg/gotenberg:8` |
-| Environment | `.env.local` — see §9.4 |
-| Migrations | `npx prisma migrate dev` |
+| Environment | `.env` (Backend) & `.env.local` (Frontend) |
+| Migrations | `alembic upgrade head` |
 
 ### 9.2 docker-compose.yml
 
@@ -673,25 +680,21 @@ volumes:
 
 | Component | Provider | Notes |
 |---|---|---|
-| Next.js app | Vercel | Auto-deploy on push to `main`; env vars in Vercel dashboard |
-| PostgreSQL | Render (managed) | Automated daily backups; SSL enforced; pgBouncer connection pooling |
+| Next.js Frontend | Vercel | Auto-deploy on push to `main` |
+| FastAPI Backend | Render (Web Service) | Handles rule engine and connects to Postgres |
+| PostgreSQL | Render (managed DB)| Automated daily backups; SSL enforced; pgBouncer connection pooling |
 | Gotenberg | Render (Docker) | Private Web Service; internal URL only; `restart: always` |
-| File storage | Cloudflare R2 | Bucket policy: private; zero egress fees |
+| File storage | PostgreSQL Base | Stored as bytea blob natively in the app database |
 | Auth | Clerk | Org creation = tenant onboarding; JWKS endpoint auto-configured |
-| Email | SendGrid | Verified sender domain required before Phase 3 go-live |
+| Email | Resend | Verified sender domain required before Phase 3 go-live |
 
 ### 9.4 Environment Variables
 
 | Variable | Ph 1/2 | Ph 3 | Description |
 |---|---|---|---|
-| `DATABASE_URL` | ✅ | ✅ | Prisma connection (app role — read/write except rulebook) |
+| `DATABASE_URL` | ✅ | ✅ | DB connection string for SQLAlchemy |
 | `ADMIN_DATABASE_URL` | ✅ | ✅ | Workflow A admin DB role (full rulebook access) |
-| `R2_ACCOUNT_ID` | ✅ | ✅ | Cloudflare R2 account ID |
-| `R2_ACCESS_KEY_ID` | ✅ | ✅ | Cloudflare R2 access key |
-| `R2_SECRET_ACCESS_KEY` | ✅ | ✅ | Cloudflare R2 secret |
-| `R2_BUCKET_NAME` | ✅ | ✅ | Cloudflare R2 bucket name |
-| `GOTENBERG_URL` | ✅ | ✅ | `http://localhost:3001` (local) or internal Render URL (prod) |
-| `SENDGRID_API_KEY` | ✅ | ✅ | Email dispatch |
+| `RESEND_API_KEY` | ✅ | ✅ | Email dispatch via Resend |
 | `APPROVER_EMAIL` | ✅ | ✅ | Jay Choy's email — enforced in report approval gate |
 | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | ❌ | ✅ | Clerk publishable key |
 | `CLERK_SECRET_KEY` | ❌ | ✅ | Clerk secret key |
@@ -708,9 +711,8 @@ volumes:
 
 ### 10.1 Before Development Starts
 
-- [ ] Finalise `/prisma/schema.prisma` and run initial migration
+- [ ] Finalise SQLModel models and generate initial Alembic migration
 - [ ] Set up `docker-compose.yml` for local development
-- [ ] Configure Cloudflare R2 bucket and access keys
 - [ ] Confirm `APPROVER_EMAIL` value with Jeff / Jay Choy
 - [ ] Obtain sample datasets: NPE site CSV and CAG site CSV for dry-run tests
 - [ ] Test Gotenberg with a sample HTML report template — verify PDF output quality
@@ -722,7 +724,7 @@ volumes:
 - [ ] Complete Clerk middleware integration (`middleware.ts`)
 - [ ] Conduct penetration test for tenant isolation (AC-D15)
 - [ ] Obtain legal/medical disclaimer wording approval — Jay Choy sign-off (AC-D16)
-- [ ] Verify SendGrid sender domain for production email delivery
+- [ ] Verify Resend sender domain for production email delivery
 
 ### 10.3 FJ Differentiation Requirements — Code-Level Verification
 
@@ -746,6 +748,5 @@ volumes:
 | 4 | Prisma docs | https://www.prisma.io/docs |
 | 5 | Gotenberg docs | https://gotenberg.dev |
 | 6 | Clerk Next.js docs | https://clerk.com/docs/nextjs |
-| 7 | Cloudflare R2 docs | https://developers.cloudflare.com/r2 |
 | 8 | Recharts docs | https://recharts.org |
 | 9 | TanStack Table docs | https://tanstack.com/table |

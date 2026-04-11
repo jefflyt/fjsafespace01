@@ -15,13 +15,13 @@
 
 | Decision | Value |
 |---|---|
-| Architecture | Full-stack Next.js (no separate backend) with Prisma ORM |
+| Architecture | Decoupled: Python FastAPI Backend (SQLModel/SQLAlchemy) + Next.js Frontend |
 | Database | PostgreSQL on Render |
 | File storage | Cloudflare R2 |
 | Auth | No auth for Phase 1/2 (internal laptop only). Clerk for Phase 3. |
 | Background jobs | None — synchronous processing throughout |
 | PDF generation | Gotenberg (open-source Docker microservice) |
-| Hosting | Vercel (frontend) + Render (PostgreSQL) + Cloudflare R2 (files) |
+| Hosting | Vercel (frontend) + Render (FastAPI + PostgreSQL) + Cloudflare R2 (files) |
 
 ---
 

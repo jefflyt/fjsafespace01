@@ -1,0 +1,24 @@
+# FJ SafeSpace — Global AI Coding Instructions
+
+## Core Mandate: Phase 1 is PRODUCTION READY
+**CRITICAL:** Phase 1 is officially considered an MVP, but it is **not** a throwaway "Proof of Concept." It must be deployed and treated as **Production Ready** from day one. 
+
+When generating code, scaffolding architecture, or making design choices for this project, you must rigidly enforce the following rules:
+
+### 1. Robust Architecture & Code Quality
+*   **No "Quick Hacks":** Never write placeholder, shortcut, or throwaway code with the assumption that it will be "fixed in Phase 2."
+*   **Data Integrity:** All Python backend endpoints must use strict `Pydantic` models for request/response validation. Never trust raw inputs.
+*   **Migrations:** Database schemas must be cleanly defined in `SQLModel`. Any schema change must be accompanied by an atomic `Alembic` migration script.
+*   **Error Handling:** Implement strict error trapping and descriptive, standardized JSON error responses. Provide clear HTTP status codes (`422 Unprocessable Entity` for rule violations, `403` for bad governance, etc).
+
+### 2. Security Defaults
+*   **No Hardcoded Secrets:** Never hardcode credentials, test emails, or API keys. Always use `.env` loading methodologies (e.g., `pydantic-settings`).
+*   **Production Safe:** Write database queries using ORM methods that prevent SQL injection natively.
+
+### 3. Premium UI / UX
+*   **Excellence from V1:** The frontend interface must look premium, modern, and trustworthy. Do not use plain, "MVP-style" basic HTML blocks.
+*   **Component Implementation:** Utilize modern typography, cohesive color palettes, and polished UI component libraries (like Shadcn UI + Tailwind CSS).
+
+### 4. Testing & Reliability
+*   Tests are not optional. Write `PyTest` coverage for backend logical pipelines (specifically the Rulebook rule-evaluator) and `Jest` tests for critical UI components.
+*   Code should only be offered to the user if it has been considered against production scaling, state management, and edge-handling (e.g., what happens if Gotenberg fails to generate the PDF?).
