@@ -313,7 +313,7 @@ The FJDashboard product release is **complete only after Jay Choy sign-off** on:
 
 *Derived from FJ SafeSpace PRD v0.4 (2026-03-30) and Product Excellence Addendum (Section 25, 2026-04-11). Parent document remains the authoritative source for platform-wide governance, certification policy, and data model definitions.*
 
-**Locked stack decisions (2026-04-12):** Decoupled Stack (Option A) — FastAPI backend + Next.js frontend. No auth for Phase 1/2 (internal laptop only). No background job processing — synchronous upload/report pipeline. Auth deferred to Phase 3 (Clerk). PDF generation via WeasyPrint. Hosting: Vercel (frontend) + Render (backend) + Supabase (database).*
+**Locked stack decisions (2026-04-12):** Decoupled Stack (Option A) — FastAPI backend + Next.js frontend. No auth for Phase 1/2 (internal laptop only). No background job processing — synchronous upload/report pipeline. Auth deferred to Phase 3 (Clerk). PDF generation via WeasyPrint. Hosting: Vercel (frontend) + Render (backend) + Supabase (database & storage).
 
 ---
 

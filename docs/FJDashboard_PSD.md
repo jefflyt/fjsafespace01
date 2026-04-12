@@ -17,7 +17,7 @@
 |---|---|
 | Architecture | Decoupled: Python FastAPI Backend (SQLModel/SQLAlchemy) + Next.js Frontend |
 | Database | Supabase (PostgreSQL) |
-| File storage | Cloudflare R2 |
+| File storage | Supabase Storage |
 | Auth | No auth for Phase 1/2 (internal laptop only). Clerk for Phase 3. |
 | Background jobs | None — synchronous processing throughout |
 | PDF generation | WeasyPrint (Native Python HTML-to-PDF library) |
