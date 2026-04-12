@@ -1,3 +1,5 @@
+import React from "react"
+
 export default function FindingsPanelPage() {
   return (
     <div className="space-y-6">

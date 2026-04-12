@@ -1,3 +1,5 @@
+import React from "react"
+
 export default function AnalystOverviewPage() {
   return (
     <div className="space-y-6">
