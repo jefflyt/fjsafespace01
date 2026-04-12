@@ -3,7 +3,13 @@
 ## Core Mandate: Phase 1 is PRODUCTION READY
 **CRITICAL:** Phase 1 is officially considered an MVP, but it is **not** a throwaway "Proof of Concept." It must be deployed and treated as **Production Ready** from day one. 
 
-When generating code, scaffolding architecture, or making design choices for this project, you must rigidly enforce the following rules:
+When generating code, scaffolding architecture, or making design choices for this project, you must rigidly enforce the following rules and refer to the **'fjdashboard_architecture' Knowledge Item** as the primary source of truth:
+
+### 0. Technical Stack & Architecture
+*   **Decoupled Stack:** Backend (FastAPI + SQLModel, Port 8000) and Frontend (Next.js 15 App Router, Port 3000).
+*   **Database:** PostgreSQL is the only persistent store. No external blob storage (S3/R2) is allowed—store all files (CSVs, PDFs) as `bytea`.
+*   **Workflow Separation:** Workflow A (Admin/Rulebook Governance) is distinct from Workflow B (Analyst/Operational Uploads).
+
 
 ### 1. Robust Architecture & Code Quality
 *   **No "Quick Hacks":** Never write placeholder, shortcut, or throwaway code with the assumption that it will be "fixed in Phase 2."
@@ -21,4 +27,7 @@ When generating code, scaffolding architecture, or making design choices for thi
 
 ### 4. Testing & Reliability
 *   Tests are not optional. Write `PyTest` coverage for backend logical pipelines (specifically the Rulebook rule-evaluator) and `Jest` tests for critical UI components.
-*   Code should only be offered to the user if it has been considered against production scaling, state management, and edge-handling (e.g., what happens if Gotenberg fails to generate the PDF?).
+### 5. Governance & Documentation
+*   **Refer to KI:** Always check for updated context in the `fjdashboard_architecture` Knowledge Item before suggesting structural changes.
+*   **Documentation Alignment:** All code must align with the `PRD`, `PSD`, and `TDD` located in `./docs`.
+*   **Sign-off:** Any change affecting certification calculations or IAQ thresholds must be explicitly flagged for sign-off by Jay Choy.
