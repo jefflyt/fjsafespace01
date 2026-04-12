@@ -75,10 +75,11 @@ Without this layer, operational efficiency and executive confidence are limited,
 - Daily summary card: top 3 risks, top 3 actions, verification due date
 - Report version history and comparison view (Phase 2)
 - Customer portal certification status view (Phase 3, post-gate)
+- **Two report product types:** Assessment Report and Intervention Impact Report (both produced from a single scan; type determines report framing and PDF template)
 
 ### Out of Scope (current cycle)
 - In-app ticketing, alert lifecycle management, and action owner tracking
-- Intervention Tracker UI (before/after comparison tools)
+- Real-time Intervention Tracker UI — the Intervention Impact Report is a single-scan product; before/after comparison tools across multiple scans are deferred to Phase 2
 - Non-IAQ parameters outside current certification scope
 - Any feature that removes or weakens rule/citation governance controls
 - Customer self-service report editing
@@ -112,6 +113,9 @@ Without this layer, operational efficiency and executive confidence are limited,
 | FR-D5 | Report builder status (draft / under review / approved) is visible in analyst dashboard. |
 | FR-D6 | Reviewer QA checklist is accessible and completion-gated before report approval. |
 | FR-D7 | All findings displayed include `rule_version` and `citation_id` — non-negotiable. |
+| FR-D20 | Analyst selects report type (Assessment or Intervention Impact) when initiating report generation from a completed upload. |
+| FR-D21 | Report type is stored on the Report record and determines which PDF template is rendered — both types follow the same single-scan upload pipeline. |
+| FR-D22 | Report type chip (`Assessment` / `Intervention Impact`) is visible on all report list views and the report detail page. |
 
 ### Phase 2 — Internal Dashboard v2 (FJ Executive Portfolio)
 
@@ -393,11 +397,15 @@ Steps:
 2. Validate and normalise readings.
 3. Evaluate against current approved Rulebook only.
 4. Generate findings, actions, and citations.
-5. Reviewer QA and sign-off.
-6. Export final report with audit metadata.
+5. **Select report type** — Assessment (current IAQ state) or Intervention Impact (IAQ state after changes have been implemented). Both types use the same single-scan pipeline; the type determines which PDF template and framing is applied.
+6. Reviewer QA and sign-off.
+7. Export final report with audit metadata.
+
+> **Report type branching:** Both `ASSESSMENT` and `INTERVENTION_IMPACT` reports follow an identical upload → findings → QA → generation pipeline. The `reportType` label is set at generation time and governs PDF template selection only. Phase 2 continuous API ingestion may introduce multi-scan comparison capabilities; this is deferred.
 
 Outputs:
-- Customer report
+- Customer report (Assessment or Intervention Impact)
+- Report type label
 - Rulebook version used
 - Citation IDs used
 - Reviewer sign-off record

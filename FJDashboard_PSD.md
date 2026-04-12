@@ -62,6 +62,7 @@ Deliver the dashboard layer of FJ SafeSpace that converts approved, rule-based f
 - Report version history and status tracking
 - Trend visualisation per parameter
 - Source currency status badges on all certification-related views
+- **Two report product types:** Assessment Report and Intervention Impact Report — each produced from a single scan; `reportType` determines report framing and PDF template
 - Customer portal: certification status summary, Verification Summary, Certificate, Entrance Decal, renewal prompt (Phase 3)
 
 ### Out of Scope
@@ -71,7 +72,7 @@ Deliver the dashboard layer of FJ SafeSpace that converts approved, rule-based f
 - Customer self-service report editing
 - BMS/IoT control automation
 - Alert queue management, ticket assignment, and action due dates
-- Intervention tracking module (before/after snapshots)
+- Real-time Intervention Tracker UI — multi-scan before/after comparison tools are deferred to Phase 2; the Intervention Impact Report is a single-scan product
 - Live uHoo API ingestion before Phase 3 API feasibility sprint is complete
 
 ---
@@ -85,8 +86,13 @@ Upload → Parse + Validate → Rule Evaluation → Findings Stored
   → Dashboard Analyst View
       ├── Upload queue status
       ├── Findings panel with citation badges
-      ├── Report status
-      └── QA checklist gate
+      ├── Report Draft Builder
+      │     ├── [Select Report Type: Assessment | Intervention Impact]
+      │     │     Assessment          → current IAQ state framing
+      │     │     Intervention Impact → post-change contextual framing
+      │     ├── QA checklist gate
+      │     └── Reviewer approval → PDF generation → Export
+      └── Report status + ReportTypeBadge chip
 ```
 
 ### Phase 2 Workflow (Internal Dashboard)
@@ -220,6 +226,11 @@ Per-metric row: `Metric Name | Current Value | Unit | Threshold Band | Rule Inte
 
 **C) Report Draft Builder**
 
+- **Report Type selector** (shown at report initiation, before generation): `Assessment` / `Intervention Impact`
+  - `Assessment` — frames report as a point-in-time current IAQ state report
+  - `Intervention Impact` — frames report as a post-change IAQ check after remediation actions have been implemented
+- Report type is stored on the Report record and cannot be changed after generation
+- **ReportTypeBadge chip** displayed on report status card: `Assessment` (neutral) or `Intervention Impact` (accented)
 - Report status chip: `draft_generated | in_review | revision_required | approved | exported`
 - Approval button **disabled** until all QA checklist items are confirmed:
 
@@ -343,6 +354,10 @@ Per-metric row: `Metric Name | Current Value | Unit | Threshold Band | Rule Inte
 | Reviewer identity check | Non-Jay-Choy reviewer cannot approve certification outcome; QA-G8 blocks |
 | Renewal prompt | In-app + email dispatched at 30-day renewal window |
 | Data quality statement absent | Report release blocked by QA-G4 |
+| Assessment report generation | Upload → select `Assessment` → `reportType = ASSESSMENT` stored; PDF renders standard current-state template |
+| Intervention Impact report generation | Upload → select `Intervention Impact` → `reportType = INTERVENTION_IMPACT` stored; PDF renders post-change contextual framing template |
+| Report type persisted | `GET /api/reports/[id]` returns correct `reportType` matching the type selected at generation |
+| Report type badge visible | Report list and report detail page display correct `ReportTypeBadge` chip for each report |
 
 ---
 

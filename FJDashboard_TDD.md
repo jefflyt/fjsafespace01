@@ -128,7 +128,10 @@ enum ThresholdBand      { GOOD WATCH CRITICAL }
 enum ConfidenceLevel    { HIGH MEDIUM LOW }
 enum BenchmarkLane      { FJ_SAFESPACE }
 enum ReviewerStatus     { DRAFT_GENERATED IN_REVIEW REVISION_REQUIRED APPROVED EXPORTED }
+enum ReportType         { ASSESSMENT INTERVENTION_IMPACT }
 ```
+
+> `ReportType` determines how the report is **framed and templated** — both types follow the same single-scan upload pipeline. `ASSESSMENT` reports the current IAQ state. `INTERVENTION_IMPACT` reports IAQ state after changes have been implemented, using a post-change contextual framing in the PDF output.
 
 ### 3.2 Workflow B Tables (Scan → Report)
 
@@ -202,6 +205,7 @@ model Finding {
 
 model Report {
   id                 String         @id @default(uuid())
+  reportType         ReportType     @default(ASSESSMENT)  // ASSESSMENT | INTERVENTION_IMPACT
   uploadId           String         @unique
   siteId             String
   reportVersion      Int            @default(1)
@@ -372,19 +376,24 @@ GET /api/dashboard/summary
 
 ```
 POST /api/reports/generate
-  Body: { uploadId }
+  Body: {
+    uploadId: string
+    reportType: "ASSESSMENT" | "INTERVENTION_IMPACT"   // defaults to ASSESSMENT
+  }
   Processing (synchronous):
     1. Fetch findings for upload
     2. Validate QA gates — fail fast on first violation
-    3. Compose HTML report from template
+    3. Select HTML template based on reportType:
+       - ASSESSMENT          → standard current-state IAQ template
+       - INTERVENTION_IMPACT → post-change contextual framing template
     4. Render HTML to PDF via WeasyPrint library
     5. Save PDF bytes to Report.pdfBinaryData in PostgreSQL
-    6. Write Report record to DB
-  Returns 200: { reportId, status: "DRAFT_GENERATED", previewUrl }
+    6. Write Report record with reportType to DB
+  Returns 200: { reportId, reportType, status: "DRAFT_GENERATED", previewUrl }
   Returns 422: { gate, message } for each failed QA gate
 
 GET /api/reports/[id]
-  Returns: { reportId, siteId, reportVersion, ruleVersionUsed,
+  Returns: { reportId, reportType, siteId, reportVersion, ruleVersionUsed,
              citationIdsUsed[], reviewerStatus, generatedAt }
 
 PATCH /api/reports/[id]/status
@@ -500,8 +509,9 @@ backend/
 | `QAChecklist` | `components/analyst/` | Gated checklist — blocks approval button until all items checked |
 | `DailySummaryCard` | `components/dashboard/` | Top 3 risks + actions + next verification date |
 | `TrendChart` | `components/shared/` | Tremor / Shadcn chart — pre/post intervention comparison |
-| `UploadForm` | `components/analyst/` | CSV file input + site selector + parse result display |
-| `ReportPreview` | `components/analyst/` | Rendered report sections; approval action button |
+| `UploadForm` | `components/analyst/` | CSV file input + site selector + **report type selector** (Assessment / Intervention Impact) + parse result display |
+| `ReportPreview` | `components/analyst/` | Rendered report sections; approval action button; **template is type-aware** — renders Assessment or Intervention Impact layout based on `reportType` |
+| `ReportTypeBadge` | `components/shared/` | **NEW** — small chip showing `Assessment` or `Intervention Impact` on report list cards and report detail page |
 | `NotificationBell` | `components/shared/` | Unread count badge + dropdown list |
 
 ### 5.4 Colour Coding
