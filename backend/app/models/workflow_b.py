@@ -152,8 +152,8 @@ class Report(SQLModel, table=True):
     reviewer_name: Optional[str] = None
     reviewer_status: ReviewerStatus = Field(default=ReviewerStatus.DRAFT_GENERATED)
     reviewer_approved_at: Optional[datetime] = None
-    # PDF stored as raw bytes in PostgreSQL — no external file storage
-    pdf_binary_data: Optional[bytes] = None
+    # PDF stored in Supabase Storage; URL saved here
+    pdf_url: Optional[str] = None
     generated_at: datetime = Field(default_factory=datetime.utcnow)
 
     upload: Upload = Relationship(back_populates="report")

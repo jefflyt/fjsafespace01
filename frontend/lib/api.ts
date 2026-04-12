@@ -1,0 +1,40 @@
+/**
+ * frontend/lib/api.ts
+ * 
+ * Centralized fetch client for the FastAPI backend.
+ */
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
+async function fetcher<T>(endpoint: string, options?: RequestInit): Promise<T> {
+  const url = `${API_BASE_URL}${endpoint}`;
+  
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options?.headers,
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ detail: 'An error occurred' }));
+    throw new Error(error.detail || response.statusText);
+  }
+
+  return response.json();
+}
+
+export const api = {
+  get: <T>(endpoint: string, options?: RequestInit) => 
+    fetcher<T>(endpoint, { ...options, method: 'GET' }),
+  
+  post: <T>(endpoint: string, body: any, options?: RequestInit) => 
+    fetcher<T>(endpoint, { ...options, method: 'POST', body: JSON.stringify(body) }),
+  
+  patch: <T>(endpoint: string, body: any, options?: RequestInit) => 
+    fetcher<T>(endpoint, { ...options, method: 'PATCH', body: JSON.stringify(body) }),
+  
+  delete: <T>(endpoint: string, options?: RequestInit) => 
+    fetcher<T>(endpoint, { ...options, method: 'DELETE' }),
+};

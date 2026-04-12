@@ -170,7 +170,7 @@ fjsafespace01/
 | Auth (Phase 1/2) | None — internal laptop only |
 | Auth (Phase 3) | Clerk (Org = Tenant) |
 | PDF generation | WeasyPrint (native Python) |
-| File storage | Supabase Storage |
+| File storage | PostgreSQL `bytea` — no object storage |
 | Rulebook access | Read-only (`SELECT` DB role) — no dashboard service may mutate Rulebook tables |
 | Report types | `ASSESSMENT` \| `INTERVENTION_IMPACT` — same pipeline, different PDF template |
 
