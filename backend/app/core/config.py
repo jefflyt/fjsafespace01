@@ -28,6 +28,11 @@ class Settings(BaseSettings):
     # ── Email ─────────────────────────────────────────────────────────────────
     RESEND_API_KEY: str
 
+    # ── Supabase Storage ──────────────────────────────────────────────────────
+    SUPABASE_URL: str | None = None
+    SUPABASE_SERVICE_ROLE_KEY: str | None = None
+    SUPABASE_STORAGE_BUCKET: str = "iaq-scans"
+
     # ── Phase 3 — Clerk auth (optional for Phase 1/2) ─────────────────────────
     CLERK_SECRET_KEY: str | None = None
 

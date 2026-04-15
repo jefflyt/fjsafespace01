@@ -26,15 +26,30 @@ async function fetcher<T>(endpoint: string, options?: RequestInit): Promise<T> {
 }
 
 export const api = {
-  get: <T>(endpoint: string, options?: RequestInit) => 
+  get: <T>(endpoint: string, options?: RequestInit) =>
     fetcher<T>(endpoint, { ...options, method: 'GET' }),
-  
-  post: <T>(endpoint: string, body: any, options?: RequestInit) => 
+
+  post: <T>(endpoint: string, body: any, options?: RequestInit) =>
     fetcher<T>(endpoint, { ...options, method: 'POST', body: JSON.stringify(body) }),
-  
-  patch: <T>(endpoint: string, body: any, options?: RequestInit) => 
+
+  /**
+   * Upload a file using multipart/form-data.
+   * Do NOT set Content-Type header — browser will set it with the boundary.
+   */
+  upload: <T>(endpoint: string, formData: FormData, options?: RequestInit) =>
+    fetcher<T>(endpoint, {
+      ...options,
+      method: 'POST',
+      body: formData,
+      headers: {
+        // Omit Content-Type — browser sets it with boundary
+        ...options?.headers,
+      },
+    }),
+
+  patch: <T>(endpoint: string, body: any, options?: RequestInit) =>
     fetcher<T>(endpoint, { ...options, method: 'PATCH', body: JSON.stringify(body) }),
-  
-  delete: <T>(endpoint: string, options?: RequestInit) => 
+
+  delete: <T>(endpoint: string, options?: RequestInit) =>
     fetcher<T>(endpoint, { ...options, method: 'DELETE' }),
 };

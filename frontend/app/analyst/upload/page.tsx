@@ -1,17 +1,28 @@
-import React from 'react'
+"use client";
+
+import { useState } from "react";
+import { UploadForm, UploadResult } from "@/components/UploadForm";
+import { UploadQueueTable } from "@/components/UploadQueueTable";
 
 export default function UploadQueuePage() {
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const handleUploadComplete = (result: UploadResult) => {
+    // Trigger a refresh of the queue table
+    setRefreshKey((prev) => prev + 1);
+  };
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Upload Queue</h1>
         <p className="text-muted-foreground">
-          Monitor and manage your uHoo CSV data uploads.
+          Upload uHoo CSV files and monitor their processing status.
         </p>
       </div>
-      <div className="rounded-md border bg-white p-8 text-center">
-        <p className="text-sm text-muted-foreground">Upload table placeholder</p>
-      </div>
+
+      <UploadForm onUploadComplete={handleUploadComplete} />
+      <UploadQueueTable refreshTrigger={refreshKey} />
     </div>
-  )
+  );
 }
