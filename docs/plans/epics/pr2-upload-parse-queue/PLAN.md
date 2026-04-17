@@ -1,5 +1,12 @@
 # Epic Plan: PR2 - Upload & Parse Queue
 
+> **STATUS**: ✅ **COMPLETED** (17 April 2026)
+> 
+> All three sub-PRs have been fully implemented and verified in the codebase.
+> - PR 2.1: Data Models & Supabase Storage Integration ✅
+> - PR 2.2: FastAPI Upload Endpoint & CSV Parser ✅
+> - PR 2.3: Frontend Upload UI & Queue Table ✅
+
 ## 1. Feature/Epic Summary
 - **Objective**: Build the full-stack flow allowing analysts to upload IAQ CSV scans to Supabase Storage, parse them via FastAPI, and view their processing status in the dashboard.
 - **User Impact**: Analysts can ingest raw sensor data efficiently while receiving immediate visual feedback on parsing success/failure or data validation issues.

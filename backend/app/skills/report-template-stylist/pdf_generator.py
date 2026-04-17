@@ -18,7 +18,7 @@ from pathlib import Path
 from app.models.enums import ReportType
 
 # Template directory — relative to this file's package root
-TEMPLATE_DIR = Path(__file__).parent.parent / "templates"
+TEMPLATE_DIR = Path(__file__).parent / "templates"
 
 
 def render_report_to_pdf(

@@ -18,7 +18,7 @@ from io import BytesIO
 import pytest
 
 from app.models.enums import ParseOutcome
-from app.services.csv_parser import parse_csv
+from app.skills.data_ingestion.csv_parser import parse_csv
 
 
 def create_csv_bytes(content: str) -> BytesIO:

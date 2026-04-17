@@ -28,8 +28,8 @@ from sqlmodel import Session, select
 from app.api.dependencies import SessionDep
 from app.models.enums import ParseOutcome, ParseStatus
 from app.models.workflow_b import Finding, Upload
-from app.services.csv_parser import parse_csv
-from app.services.supabase_storage import SupabaseStorage, SupabaseStorageError
+from app.skills.data_ingestion.csv_parser import parse_csv
+from app.skills.data_ingestion.supabase_storage import SupabaseStorage, SupabaseStorageError
 
 router = APIRouter()
 
