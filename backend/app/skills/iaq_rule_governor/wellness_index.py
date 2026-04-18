@@ -1,5 +1,5 @@
 """
-backend/app/services/wellness_index.py
+backend/app/skills/iaq_rule_governor/wellness_index.py
 
 FJ SafeSpace Wellness Index calculator.
 
@@ -44,13 +44,37 @@ def calculate_wellness_index(
 
     Returns:
         Wellness index score as float 0.0–100.0.
-
-    TODO (Phase 1 implementation):
-    - Map ThresholdBand → metric score (GOOD=100, WATCH=50, CRITICAL=0)
-    - Multiply by weight from rulebook_weights
-    - Sum → wellness_index_score
     """
-    raise NotImplementedError("wellness_index.calculate — Phase 1 implementation pending")
+    if not findings or not rulebook_weights:
+        return 0.0
+
+    # Map threshold band to a 0-100 score
+    BAND_SCORES = {
+        "GOOD": 100.0,
+        "WATCH": 50.0,
+        "CRITICAL": 0.0,
+    }
+
+    # Aggregate findings by metric — use average score per metric
+    metric_scores: dict[str, list[float]] = {}
+    for finding in findings:
+        metric = finding["metric_name"]
+        band = finding["threshold_band"]
+        score = BAND_SCORES.get(band, 0.0)
+        metric_scores.setdefault(metric, []).append(score)
+
+    # Weighted average across metrics
+    total_weight = sum(rulebook_weights.values())
+    if total_weight == 0:
+        return 0.0
+
+    weighted_sum = 0.0
+    for metric, weight in rulebook_weights.items():
+        if metric in metric_scores:
+            avg_score = sum(metric_scores[metric]) / len(metric_scores[metric])
+            weighted_sum += avg_score * (weight / total_weight)
+
+    return round(weighted_sum, 2)
 
 
 def derive_certification_outcome(wellness_index_score: float | None) -> CertificationOutcome:

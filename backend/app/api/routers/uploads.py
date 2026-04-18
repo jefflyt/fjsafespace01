@@ -19,6 +19,7 @@ GET /api/uploads/{upload_id}/findings
 Reference: TDD §4.1
 """
 
+import json
 import uuid
 from datetime import datetime
 
@@ -30,8 +31,22 @@ from app.models.enums import ParseOutcome, ParseStatus
 from app.models.workflow_b import Finding, Upload
 from app.skills.data_ingestion.csv_parser import parse_csv
 from app.skills.data_ingestion.supabase_storage import SupabaseStorage, SupabaseStorageError
+from app.skills.iaq_rule_governor.rule_engine import evaluate_readings
+from app.skills.iaq_rule_governor.wellness_index import calculate_wellness_index, derive_certification_outcome
 
 router = APIRouter()
+
+# Phase 1 default rule version
+_DEFAULT_RULE_VERSION = "v1"
+
+# Default rulebook weights for wellness index (sums to 100)
+_DEFAULT_RULEBOOK_WEIGHTS: dict[str, float] = {
+    "co2_ppm": 25.0,
+    "pm25_ugm3": 25.0,
+    "tvoc_ppb": 20.0,
+    "temperature_c": 15.0,
+    "humidity_rh": 15.0,
+}
 
 
 @router.post("/uploads", status_code=status.HTTP_201_CREATED)
@@ -115,11 +130,47 @@ async def create_upload(
     upload.parse_outcome = parse_result.parse_outcome
     upload.warnings = ", ".join(parse_result.warnings) if parse_result.warnings else None
 
-    # TODO (PR 2.2/PR 3): Call rule_engine.evaluate_readings() to generate findings
-    # For now, findings will be generated in a later PR.
-    # findings = evaluate_readings(parse_result.normalised_rows, site_id, upload_id, "v1")
-    # for finding in findings:
-    #     session.add(finding)
+    # Evaluate readings against rulebook to generate findings
+    eval_findings = evaluate_readings(
+        parse_result.normalised_rows,
+        site_id=site_id,
+        upload_id=upload_id,
+        rule_version=_DEFAULT_RULE_VERSION,
+    )
+
+    # Persist findings to DB
+    for ef in eval_findings:
+        from app.models.workflow_b import Finding as FindingModel
+        finding = FindingModel(
+            upload_id=upload_id,
+            site_id=site_id,
+            zone_name=ef.zone_name,
+            metric_name=ef.metric_name,
+            threshold_band=ef.threshold_band,
+            interpretation_text=ef.interpretation_text,
+            workforce_impact_text=ef.workforce_impact_text,
+            recommended_action=ef.recommended_action,
+            rule_id=ef.rule_id,
+            rule_version=ef.rule_version,
+            citation_unit_ids=json.dumps(ef.citation_unit_ids),
+            confidence_level=ef.confidence_level,
+            source_currency_status=ef.source_currency_status,
+            benchmark_lane=ef.benchmark_lane,
+        )
+        session.add(finding)
+
+    # Calculate wellness index from findings
+    finding_dicts = [
+        {
+            "metric_name": f.metric_name.value if hasattr(f.metric_name, "value") else str(f.metric_name),
+            "threshold_band": f.threshold_band.value if hasattr(f.threshold_band, "value") else str(f.threshold_band),
+        }
+        for f in eval_findings
+    ]
+    wellness_score = calculate_wellness_index(finding_dicts, _DEFAULT_RULEBOOK_WEIGHTS)
+    certification = derive_certification_outcome(wellness_score).value
+
+    upload.rule_version_used = _DEFAULT_RULE_VERSION
 
     session.add(upload)
     session.commit()
@@ -134,6 +185,9 @@ async def create_upload(
         "warnings": upload.warnings,
         "uploaded_at": upload.uploaded_at.isoformat(),
         "failed_row_count": parse_result.failed_row_count,
+        "finding_count": len(eval_findings),
+        "wellness_score": wellness_score,
+        "certification_outcome": certification,
     }
 
 
