@@ -15,6 +15,7 @@ from sqlmodel import Field, Relationship, SQLModel
 
 from app.models.enums import (
     BenchmarkLane,
+    CertificationOutcome,
     ConfidenceLevel,
     MetricName,
     ParseOutcome,
@@ -152,6 +153,12 @@ class Report(SQLModel, table=True):
     reviewer_name: Optional[str] = None
     reviewer_status: ReviewerStatus = Field(default=ReviewerStatus.DRAFT_GENERATED)
     reviewer_approved_at: Optional[datetime] = None
+    # QA checklist — JSON dict of gate_id -> bool
+    qa_checks: str = Field(default="{}")
+    # Data quality statement (free text)
+    data_quality_statement: Optional[str] = None
+    # Certification outcome (never null after evaluation)
+    certification_outcome: Optional[CertificationOutcome] = None
     # PDF stored in Supabase Storage; URL saved here
     pdf_url: Optional[str] = None
     generated_at: datetime = Field(default_factory=datetime.utcnow)

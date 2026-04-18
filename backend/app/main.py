@@ -13,7 +13,13 @@ Production (Render):
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routers import dashboard, notifications, reports, rulebook, uploads
+from app.api.routers import (
+    dashboard_router,
+    notifications_router,
+    reports_router,
+    rulebook_router,
+    uploads_router,
+)
 
 app = FastAPI(
     title="FJDashboard API",
@@ -37,11 +43,11 @@ app.add_middleware(
 )
 
 # ── Routers ───────────────────────────────────────────────────────────────────
-app.include_router(uploads.router, prefix="/api", tags=["uploads"])
-app.include_router(dashboard.router, prefix="/api", tags=["dashboard"])
-app.include_router(reports.router, prefix="/api", tags=["reports"])
-app.include_router(rulebook.router, prefix="/api", tags=["rulebook"])
-app.include_router(notifications.router, prefix="/api", tags=["notifications"])
+app.include_router(uploads_router, prefix="/api", tags=["uploads"])
+app.include_router(dashboard_router, prefix="/api", tags=["dashboard"])
+app.include_router(reports_router, prefix="/api", tags=["reports"])
+app.include_router(rulebook_router, prefix="/api", tags=["rulebook"])
+app.include_router(notifications_router, prefix="/api", tags=["notifications"])
 
 
 @app.get("/health", tags=["health"])
