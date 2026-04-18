@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Download, Loader2 } from "lucide-react";
 import { api } from "@/lib/api";
 import { ReportTypeBadge } from "@/components/ReportTypeBadge";
 import { QAChecklist } from "@/components/QAChecklist";
@@ -68,6 +68,31 @@ export default function ReportDetailPage() {
   }
 
   const qaChecks = report ? JSON.parse(report.qa_checks || "{}") : {};
+  const [downloading, setDownloading] = useState(false);
+
+  async function handleDownloadPdf() {
+    setDownloading(true);
+    try {
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const response = await fetch(`${API_BASE_URL}/api/reports/${reportId}/pdf`);
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF');
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `FJDashboard_Report_${reportId.slice(0, 8)}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err: any) {
+      setError(err.message || 'Failed to download PDF.');
+    } finally {
+      setDownloading(false);
+    }
+  }
 
   if (loading) {
     return (
@@ -182,6 +207,23 @@ export default function ReportDetailPage() {
               This report has passed all QA gates and is ready for export.
             </CardDescription>
           </CardHeader>
+          <CardContent>
+            <Button
+              onClick={handleDownloadPdf}
+              disabled={downloading}
+              className="bg-green-700 hover:bg-green-800"
+            >
+              {downloading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating PDF...
+                </>
+              ) : (
+                <>
+                  <Download className="mr-2 h-4 w-4" /> Download PDF Report
+                </>
+              )}
+            </Button>
+          </CardContent>
         </Card>
       )}
     </div>

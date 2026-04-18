@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FJ SafeSpace IAQ Assessment Report</title>
+    <link rel="stylesheet" href="{{ style_url }}">
+</head>
+<body>
+    <header class="report-header">
+        <h1>Indoor Air Quality Assessment Report</h1>
+        <p class="subtitle">FJ SafeSpace Wellness Platform</p>
+        <div class="report-meta">
+            <span>Site: {{ site_name }}</span>
+            <span>Generated: {{ generated_date }}</span>
+            <span>Report ID: {{ report_id }}</span>
+        </div>
+    </header>
+
+    <main>
+        {# ── Certification Status ────────────────────────────────── #}
+        <section class="certification-status">
+            <h2>Certification Status</h2>
+            <div class="outcome-badge outcome-{{ certification_outcome | lower }}">
+                {{ certification_outcome | replace("_", " ") }}
+            </div>
+            <p class="data-quality-statement">{{ data_quality_statement }}</p>
+        </section>
+
+        {# ── Executive Summary ───────────────────────────────────── #}
+        <section class="executive-summary">
+            <h2>Executive Summary</h2>
+            <table class="summary-table">
+                <tr><th>Rule Version</th><td>{{ rule_version_used }}</td></tr>
+                <tr><th>Report Type</th><td>{{ report_type | replace("_", " ") | title }}</td></tr>
+                <tr><th>Total Findings</th><td>{{ findings | length }}</td></tr>
+                {% if critical_count > 0 %}
+                <tr><th>Critical Findings</th><td class="text-critical">{{ critical_count }}</td></tr>
+                {% endif %}
+            </table>
+        </section>
+
+        {# ── Top Findings by Priority ────────────────────────────── #}
+        {% if top_findings %}
+        <section class="top-findings">
+            <h2>Top Findings</h2>
+            <table class="findings-table">
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Band</th>
+                        <th>Interpretation</th>
+                        <th>Recommended Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for finding in top_findings %}
+                    <tr class="band-{{ finding.threshold_band | lower }}">
+                        <td>{{ finding.metric_name | replace("_", " ") | upper }}</td>
+                        <td><span class="badge badge-{{ finding.threshold_band | lower }}">{{ finding.threshold_band }}</span></td>
+                        <td>{{ finding.interpretation_text }}</td>
+                        <td>{{ finding.recommended_action }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+        {% endif %}
+
+        {# ── All Findings ────────────────────────────────────────── #}
+        {% if findings %}
+        <section class="all-findings">
+            <h2>All Findings</h2>
+            <table class="findings-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Metric</th>
+                        <th>Zone</th>
+                        <th>Band</th>
+                        <th>Confidence</th>
+                        <th>Source Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for finding in findings %}
+                    <tr class="band-{{ finding.threshold_band | lower }}{% if finding.source_currency_status != "CURRENT_VERIFIED" %} advisory-row{% endif %}">
+                        <td>{{ loop.index }}</td>
+                        <td>{{ finding.metric_name | replace("_", " ") | upper }}</td>
+                        <td>{{ finding.zone_name }}</td>
+                        <td><span class="badge badge-{{ finding.threshold_band | lower }}">{{ finding.threshold_band }}</span></td>
+                        <td>{{ finding.confidence_level }}</td>
+                        <td>
+                            {{ finding.source_currency_status | replace("_", " ") | title }}
+                            {% if finding.source_currency_status != "CURRENT_VERIFIED" %}
+                            <br><em class="advisory-label">(Advisory Only)</em>
+                            {% endif %}
+                        </td>
+                        <td>{{ finding.recommended_action }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+        {% endif %}
+
+        {# ── QA Checklist Summary ────────────────────────────────── #}
+        <section class="qa-summary">
+            <h2>QA Compliance Checklist</h2>
+            <table class="qa-table">
+                {% for gate_id, passed in qa_checks.items() %}
+                <tr>
+                    <td>{{ gate_id }}</td>
+                    <td class="{% if passed %}text-pass{% else %}text-fail{% endif %}">
+                        {% if passed %}Passed{% else %}Failed{% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </section>
+
+        {# ── Disclaimer ──────────────────────────────────────────── #}
+        <section class="disclaimer">
+            <p>This report was generated automatically by the FJ SafeSpace Wellness Platform.
+            Findings marked "Advisory Only" are derived from sources that are not current or fully verified
+            and must not be used for certification decisions.</p>
+        </section>
+    </main>
+
+    <footer class="report-footer">
+        <p>FJ SafeSpace Wellness Platform — Confidential</p>
+        {% if reviewer_name %}
+        <p>Reviewed and approved by: {{ reviewer_name }} on {{ reviewer_approved_at }}</p>
+        {% endif %}
+    </footer>
+</body>
+</html>

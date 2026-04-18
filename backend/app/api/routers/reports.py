@@ -22,11 +22,11 @@ Reference: TDD §4.5
 import json
 from datetime import datetime
 
-from fastapi import APIRouter, HTTPException, status
-from sqlmodel import Session, select
+from fastapi import APIRouter, HTTPException, Response, status
+from sqlmodel import select
 
 from app.api.dependencies import SessionDep
-from app.models.enums import CertificationOutcome, ReportType, ReviewerStatus
+from app.models.enums import CertificationOutcome, ReviewerStatus
 from app.models.workflow_b import Finding, Report, Upload
 from app.schemas.report import (
     ApprovalResponse,
@@ -36,7 +36,8 @@ from app.schemas.report import (
     ReportResponse,
     UpdateQAChecklistRequest,
 )
-from app.services.qa_gates import can_approve_report, run_all_qa_gates
+from app.services.pdf_orchestrator import generate_report_pdf
+from app.services.qa_gates import can_approve_report
 
 router = APIRouter(tags=["reports"])
 
@@ -242,6 +243,55 @@ async def export_report(report_id: str, session: SessionDep):
         )
 
     return {"pdf_url": report.pdf_url}
+
+
+@router.get("/reports/{report_id}/pdf", status_code=status.HTTP_200_OK)
+async def generate_report_pdf_endpoint(report_id: str, session: SessionDep):
+    """
+    Generate and stream a PDF report.
+    Only approved reports can be generated.
+    Returns PDF bytes directly for browser download.
+    """
+    report = session.get(Report, report_id)
+    if not report:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Report not found.")
+
+    if report.reviewer_status != ReviewerStatus.APPROVED:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Report must be approved before PDF generation.",
+        )
+
+    # Get site name
+    site = session.get(Upload, report.upload_id)
+    site_name = site.site_id if site else "Unknown Site"
+
+    # Get findings for this report's upload
+    findings = session.exec(select(Finding).where(Finding.upload_id == report.upload_id)).all()
+
+    if not findings:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No findings available for PDF generation.",
+        )
+
+    # Generate PDF
+    pdf_bytes = generate_report_pdf(report, findings, site_name)
+
+    # Update report with generation timestamp
+    report.generated_at = __import__("datetime").datetime.utcnow()
+    session.add(report)
+    session.commit()
+
+    filename = f"FJDashboard_Report_{report.id[:8]}.pdf"
+
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+        },
+    )
 
 
 def _determine_outcome(findings: list[Finding]) -> CertificationOutcome:

@@ -13,7 +13,16 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
-import sqlmodel.sql.sqltypes
+
+
+def _guid_pk(col_name: str = 'id') -> sa.Column:
+    """Primary key column for string-based UUID (36 chars with dashes)."""
+    return sa.Column(col_name, sa.String(length=36), primary_key=True)
+
+
+def _guid_fk(col_name: str, foreign_table: str, nullable: bool = False) -> sa.Column:
+    """Foreign key column referencing a string-based UUID."""
+    return sa.Column(col_name, sa.String(length=36), sa.ForeignKey(f'{foreign_table}.id'), nullable=nullable)
 
 
 # revision identifiers, used by alembic.
@@ -27,7 +36,7 @@ def upgrade() -> None:
     # ── tenant (from supporting.py) ──────────────────────────────────────
     op.create_table(
         'tenant',
-        sa.Column('id', sqlmodel.sql.sqltypes.GUID(), primary_key=True),
+        _guid_pk(),
         sa.Column('tenant_name', sa.String(), nullable=False),
         sa.Column('contact_email', sa.String(), nullable=False),
         sa.Column('certification_due_date', sa.DateTime(), nullable=True),
@@ -37,9 +46,9 @@ def upgrade() -> None:
     # ── notification (from supporting.py) ────────────────────────────────
     op.create_table(
         'notification',
-        sa.Column('id', sqlmodel.sql.sqltypes.GUID(), primary_key=True),
+        _guid_pk(),
         sa.Column('user_id', sa.String(), nullable=True),
-        sa.Column('tenant_id', sqlmodel.sql.sqltypes.GUID(), sa.ForeignKey('tenant.id'), nullable=True),
+        _guid_fk('tenant_id', 'tenant', nullable=True),
         sa.Column('type', sa.String(), nullable=False),
         sa.Column('title', sa.String(), nullable=False),
         sa.Column('body', sa.String(), nullable=False),
@@ -50,17 +59,17 @@ def upgrade() -> None:
     # ── site (from workflow_b.py) ────────────────────────────────────────
     op.create_table(
         'site',
-        sa.Column('id', sqlmodel.sql.sqltypes.GUID(), primary_key=True),
+        _guid_pk(),
         sa.Column('name', sa.String(), nullable=False),
-        sa.Column('tenant_id', sqlmodel.sql.sqltypes.GUID(), sa.ForeignKey('tenant.id'), nullable=True),
+        _guid_fk('tenant_id', 'tenant', nullable=True),
         sa.Column('created_at', sa.DateTime(), nullable=False),
     )
 
     # ── upload (from workflow_b.py) ──────────────────────────────────────
     op.create_table(
         'upload',
-        sa.Column('id', sqlmodel.sql.sqltypes.GUID(), primary_key=True),
-        sa.Column('site_id', sqlmodel.sql.sqltypes.GUID(), sa.ForeignKey('site.id'), nullable=False),
+        _guid_pk(),
+        _guid_fk('site_id', 'site'),
         sa.Column('file_name', sa.String(), nullable=False),
         sa.Column('uploaded_by', sa.String(), nullable=False),
         sa.Column('uploaded_at', sa.DateTime(), nullable=False),
@@ -73,9 +82,9 @@ def upgrade() -> None:
     # ── reading (from workflow_b.py) ─────────────────────────────────────
     op.create_table(
         'reading',
-        sa.Column('id', sqlmodel.sql.sqltypes.GUID(), primary_key=True),
-        sa.Column('upload_id', sqlmodel.sql.sqltypes.GUID(), sa.ForeignKey('upload.id'), nullable=False),
-        sa.Column('site_id', sqlmodel.sql.sqltypes.GUID(), sa.ForeignKey('site.id'), nullable=False),
+        _guid_pk(),
+        _guid_fk('upload_id', 'upload'),
+        _guid_fk('site_id', 'site'),
         sa.Column('device_id', sa.String(), nullable=False),
         sa.Column('reading_timestamp', sa.DateTime(), nullable=False),
         sa.Column('metric_name', sa.String(), nullable=False),
@@ -88,9 +97,9 @@ def upgrade() -> None:
     # ── finding (from workflow_b.py) ─────────────────────────────────────
     op.create_table(
         'finding',
-        sa.Column('id', sqlmodel.sql.sqltypes.GUID(), primary_key=True),
-        sa.Column('upload_id', sqlmodel.sql.sqltypes.GUID(), sa.ForeignKey('upload.id'), nullable=False),
-        sa.Column('site_id', sqlmodel.sql.sqltypes.GUID(), sa.ForeignKey('site.id'), nullable=False),
+        _guid_pk(),
+        _guid_fk('upload_id', 'upload'),
+        _guid_fk('site_id', 'site'),
         sa.Column('zone_name', sa.String(), nullable=False),
         sa.Column('metric_name', sa.String(), nullable=False),
         sa.Column('threshold_band', sa.String(), nullable=False),

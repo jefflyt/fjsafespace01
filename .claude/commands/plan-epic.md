@@ -24,10 +24,10 @@ Your job:
 
 ## Output
 
-Save the plan to `docs/plans/epics/[epic-name]/PLAN.md`:
+Save the plan to `docs/plans/epics/prN-short-name-plan.md` (flat file, matching existing convention: `pr1-layout-skeleton-plan.md`, `pr2-upload-parse-queue-plan.md`, etc.):
 
 ```markdown
-# Epic Plan: [Epic Name]
+# Epic Plan: PRN - Name (Phase X)
 
 ## 1. Feature/Epic Summary
 - **Objective**:
@@ -45,14 +45,14 @@ Save the plan to `docs/plans/epics/[epic-name]/PLAN.md`:
 
 ## 4. PR Roadmap
 
-### PR 1: [Name]
+### PR N.1: [Name]
 - **Goal**:
 - **Scope (in/out)**:
 - **Key Changes**:
 - **Testing**:
 - **Dependencies**:
 
-### PR 2: [Name]
+### PR N.2: [Name]
 ...
 
 ## 5. Milestones & Sequence

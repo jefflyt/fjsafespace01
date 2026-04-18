@@ -158,3 +158,13 @@
   may need to pass base64 image strings from the
   frontend, or use pure CSS/SVG tricks in the Jinja
   HTML itself).
+
+## 7. Implementation Status
+
+**Status: Complete** — Updated 2026-04-18
+
+| Sub-PR | Goal | Status | Details |
+| -------- | ------ | -------- | ------- |
+| 5.1 | WeasyPrint Engine & Infra | ✅ Done | `weasyprint==68.1` + `Jinja2` in requirements. `pdf_orchestrator.py` with `render_pdf()` + Jinja2 env. `base.html` + `style.css` with A4 print styles. |
+| 5.2 | Report Templates | ✅ Done | `assessment_report.html` + `intervention_impact_report.html` created with Jinja2 hydration. `pdf_orchestrator.py` extended with `generate_report_pdf()`. `pdf_generator.py` implemented (was stub). |
+| 5.3 | End-to-End PDF Download | ✅ Done | `GET /api/reports/{id}/pdf` endpoint generates and streams PDF bytes. Frontend download button added to report detail page with blob handling. |
