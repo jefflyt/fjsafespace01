@@ -11,6 +11,7 @@ import uuid
 from datetime import datetime
 from typing import Optional
 
+from sqlalchemy import Column, Index
 from sqlmodel import Field, Relationship, SQLModel
 
 from app.models.enums import (
@@ -122,6 +123,14 @@ class Finding(SQLModel, table=True):
     benchmark_lane: BenchmarkLane
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
+    __table_args__ = (
+        # PR 6.1: Indexes for aggregated cross-site queries
+        Index("ix_finding_site_id", "site_id"),
+        Index("ix_finding_created_at", "created_at"),
+        Index("ix_finding_rule_version", "rule_version"),
+        Index("ix_finding_site_created", "site_id", "created_at"),
+    )
+
     upload: Upload = Relationship(back_populates="findings")
 
 
@@ -162,6 +171,12 @@ class Report(SQLModel, table=True):
     # PDF stored in Supabase Storage; URL saved here
     pdf_url: Optional[str] = None
     generated_at: datetime = Field(default_factory=datetime.utcnow)
+
+    __table_args__ = (
+        # PR 6.1: Indexes for aggregated reporting queries
+        Index("ix_report_site_id", "site_id"),
+        Index("ix_report_generated_at", "generated_at"),
+    )
 
     upload: Upload = Relationship(back_populates="report")
     site: Site = Relationship(back_populates="reports")

@@ -1,0 +1,70 @@
+/* backend/templates/style.css
+ *
+ * Base PDF styles for FJ SafeSpace WeasyPrint reports.
+ * Targets A4 print output with consistent margins and typography.
+ */
+
+@page {
+    size: A4;
+    margin: 20mm 15mm 25mm 15mm;
+
+    @bottom-center {
+        content: "Page " counter(page) " of " counter(pages);
+        font-size: 9pt;
+        color: #666;
+    }
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 11pt;
+    line-height: 1.5;
+    color: #1a1a1a;
+}
+
+/* ── Header ──────────────────────────────────────────────────────── */
+
+.report-header {
+    border-bottom: 2px solid #2563eb;
+    padding-bottom: 12px;
+    margin-bottom: 24px;
+}
+
+.report-header h1 {
+    font-size: 20pt;
+    font-weight: 700;
+    color: #1e3a5f;
+}
+
+.report-header .subtitle {
+    font-size: 10pt;
+    color: #64748b;
+    margin-top: 4px;
+}
+
+/* ── Main content ────────────────────────────────────────────────── */
+
+.hello-section p {
+    font-size: 12pt;
+    color: #334155;
+}
+
+/* ── Footer ──────────────────────────────────────────────────────── */
+
+.report-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 8px;
+    font-size: 8pt;
+    color: #94a3b8;
+    text-align: center;
+}
