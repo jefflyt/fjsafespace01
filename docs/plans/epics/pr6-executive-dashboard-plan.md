@@ -1,5 +1,14 @@
 # Epic Plan: PR6 - Executive Dashboard & Aggregation (Phase 2)
 
+> **STATUS**: ✅ **COMPLETED** (18 April 2026)
+>
+> All three sub-PRs have been fully implemented and
+> verified in the codebase.
+>
+> - PR 6.1: Aggregation Models & Database Optimization ✅
+> - PR 6.2: Executive Dashboard REST APIs ✅
+> - PR 6.3: Executive UI & Leaderboard Views ✅
+
 ## 1. Feature/Epic Summary
 
 - **Objective**: Build the Phase 2 Executive View,

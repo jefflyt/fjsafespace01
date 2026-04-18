@@ -1,5 +1,14 @@
 # Epic Plan: PR4 - Report Draft Builder & QA Checklist
 
+> **STATUS**: ✅ **COMPLETED** (18 April 2026)
+>
+> All three sub-PRs have been fully implemented and
+> verified in the codebase.
+>
+> - PR 4.1: Report Data Model & QA Gate Service ✅
+> - PR 4.2: FastAPI Report Endpoints ✅
+> - PR 4.3: Frontend Report Draft Builder & Checklist UI ✅
+
 ## 1. Feature/Epic Summary
 
 - **Objective**: Create the Report Draft module allowing
