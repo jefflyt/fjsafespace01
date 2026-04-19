@@ -124,6 +124,7 @@ PR 8.1 (Infrastructure Bootstrap) ✅
 **Parallel After 8.1**: 8.3 and 8.4 can proceed in parallel once database is ready.
 
 **Sequence Rationale**:
+
 1. Infrastructure (8.1) is the absolute prerequisite — nothing else works without a database.
 2. QA fixtures (8.2) validate the core compliance engine — the heart of the product.
 3. Endpoint verification (8.3) and frontend components (8.4) are complementary and can be developed together.
@@ -168,7 +169,7 @@ PR 8.1 (Infrastructure Bootstrap) ✅
 ### Trade-offs
 
 | Decision | Rationale |
-|----------|-----------|
+| ---------- | ----------- |
 | **Seed script over migration-based data** | Rulebook data is reference data, not schema. Seed script is idempotent and re-runnable. |
 | **6 components, minimal styling** | UAT needs functional completeness. Visual polish can be iterated after stakeholders confirm the flow works. |
 | **No CI pipeline in PR8** | CI/CD setup is infrastructure work that belongs in a separate PR (Phase 2/3 prep). PR8 focuses on what can be tested locally. |

@@ -1,7 +1,7 @@
 # FJDashboard — Technical Design Document
 
 | Field | Value |
-|---|---|
+| --- | --- |
 | **Document** | FJDashboard TDD v0.2 |
 | **Date** | 2026-04-12 (Revised: 2026-04-18) |
 | **Owner** | Jeff |
@@ -15,7 +15,7 @@
 ## 0. Document Control
 
 | Field | Detail |
-|---|---|
+| --- | --- |
 | **Purpose** | Define the technical implementation of FJDashboard across all three phases |
 | **Source of truth** | This document governs architecture, schema, API contracts, and infrastructure decisions |
 | **Change control** | Any change to schema, API contracts, or infrastructure requires a version bump and decision-log entry |
@@ -34,7 +34,7 @@
 
 ### 1.2 Component Diagram
 
-```
+```text
 [Analyst / Ops User]
         │
         ▼
@@ -76,7 +76,7 @@
 ### 1.3 Workflow Separation
 
 | Workflow | Purpose | Access |
-|---|---|---|
+| --- | --- | --- |
 | **Workflow A** | Rulebook population via seed script | `scripts/seed_rulebook_v1.py` only |
 | **Workflow B** | Scan-to-Report operations | Core dashboard application |
 
@@ -85,7 +85,7 @@
 ### 1.4 Deployment Model
 
 | Phase | Deployment |
-|---|---|
+| --- | --- |
 | **Phase 1/2** | `npm run dev` on analyst's internal laptop. PostgreSQL via Docker or Render free tier. Not internet-accessible. |
 | **Phase 3** | Vercel (production) + Render (managed PostgreSQL). Clerk middleware enforces tenant isolation on all customer routes. |
 
@@ -94,11 +94,11 @@
 ## 2. Technology Stack
 
 | Layer | Technology | Version | Notes |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **Backend API** | FastAPI | 0.x | Ultra-fast Python framework |
-| **Frontend UI** | Next.js App Router| 15.x | React Server Components |
-| **Backend Language**| Python | 3.12+ | Pydantic data validation |
-| **Frontend Language**| TypeScript | 5.x | End-to-end type safety |
+| **Frontend UI** | Next.js App Router | 15.x | React Server Components |
+| **Backend Language** | Python | 3.12+ | Pydantic data validation |
+| **Frontend Language** | TypeScript | 5.x | End-to-end type safety |
 | **ORM** | SQLModel | 0.x | SQLAlchemy wrapper |
 | **Database** | Supabase | 15.x | Managed PostgreSQL platform with AI MCP support |
 | **File storage** | PostgreSQL `bytea` | — | Direct DB binary storage (Lean MVP) |
@@ -316,7 +316,7 @@ model Notification {
 ### 3.5 Key Database Constraints
 
 | Constraint | Enforcement |
-|---|---|
+| --- | --- |
 | `RulebookEntry` — read-only from dashboard | App DB role: `SELECT` only on rulebook tables |
 | `Finding.sourceCurrencyStatus` | `NOT NULL` at DB level |
 
@@ -330,7 +330,7 @@ model Notification {
 
 ### 4.1 Upload Routes
 
-```
+```text
 POST /api/uploads
   Body: multipart/form-data
     file:    CSV file (required)
@@ -353,7 +353,7 @@ GET /api/uploads/[id]/findings
 
 ### 4.2 Dashboard Routes
 
-```
+```text
 GET /api/dashboard/sites
   Returns: [{ siteId, siteName, certificationOutcome, wellnessIndexScore,
               top3Risks[], top3Actions[], nextVerificationDate, lastScanDate }]
@@ -374,7 +374,7 @@ GET /api/dashboard/summary
 
 ### 4.5 Report Routes
 
-```
+```text
 POST /api/reports/generate
   Body: {
     uploadId: string
@@ -412,7 +412,7 @@ GET /api/reports/[id]/export
 
 ### 4.6 Rulebook Routes (Read-Only)
 
-```
+```text
 GET /api/rulebook/rules
   Query params (optional): metricName, contextScope, approvalStatus
   Returns: [RulebookEntry]  ← SELECT only; no mutations permitted
@@ -426,7 +426,7 @@ GET /api/rulebook/sources
 
 ### 4.7 Notification Routes
 
-```
+```text
 GET /api/notifications
   Returns: [{ id, type, title, body, isRead, createdAt }]
   Phase 3: scoped to tenant from JWT
@@ -440,7 +440,7 @@ PATCH /api/notifications/[id]/read
 Applied in `POST /api/reports/generate` before any processing begins:
 
 | Gate | Field Checked | Fail Condition |
-|---|---|---|
+| --- | --- | --- |
 | QA-G4 | `dataQualityStatement` | Absent or not confirmed by analyst |
 | QA-G5 | `finding.ruleVersion` + `citationUnitIds` | Absent from any certification-impact finding |
 | QA-G6 | `finding.sourceCurrencyStatus` | Non-`CURRENT_VERIFIED` without advisory label |
@@ -454,7 +454,7 @@ Applied in `POST /api/reports/generate` before any processing begins:
 
 ### 5.1 Next.js Frontend Structure (app directory)
 
-```
+```text
 app/
 ├── layout.tsx                          ← root layout (fonts, Tailwind, Shadcn UI, nav shell)
 ├── page.tsx                            ← redirect → /dashboard
@@ -484,7 +484,8 @@ app/
 
 ### 5.2 FastAPI Backend Structure (Python)
 
-```
+```text
+
 backend/
 ├── app/
 │   ├── main.py                         ← FastAPI application instance
@@ -495,12 +496,13 @@ backend/
 │   ├── models/                         ← SQLModel definitions (DB tables)
 │   ├── core/                           ← Config, env variables
 │   └── database.py                     ← SQLAlchemy engine configuration
+
 ```
 
 ### 5.3 Key UI Components
 
 | Component | Location | Purpose |
-|---|---|---|
+| --- | --- | --- |
 | `WellnessIndexCard` | `components/dashboard/` | Certification outcome chip + index score dial |
 | `CrossSiteComparisonTable` | `components/ops/` | Wellness Index columns; ranked descending |
 | `FindingsPanel` | `components/analyst/` | Per-metric rows with citation badge + source currency badge |
@@ -519,7 +521,7 @@ backend/
 **FJ SafeSpace Wellness Index / Certification Outcome:**
 
 | Outcome | Tailwind Token | Display Label |
-|---|---|---|
+| --- | --- | --- |
 | `HEALTHY_WORKPLACE_CERTIFIED` | `green-600` | Healthy Workplace Certified |
 | `HEALTHY_SPACE_VERIFIED` | `amber-500` | Healthy Space Verified |
 | `IMPROVEMENT_RECOMMENDED` | `red-600` | Improvement Recommended |
@@ -528,7 +530,7 @@ backend/
 **Source Currency Badge:**
 
 | Status | Badge Colour | Tag |
-|---|---|---|
+| --- | --- | --- |
 | `CURRENT_VERIFIED` | Green | *(none)* |
 | `PARTIAL_EXTRACT` | Amber | "Advisory Only" |
 | `VERSION_UNVERIFIED` | Amber | "Advisory Only" |
@@ -589,7 +591,7 @@ backend/
 ### 7.3 Trigger Table
 
 | Trigger | In-App | Email | Recipients |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Report approved (internal) | ✅ | ❌ | Analyst who uploaded |
 | Renewal due in 30 days (Phase 3) | ✅ | ✅ | Customer contact + internal ops |
 
@@ -600,7 +602,7 @@ backend/
 ### 8.1 Backend Unit Tests (PyTest) & Frontend Unit Tests (Vitest)
 
 | Test | Description |
-|---|---|
+| --- | --- |
 | Rule evaluation determinism | Same reading + same `ruleVersion` → identical finding every time |
 | Parse outcome state machine | `PASS / PASS_WITH_WARNINGS / FAIL` transitions correct |
 | QA gate enforcement | Each gate individually asserted — fail fast on first violation |
@@ -610,7 +612,7 @@ backend/
 ### 8.2 Integration Tests
 
 | Test | Description |
-|---|---|
+| --- | --- |
 | Full upload pipeline | `POST /api/uploads` → parse → findings → DB written correctly |
 | Cross-site comparison sort | Sites returned sorted by wellnessIndexScore DESC; |
 | Rulebook read-only | `PUT/POST/DELETE /api/rulebook/*` returns `405` |
@@ -627,7 +629,7 @@ backend/
 ### 8.4 End-to-End Tests (Playwright)
 
 | Test | Dataset |
-|---|---|
+| --- | --- |
 | NPE dry-run | NPE sample upload → dashboard renders → Executive view shows top risks within 5 minutes |
 | CAG dry-run | CAG sample upload with data gaps → `INSUFFICIENT_EVIDENCE` displayed |
 | Cross-site comparison | 2 site uploads → comparison table ranks by wellness index score correctly |
@@ -635,7 +637,7 @@ backend/
 ### 8.5 Performance Tests
 
 | Scenario | Target | Tool |
-|---|---|---|
+| --- | --- | --- |
 | Dashboard page load | < 3 seconds | Playwright perf API / Lighthouse |
 | Report generation | < 2 minutes | PyTest timer assertion on synchronous handler |
 | Upload + parse (1,000 rows) | < 30 seconds | PyTest integration test |
@@ -643,7 +645,7 @@ backend/
 ### 8.6 Phase 3 Security Tests
 
 | Test | Description |
-|---|---|
+| --- | --- |
 | Tenant isolation | Customer A JWT: assert `/api/dashboard/sites` returns only Customer A sites |
 | Cross-tenant block | Customer A JWT + Customer B `siteId` → `403` |
 
@@ -654,7 +656,7 @@ backend/
 ### 9.1 Phase 1/2 — Local Development
 
 | Component | Setup |
-|---|---|
+| --- | --- |
 | Next.js app | `pnpm run dev` (localhost:3000) |
 | FastAPI Backend | `fastapi dev backend/app/main.py` (localhost:8000) |
 | PostgreSQL | Supabase Local Dev (`supabase start`) or Docker |
@@ -683,7 +685,7 @@ volumes:
 ### 9.3 Phase 3 — Production Deployment
 
 | Component | Provider | Notes |
-|---|---|---|
+| --- | --- | --- |
 | Next.js Frontend | Vercel | Auto-deploy on push to `main` |
 | FastAPI Backend | Render (Web Service) | Handles rule engine and connects to Postgres |
 | Supabase | Supabase (managed DB) | Automated daily backups; SSL enforced; pgBouncer connection pooling |
@@ -732,7 +734,7 @@ volumes:
 ### 10.3 FJ Differentiation Requirements — Code-Level Verification
 
 | Requirement | Enforcement Point |
-|---|---|
+| --- | --- |
 | D1: `rule_version` + `citation_id` present | Checked in `GET /api/uploads/[id]/findings` — returns `422` if absent |
 | D2: `sourceCurrencyStatus` badge | `SourceCurrencyBadge` in `FindingsPanel` and `AlertCenterTable` |
 | D3: Rulebook read-only | App DB role: `SELECT` only on rulebook tables |
@@ -744,7 +746,7 @@ volumes:
 ## References
 
 | # | Document | Location |
-|---|---|---|
+| --- | --- | --- |
 | 1 | FJDashboard PRD v1.1 | `FJDashboard_PRD.md` (2026-04-11) |
 | 2 | FJDashboard PSD-02 v0.2 | `FJDashboard_PSD.md` (2026-04-12) |
 | 3 | Next.js App Router docs | https://nextjs.org/docs/app |

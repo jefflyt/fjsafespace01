@@ -1,7 +1,7 @@
 # FJDashboard — Product Specification Document (PSD-02)
 
 | Field | Value |
-|---|---|
+| --- | --- |
 | **Document** | FJDashboard PSD-02 v0.3 |
 | **Scope** | Dashboard Layer — Phase 1 (Operations + Executive) + Phase 3 (Customer Portal) |
 | **Date** | 2026-04-11 (Updated: 2026-04-19) |
@@ -11,10 +11,10 @@
 | **Parent PRD** | FJDashboard PRD v1.1 (`FJDashboard_PRD.md`) |
 | **Parent PSD** | PSD-01 v0.3 (`PSD.md` — superseded) |
 
-### Locked Tech Stack Decisions (2026-04-12)
+## Locked Tech Stack Decisions (2026-04-12)
 
 | Decision | Value |
-|---|---|
+| --- | --- |
 | Architecture | Decoupled: Python FastAPI Backend (SQLModel/SQLAlchemy) + Next.js Frontend |
 | Database | Supabase (PostgreSQL) |
 | File storage | Supabase Storage |
@@ -28,14 +28,13 @@
 ## 0. Document Control
 
 | Field | Detail |
-|---|---|
+| --- | --- |
 | **Purpose** | Provide build-ready implementation detail for the FJDashboard product layer across all three phases |
 | **Source of truth** | This document governs dashboard scope, data contracts, service boundaries, view specifications, and acceptance criteria |
 | **Parent documents** | FJDashboard PRD v1.1 (product requirements) and PSD-01 v0.3 (Phase 1 pipeline specification) |
 | **Change control** | Any change to dashboard schema, service boundaries, view layout rules, or QA gates requires a version bump and decision-log entry in FJDashboard PRD |
 | **Approval authority** | Jay Choy — final approver for rule changes, report release, and certification outcomes |
 | **Legal gate** | Phase 3 customer portal go-live is blocked until legal/medical disclaimer wording is approved |
-
 
 ## 1. Objective
 
@@ -44,7 +43,7 @@ Deliver the dashboard layer of FJ SafeSpace that converts approved, rule-based f
 > The dashboard does **not** generate findings or set thresholds. It reads from the Rulebook runtime API (approved outputs only) and presents data through role-gated views.
 
 | Phase | Scope |
-|---|---|
+| --- | --- |
 | **Phase 1** | Operations view (single CSV upload, findings panel, report builder) + Executive view (results, suggestions, historical selector) |
 | **Phase 2** | Customer profile management, Clerk auth integration, tenant isolation |
 | **Phase 3** | Customer portal — scoped building view, certification status, renewal workflow |
@@ -83,7 +82,7 @@ Deliver the dashboard layer of FJ SafeSpace that converts approved, rule-based f
 
 ### Phase 1 Workflow (Operations View)
 
-```
+```text
 Upload → Parse + Validate → Rule Evaluation → Findings Stored
   → Dashboard Operations View
       ├── Single CSV upload (inline status)
@@ -99,7 +98,7 @@ Upload → Parse + Validate → Rule Evaluation → Findings Stored
 
 ### Phase 2 Workflow (Internal Dashboard)
 
-```
+```text
 Approved Findings
   → Dashboard Aggregation Service
       ├── Operations View: upload → findings → report generation (tabbed UI)
@@ -108,7 +107,7 @@ Approved Findings
 
 ### Phase 3 Workflow (Customer Portal)
 
-```
+```text
 Approved Report + Certification Outcome
   → Tenant-Isolated Customer View
       ├── FJ SafeSpace Wellness Index status
@@ -120,7 +119,7 @@ Approved Report + Certification Outcome
 
 ### Workflow A — Rulebook Population (Seed-Driven)
 
-```
+```text
 Curated Seed Script (code)
   → Populate ReferenceSource, CitationUnit, RulebookEntry tables
     → Approved Rulebook entries (rule_version, thresholds, citations)
@@ -130,7 +129,6 @@ Curated Seed Script (code)
 
 > **Note**: Workflow A rules are populated via a curated Python seed script (`scripts/seed_rulebook_v1.py`), not a manual admin UI. Standards (WHO AQG 2021, SS554, etc.) are read by a human and encoded directly in code. This is accurate, auditable via code review, and sufficient for Phase 1/2 where we have a small, stable set of standards. LLM-assisted PDF extraction is a future enhancement (deferred).
 
-
 ---
 
 ## 4. Dashboard Data Contract (Schema v1)
@@ -138,7 +136,7 @@ Curated Seed Script (code)
 ### 4.1 New Fields (extending PSD-01 data model)
 
 | Field | Type | Required | Values / Constraints |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `dashboard_role_view` | enum | Yes | `executive` \| `operations` \| `customer` |
 | `data_quality_score` | float 0.0–1.0 | Yes | Composite of `uptime_ratio` and `outlier_rate` |
 | `uptime_ratio` | float 0.0–1.0 | Yes | Proportion of expected readings received in window |
@@ -187,6 +185,7 @@ All fields from PSD-01 §4 — `site_name`, `zone_name`, `device_id`, `reading_t
 **Purpose:** Compute and serve site/zone summary cards for all role views.
 
 **Inputs:**
+
 - Approved findings (from Rule Evaluation Service)
 - Rulebook runtime API (`rule_version`, `citation_unit_ids`, `benchmark_lane`)
 - Site metadata (`site_name`, `zone_name`, `device_id`)
@@ -194,12 +193,13 @@ All fields from PSD-01 §4 — `site_name`, `zone_name`, `device_id`, `reading_t
 **Outputs:**
 
 | Output | Fields |
-|---|---|
+| --- | --- |
 | Site summary card | `site_name`, `certification_outcome`, `wellness_index_score`, `top_3_risks[]`, `top_3_actions[]`, `next_verification_date`, `last_scan_date` |
 | Zone drilldown card | `zone_name`, `metric_readings[]`, `threshold_band[]`, `source_currency_status[]`, `trend_sparkline_data[]` |
 | Cross-site comparison row | `site_name`, `wellness_index_score`, `certification_outcome` — sorted by wellness index descending |
 
 **Runtime integrity constraints:**
+
 - Every finding served must include `rule_version` + `citation_id`; any finding missing these is rejected from dashboard output.
 - If `certification_outcome` cannot be determined due to missing applicable rules, service must return `Insufficient Evidence` — never `null` or a default pass value.
 - Threshold mutation requests rejected at service boundary (`403`).
@@ -213,6 +213,7 @@ All fields from PSD-01 §4 — `site_name`, `zone_name`, `device_id`, `reading_t
 > **Available from:** Phase 2
 
 **Layout (top to bottom):**
+
 1. Page header: site selector (multi-select) + date range picker
 2. FJ SafeSpace Wellness Index card per site: certification outcome chip (colour-coded) + `last_scan_date`
 3. Top 3 Risks panel: P1 findings, metric name, zone, benchmark limit exceeded
@@ -222,7 +223,7 @@ All fields from PSD-01 §4 — `site_name`, `zone_name`, `device_id`, `reading_t
 **Colour coding:**
 
 | Outcome | Colour | Notes |
-|---|---|---|
+| --- | --- | --- |
 | Healthy Workplace Certified | Green | ≥ 90% |
 | Healthy Space Verified | Amber | 75% – 89% |
 | Improvement Recommended | Red | < 75% |
@@ -240,14 +241,14 @@ All fields from PSD-01 §4 — `site_name`, `zone_name`, `device_id`, `reading_t
 
 **Tab A) Upload** — Single file upload (no queue). Inline status shown after upload completes.
 
-**Tab B) Findings Panel**
+#### Tab B) Findings Panel
 
 Per-metric row: `Metric Name | Current Value | Unit | Threshold Band | Rule Interpretation | Citation Badge | Confidence | Action Priority`
 
 - **Citation Badge:** clickable → shows `citation_unit_id`, source title, `source_currency_status`, `rule_version`
 - Source currency badge follows same colour coding as Operations View
 
-**Tab C) Report Draft Builder**
+#### Tab C) Report Draft Builder
 
 - **Report Type auto-detected** from CSV timestamp patterns during upload:
   - Single calendar day → `Assessment` (current IAQ state)
@@ -258,7 +259,7 @@ Per-metric row: `Metric Name | Current Value | Unit | Threshold Band | Rule Inte
 - Approval button **disabled** until all QA checklist items are confirmed:
 
 | # | QA Checklist Item |
-|---|---|
+| --- | --- |
 | 1 | All non-obvious findings have `citation_id` |
 | 2 | All citation sources are `Current Verified` (or advisory label confirmed) |
 | 3 | Data quality statement present |
@@ -270,6 +271,7 @@ Per-metric row: `Metric Name | Current Value | Unit | Threshold Band | Rule Inte
 > **Available from:** Phase 3
 
 **Layout:**
+
 1. Legal/medical disclaimer banner (always visible, top of page — approved wording required)
 2. FJ SafeSpace Wellness Index card: `certification_outcome | wellness_index_score | site_name | assessment_date | next_renewal_date`
 3. Verification Deliverables: Download links for Verification Summary (PDF), Certificate (PDF), and Entrance Decal (Image with QR).
@@ -299,7 +301,7 @@ Per-metric row: `Metric Name | Current Value | Unit | Threshold Band | Rule Inte
 ## 8. Non-Functional Requirements
 
 | ID | Category | Requirement |
-|---|---|---|
+| --- | --- | --- |
 | NFR-D1 | Reproducibility | Same input + same `rule_version` always produces identical dashboard output |
 | NFR-D2 | Traceability | Every metric card, finding, and alert includes `rule_version` and `citation_id` |
 | NFR-D3 | Performance | Dashboard page load < 3 seconds (all views, standard network) |
@@ -318,7 +320,7 @@ Per-metric row: `Metric Name | Current Value | Unit | Threshold Band | Rule Inte
 > A dashboard view render or report release **fails** if any of the following is true:
 
 | Gate | Fail Condition |
-|---|---|
+| --- | --- |
 | **QA-G4** | `data_quality_score` or data quality statement is absent from report |
 | **QA-G5** | `rule_version` or `citation_id` is absent from any certification-impact finding |
 | **QA-G6** | `source_currency_status` is non-`Current Verified` for a cert-path finding without advisory warning label |
@@ -333,7 +335,7 @@ Per-metric row: `Metric Name | Current Value | Unit | Threshold Band | Rule Inte
 ### Phase 1 Gate (Phase 1 → Phase 2 unlock)
 
 | ID | Criterion |
-|---|---|
+| --- | --- |
 | AC-D1 | FR-D1 to FR-D7 all implemented and verified on test dataset |
 | AC-D2 | Analyst view page load < 3 seconds on standard network |
 | AC-D3 | Citation badge visible and correct on all findings in test dataset |
@@ -343,7 +345,7 @@ Per-metric row: `Metric Name | Current Value | Unit | Threshold Band | Rule Inte
 ### Phase 2 Gate (Phase 2 → Phase 3 unlock)
 
 | ID | Criterion |
-|---|---|
+| --- | --- |
 | AC-D6 | FR-D8 to FR-D18 all implemented and verified |
 | AC-D7 | Executive view: NPE and CAG dry-run; stakeholder comprehension confirmed within 5 minutes |
 | AC-D8 | Cross-site comparison sorted correctly by wellness index on test dataset |
@@ -354,7 +356,7 @@ Per-metric row: `Metric Name | Current Value | Unit | Threshold Band | Rule Inte
 ### Phase 3 Gate (Customer Portal Go-Live)
 
 | ID | Criterion |
-|---|---|
+| --- | --- |
 | AC-D14 | FR-D19 to FR-D23 all implemented and verified |
 | AC-D15 | Clerk auth and tenant isolation tested; penetration test passed |
 | AC-D16 | Legal/medical disclaimer wording approved (Jay Choy sign-off) |
@@ -367,7 +369,7 @@ Per-metric row: `Metric Name | Current Value | Unit | Threshold Band | Rule Inte
 ## 11. Test Plan
 
 | Test Case | Description |
-|---|---|
+| --- | --- |
 | Happy-path Phase 1 | All role views load with valid rule-linked data; citation badges correct |
 | Missing citation block | Findings panel shows citation error; QA checklist prevents approval |
 | Source currency advisory | Partial Extract finding shows amber advisory label; certification outcome blocked |
@@ -387,7 +389,7 @@ Per-metric row: `Metric Name | Current Value | Unit | Threshold Band | Rule Inte
 ## 12. Risks and Mitigations
 
 | Risk | Mitigation |
-|---|---|
+| --- | --- |
 | R1: Rulebook API not ready when dashboard build starts | Mock Rulebook API with sample dataset for Phase 1/2 development; contract-first approach |
 | R3: Executive comprehension test failure (>5 minutes) | Usability testing with NPE and CAG stakeholders during Phase 2; iterate before Phase 3 gate |
 | R4: Phase 3 tenant isolation breach (Clerk) | Clerk org-scoped JWT enforced at middleware; penetration test required before Phase 3 go-live |
@@ -409,8 +411,7 @@ Per-metric row: `Metric Name | Current Value | Unit | Threshold Band | Rule Inte
 ## References
 
 | # | Document | Notes |
-|---|---|---|
+| --- | --- | --- |
 | 1 | FJDashboard PRD v1.1 (`FJDashboard_PRD.md`) | 2026-04-11 |
 | 2 | PSD-01 v0.3 (consolidated into this document 2026-04-11) | §4 Upload contract; §6 Parse states; §7 Rules engine; §11 Reviewer workflow; §21–23 Workflow spec; Appendix A Rule Dictionary; Appendix B Research Mapping |
 | 3 | FJ SafeSpace PRD v0.4 (consolidated into FJDashboard_PRD.md 2026-04-11) | |
-

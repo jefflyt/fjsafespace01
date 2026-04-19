@@ -38,7 +38,7 @@ pytest tests/integration   # requires running DB
 
 ## Package Structure
 
-```
+```text
 app/
 ├── main.py           ← FastAPI app + router registration
 ├── database.py       ← SQLAlchemy engine + session

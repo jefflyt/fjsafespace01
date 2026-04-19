@@ -1,0 +1,17 @@
+{
+  "globs": [
+    "**/*.md",
+    "!node_modules/**",
+    "!frontend/node_modules/**",
+    "!.agent/**",
+    "!.claude/**",
+    "!.agents/**",
+    "!.qwen/**",
+    "!frontend/.next/**",
+    "!backend/.venv/**"
+  ],
+  "config": {
+    "MD013": false,
+    "MD034": false
+  }
+}

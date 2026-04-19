@@ -1,4 +1,5 @@
 # FJDashboard — Product Requirements Document
+
 **Version:** 1.2
 **Date:** 2026-04-11 (Revised: 2026-04-18)
 **Owner:** Jeff
@@ -11,7 +12,7 @@
 ## 0. Document Control
 
 | Field | Value |
-|---|---|
+| --- | --- |
 | Purpose | Define the FJDashboard product layer as a standalone reviewable specification, derived from the FJ SafeSpace PRD v0.4. |
 | Review cadence | Weekly (every Monday) |
 | Change control | Any change to dashboard scope, KPI definitions, or role-access rules requires a Decision Log entry. |
@@ -25,6 +26,7 @@
 Build the **dashboard layer** of the FJ SafeSpace platform that gives internal and customer-facing stakeholders a clear, actionable, and fully traceable view of Indoor Air Quality (IAQ) status across sites and zones.
 
 The FJDashboard converts rule-based findings into:
+
 - **Operational visibility** for analysts managing scan-to-report workflows.
 - **Executive summaries** for decision-makers needing fast risk identification.
 - **Customer-facing certification status** (Phase 3, post-gate).
@@ -34,6 +36,7 @@ The FJDashboard converts rule-based findings into:
 ## 2. Problem Statement
 
 FJ SafeSpace can generate findings and reports from uHoo IAQ data, but stakeholders currently lack a real-time or near-real-time interface to:
+
 - Monitor site/zone status across the portfolio.
 - Track alert resolution progress.
 - Compare multi-site performance.
@@ -46,11 +49,13 @@ Without this layer, operational efficiency and executive confidence are limited,
 ## 3. Outcome Definition
 
 ### Business Outcomes
+
 - Operations team can execute rule-driven reporting with high reliability and low manual effort.
 - Executives can identify top risks and required actions across the portfolio in ≤5 minutes.
 - Customer trust increases via transparent, traceable certification status.
 
 ### Product Outcomes
+
 - All dashboard views are role-appropriate (FJ Executive, Analyst / Operations, Customer).
 - Every insight on the dashboard is traceable to a `rule_version` and `citation_id`.
 - The interface is strictly a reporting tool — no task management or alert queues.
@@ -60,7 +65,7 @@ Without this layer, operational efficiency and executive confidence are limited,
 ## 4. Personas
 
 | Persona | Role | Key Needs | Pain Points |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **Executive / Decision Maker** | Customer or internal leadership | Quick risk summary, certification status, recommended actions | Raw IAQ numbers are uninterpretable |
 | **Analyst / Operations** | FJ analyst and operations | Data upload, rule-based findings, report draft generation | Manual inconsistency, slow report cycle |
 
@@ -69,6 +74,7 @@ Without this layer, operational efficiency and executive confidence are limited,
 ## 5. Scope Boundaries
 
 ### In Scope
+
 - Role-based dashboard modes: FJ Executive, Analyst / Operations, Customer
 - Site-level and Zone/Floor-level views
 - Cross-site comparison view (Leaderboard)
@@ -78,6 +84,7 @@ Without this layer, operational efficiency and executive confidence are limited,
 - **Two report product types:** Assessment Report and Intervention Impact Report (both produced from a single scan; type determines report framing and PDF template)
 
 ### Out of Scope (current cycle)
+
 - In-app ticketing, alert lifecycle management, and action owner tracking
 - Real-time Intervention Tracker UI — the Intervention Impact Report is a single-scan product; before/after comparison tools across multiple scans are deferred to Phase 2
 - Non-IAQ parameters outside current certification scope
@@ -91,7 +98,7 @@ Without this layer, operational efficiency and executive confidence are limited,
 ## 6. Product Principles (Anti-Drift Guardrails)
 
 | Principle | Meaning |
-|---|---|
+| --- | --- |
 | **Evidence before aesthetics** | Every dashboard metric must be traceable to an approved rulebook entry. |
 | **Transparent Weighted Scoring** | The FJ SafeSpace Wellness Index is calculated using a 0-100% equation where parameter weights (e.g., CO2 25%) and exact thresholds are driven strictly by the active Rulebook version as the anchor base. |
 | **Internal reliability first** | Executive and customer views are Phase 2/3; internal operations view ships first. |
@@ -105,7 +112,7 @@ Without this layer, operational efficiency and executive confidence are limited,
 ### Phase 1 — Upload + Findings + Analyst / Operations View
 
 | ID | Requirement |
-|---|---|
+| --- | --- |
 | FR-D1 | Analyst dashboard shows current upload queue status (pending, processing, complete, failed). |
 | FR-D2 | Upload module accepts defined schema (CSV/PDF export from uHoo). |
 | FR-D3 | Parser validation summary (fields normalised, missing fields flagged) is visible to analyst. |
@@ -120,7 +127,7 @@ Without this layer, operational efficiency and executive confidence are limited,
 ### Phase 2 — Internal Dashboard v2 (FJ Executive Portfolio)
 
 | ID | Requirement |
-|---|---|
+| --- | --- |
 | FR-D8 | Role-based dashboard views: FJ Executive, Analyst / Operations — sharing components but differing in cross-tenant scope. |
 | FR-D9 | **Site-level summary cards**: FJ SafeSpace Wellness Index (0-100%), certification status, last scan date. |
 | FR-D10 | **Zone/Floor-level drill-down**: parameter readings per zone, benchmark proximity, trend sparklines. |
@@ -132,7 +139,7 @@ Without this layer, operational efficiency and executive confidence are limited,
 ### Phase 3 — Customer Portal + Live Dashboard
 
 | ID | Requirement |
-|---|---|
+| --- | --- |
 | FR-D15 | Role-based authentication with tenant data separation (customer only sees their sites). |
 | FR-D16 | Customer portal view: certification status (Healthy Workplace Certified / Healthy Space Verified / Improvement Recommended), and download links for Certificate, Verification Summary, and Entrance Decal. |
 | FR-D17 | Live uHoo API ingestion (polling/webhook per API feasibility sprint outcome). |
@@ -144,7 +151,7 @@ Without this layer, operational efficiency and executive confidence are limited,
 ## 8. Non-Functional Requirements
 
 | ID | Requirement |
-|---|---|
+| --- | --- |
 | NFR-D1 | **Reproducibility**: identical input + identical rule version must always produce identical dashboard output. |
 | NFR-D2 | **Traceability**: every metric card, finding, and alert links to its rule and citation source. |
 | NFR-D3 | **Performance**: dashboard page load <3 seconds; report draft generation <2 minutes (Phase 1). |
@@ -160,7 +167,7 @@ Without this layer, operational efficiency and executive confidence are limited,
 These requirements distinguish FJDashboard from commodity IAQ dashboards and must never be removed or weakened.
 
 | # | Requirement |
-|---|---|
+| --- | --- |
 | D1 | Every finding is traceable to `rule_version` + `citation_id`. |
 | D2 | Source currency status (`Current Verified / Partial Extract / Version Unverified / Superseded`) is visible in report metadata and on relevant dashboard cards. |
 | D3 | No manual threshold override is allowed under any circumstance in production. |
@@ -172,18 +179,21 @@ These requirements distinguish FJDashboard from commodity IAQ dashboards and mus
 ## 10. Dashboard Views — Design Specifications
 
 ### 10.1 FJ Executive View
+
 - Dashboard shell matches Customer Portal exactly, but with `tenant_id` unlocked.
 - Cross-site Leaderboard: rank all buildings across all customers by Wellness Index.
 - One-page summary card per site: Wellness Index, certification status, top 3 actions, next verification date.
 - Status traffic-light colour coding (Certified = green, Verified = amber, Improvement Recommended = red).
 
 ### 10.2 Analyst / Operations View
+
 - Upload queue and parse validation status.
 - Findings panel per metric: value, threshold band, rule interpretation, citation, confidence, action priority.
 - Report draft builder with QA checklist gate.
 - Source currency status badge on each citation.
 
 ### 10.3 Customer Portal View (Phase 3)
+
 - Certification status card: Healthy Workplace Certified / Healthy Space Verified / Improvement Recommended.
 - View-only report (Verification Summary, Certificate, Decal). Customers cannot modify thresholds or findings.
 - Next renewal date and recertification workflow prompt.
@@ -196,7 +206,7 @@ These requirements distinguish FJDashboard from commodity IAQ dashboards and mus
 The FJDashboard reads from the following core entities (defined in FJ SafeSpace PRD v0.4 and Reference Vault/Rulebook Schema v1.0):
 
 | Entity | Key Fields Used by Dashboard |
-|---|---|
+| --- | --- |
 | **Site Reading** | `site_name`, `zone`, `device_id`, `timestamp`, `metric_name`, `value`, `unit` |
 | **Finding** | `threshold_band`, `interpretation_text`, `action_priority`, `confidence_level` |
 | **Rulebook Entry** | `rule_id`, `rule_version`, `citation_unit_ids[]`, `approval_status` |
@@ -209,14 +219,17 @@ The FJDashboard reads from the following core entities (defined in FJ SafeSpace 
 ## 12. KPI Framework (Dashboard-Specific)
 
 ### Operational KPIs
+
 - Time-from-upload to dashboard update (target: <2 hours, Phase 2).
 
 ### Quality KPIs
+
 - % dashboard findings with complete `rule_version` + `citation_id`.
 - % findings with `Partial Extract` / `Version Unverified` sources correctly labelled as advisory-only.
 - QA checklist pass rate before report approval.
 
 ### Customer Value KPIs
+
 - Executive comprehension time (≤5 minutes target, measured in user testing).
 - Customer portal certification status accuracy (matches reviewer-approved outcome 100%).
 - Renewal conversion rate (Phase 3).
@@ -226,12 +239,14 @@ The FJDashboard reads from the following core entities (defined in FJ SafeSpace 
 ## 13. Phase Gates
 
 ### Gate 1 → 2 (Phase 1 to Phase 2 unlock)
+
 - ≥10 assessments processed through the upload + findings pipeline.
 - ≥95% parse success rate.
 - Evidence citation completeness ≥95%.
 - Analyst dashboard reviewed and signed off internally.
 
 ### Gate 2 → 3 (Phase 2 to Phase 3 unlock)
+
 - uHoo API feasibility validated.
 - Security/auth design (Clerk + tenant isolation) approved.
 - Support model for customer access defined.
@@ -243,6 +258,7 @@ The FJDashboard reads from the following core entities (defined in FJ SafeSpace 
 ## 14. Reporting Upgrade Requirements (From Section 25.5)
 
 Applies to any report surfaced through or linked from the dashboard:
+
 - Mandatory **one-page Executive Brief** at report front.
 - Each parameter block must include: current reading, benchmark lane (SS554 / BCA / WELL), status, business meaning, action, owner, due date.
 - Mandatory **confidence and causality note** for all intervention claims.
@@ -253,7 +269,7 @@ Applies to any report surfaced through or linked from the dashboard:
 ## 15. Risk Register
 
 | ID | Risk | Mitigation |
-|---|---|---|
+| --- | --- | --- |
 | R1 | uHoo API uncertainty (rate limits, auth) | API discovery sprint before Phase 3 commitment |
 | R2 | Dashboard scoring trust (user disbelief) | Publish logic dictionary; surface rule/citation on every card |
 | R3 | Scope creep into non-IAQ domains | Enforce out-of-scope list; no feature ships without PRD alignment |
@@ -274,6 +290,7 @@ Applies to any report surfaced through or linked from the dashboard:
 ## 17. Approval Gate
 
 The FJDashboard product release is **complete only after Jay Choy sign-off** on:
+
 1. This PRD (FJDashboard v1.1).
 2. Dashboard design and role-view specifications.
 3. Report template v2 (Executive Brief + parameter blocks).
@@ -287,7 +304,7 @@ The FJDashboard product release is **complete only after Jay Choy sign-off** on:
 > All open questions resolved and locked on 2026-04-11 by Jeff. Decisions recorded in Section 19.
 
 | # | Question | Owner | Status |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | OQ1 | Customer-facing label for the IAQ/wellness score | Jeff / Jay Choy | ✅ Locked — see Decision Log |
 | OQ2 | Is the Intervention Tracker confounder notes field analyst-editable? | Jeff | ✅ Locked — see Decision Log |
 | OQ3 | Alert notification channels in scope | Jeff | ✅ Locked — see Decision Log |
@@ -299,7 +316,7 @@ The FJDashboard product release is **complete only after Jay Choy sign-off** on:
 ## 19. Decision Log
 
 | Decision | Rationale | Trade-off | Owner | Date | Revisit Trigger |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | Role-based modes: Executive / Operations / Analyst | Different personas need radically different information density | More build complexity | Jeff | 2026-04-11 | If user research reveals persona overlap |
 | Insufficient Evidence surfaced visibly | FJ differentiator; prevents false certification signals | May confuse users unfamiliar with evidence grading | Jeff / Jay Choy | 2026-04-11 | Never for compliance; revisit labelling wording only |
 | No manual threshold override | Core governance control; certification defensibility | Reduces analyst flexibility | Jay Choy | 2026-04-08 (locked) | Never |
@@ -320,16 +337,19 @@ The FJDashboard product release is **complete only after Jay Choy sign-off** on:
 ## 20. Certification Policy Baseline
 
 Decision states:
+
 - **Pass**: meets required threshold bands and evidence completeness
 - **Conditional**: minor gaps; corrective actions required with a due date
 - **Fail**: significant threshold breaches or insufficient evidence
 - **Insufficient Evidence**: no valid applicable rule set for context/metric — outcome blocked; cannot be upgraded until rulebook support exists
 
 Governance:
+
 - Certification decisions require final sign-off by Jay Choy (sole approver; no delegation path)
 - Renewal interval: annual (default), with interim checks if needed
 
 Minimum evidence pack (mandatory for Pass / Conditional / Fail):
+
 - Raw input identifiers (file names + assessment ID + sampling window)
 - Rulebook version used
 - Citation IDs for all non-obvious findings
@@ -351,7 +371,7 @@ Minimum evidence pack (mandatory for Pass / Conditional / Fail):
 ## 22. Milestone Plan
 
 | Milestone | Timeline | Deliverable |
-|---|---|---|
+| --- | --- | --- |
 | M1 | Week 1–2 | Upload schema + parser + rule table |
 | M2 | Week 3–4 | Findings engine + report v1 + QA checklist |
 | M3 | Week 5–6 | Dashboard v2 internal + trend views |
@@ -387,6 +407,7 @@ Purpose: Maintain an accurate and auditable Rulebook via curated code, not manua
 **Future enhancement**: LLM-assisted PDF extraction — upload a PDF, LLM extracts thresholds, human reviews and approves. Deferred until manual update burden becomes significant.
 
 Steps:
+
 1. Curate threshold values from standard documents (WHO AQG 2021, SS554, etc.).
 2. Encode values in `scripts/seed_rulebook_v1.py` with verbatim citation excerpts.
 3. Code review and merge.
@@ -394,6 +415,7 @@ Steps:
 5. Mark superseded rule versions while preserving history.
 
 Outputs:
+
 - Approved Rulebook version
 - Citation registry and change log
 - Effective date mapping for rule versions
@@ -403,6 +425,7 @@ Outputs:
 Purpose: Generate customer-ready IAQ reports from scan data.
 
 Steps:
+
 1. Upload uHoo readings (CSV/export).
 2. Validate and normalise readings.
 3. Evaluate against current approved Rulebook only.
@@ -414,6 +437,7 @@ Steps:
 > **Report type branching:** Both `ASSESSMENT` and `INTERVENTION_IMPACT` reports follow an identical upload → findings → QA → generation pipeline. The `reportType` label is set at generation time and governs PDF template selection only. Phase 2 continuous API ingestion may introduce multi-scan comparison capabilities; this is deferred.
 
 Outputs:
+
 - Customer report (Assessment or Intervention Impact)
 - Report type label
 - Rulebook version used
@@ -421,6 +445,7 @@ Outputs:
 - Reviewer sign-off record
 
 ### Separation-of-Duties Rule
+
 - Workflow B cannot create or modify thresholds.
 - Rule changes can only occur via Workflow A governance path.
 - Missing citations block report approval.
@@ -441,6 +466,7 @@ Outputs:
 ## Appendix A — Standards Ingestion and Governance Pipeline (Revised 2026-04-18)
 
 ### Purpose
+
 Define how standards are converted into runtime Rulebook entries.
 
 ### Method: Seed Script (Phase 1/2)
@@ -485,6 +511,7 @@ When the manual update burden becomes significant, a future enhancement will add
 - Gate D: approval sign-off complete
 
 ### Risk Controls
+
 - No auto-publish from extraction to production.
 - No threshold change without diff + sign-off.
 - No customer report release with unresolved citation gaps.
@@ -496,7 +523,7 @@ When the manual update burden becomes significant, a future enhancement will add
 ### Reference Vault Schema (Raw Source)
 
 | Field | Description |
-|---|---|
+| --- | --- |
 | source_id | Unique identifier |
 | title | Document title |
 | publisher | Issuing body |
@@ -514,7 +541,7 @@ When the manual update burden becomes significant, a future enhancement will add
 ### Extracted Citation Unit Schema
 
 | Field | Description |
-|---|---|
+| --- | --- |
 | citation_unit_id | Unique identifier |
 | source_id | Parent source reference |
 | page_or_section | Location in source document |
@@ -530,7 +557,7 @@ When the manual update burden becomes significant, a future enhancement will add
 ### Rulebook Schema (Approved Runtime)
 
 | Field | Description |
-|---|---|
+| --- | --- |
 | rule_id | Unique identifier |
 | metric_name | IAQ metric |
 | threshold_type | range / upper_bound / lower_bound |
@@ -552,12 +579,14 @@ When the manual update burden becomes significant, a future enhancement will add
 | approved_at | Approval timestamp |
 
 ### Versioning and Change Control
+
 - New source edition does not overwrite old entries.
 - Old rules remain queryable with superseded status.
 - New rule versions require approver sign-off.
 - Every report stores rule_version and citation_unit_ids used.
 
 ### Runtime Guardrails
+
 - Report scoring can only use approved Rulebook records.
 - RAG can suggest context but cannot set thresholds directly.
 - Missing citation blocks final report approval.

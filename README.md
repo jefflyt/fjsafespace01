@@ -9,7 +9,7 @@ FJDashboard is the operational and reporting interface for the FJ SafeSpace Indo
 ## Documents
 
 | Document | File | Purpose |
-|---|---|---|
+| --- | --- | --- |
 | PRD v1.1 | [`FJDashboard_PRD.md`](./docs/FJDashboard_PRD.md) | Product requirements |
 | PSD-02 v0.2 | [`FJDashboard_PSD.md`](./docs/FJDashboard_PSD.md) | Product specification |
 | TDD v0.1 | [`FJDashboard_TDD.md`](./docs/FJDashboard_TDD.md) | Technical design |
@@ -22,7 +22,7 @@ FJDashboard is the operational and reporting interface for the FJ SafeSpace Indo
 
 **Decoupled stack — Python backend + Next.js frontend.**
 
-```
+```text
 frontend/      ← Next.js 15 App Router (Vercel)
 backend/       ← FastAPI + SQLModel (Render)
 docs/          ← Specifications, schema reference, plans, setup guides
@@ -92,7 +92,7 @@ python scripts/seed_rulebook.py   # Populates WHO AQG 2021 + SS554 entries
 
 ## Project Structure
 
-```
+```text
 fjsafespace01/
 ├── backend/                  ← FastAPI backend
 │   ├── app/
@@ -189,7 +189,7 @@ fjsafespace01/
 ## Phases
 
 | Phase | Scope | Status |
-|---|---|---|
+| --- | --- | --- |
 | **Phase 1** | Analyst view — upload, findings, report draft builder | ✅ Complete |
 | **Phase 2** | Internal dashboard — Executive portfolio, leaderboard, zone drilldown | ✅ Complete |
 | **Phase 3** | Customer portal — Clerk auth, tenant isolation, renewal workflow | ⏳ Gate-locked |
@@ -204,7 +204,7 @@ fjsafespace01/
 ## Key Design Decisions
 
 | Decision | Value |
-|---|---|
+| --- | --- |
 | All processing | Synchronous — no background queues |
 | Auth (Phase 1/2) | None — internal laptop only |
 | Auth (Phase 3) | Clerk (Org = Tenant) |

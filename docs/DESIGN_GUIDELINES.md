@@ -3,9 +3,11 @@
 ## 1. Brand Identity
 
 ### 1.1 Brand Essence
+
 FJ SafeSpace is a **technology-driven indoor air quality and wellness platform**. The dashboard should feel like a modern command center — clean, data-rich, and trustworthy — with subtle technological flair that signals sophistication without overwhelming the user.
 
 ### 1.2 Visual Personality
+
 - **Primary**: Professional, clinical, trustworthy (healthcare/wellness domain)
 - **Secondary**: Modern, tech-forward, data-driven (IoT monitoring, real-time analytics)
 - **Tone**: Calm but authoritative — like a medical instrument meets a mission control dashboard
@@ -17,7 +19,7 @@ FJ SafeSpace is a **technology-driven indoor air quality and wellness platform**
 ### 2.1 Core Brand Colors (from fjsafespace.com)
 
 | Token | Hex | HSL | Usage |
-|-------|-----|-----|-------|
+| ------- | ----- | ----- | ------- |
 | `--fj-purple` | `#8700E3` | `276 100% 44%` | Primary brand color, CTAs, active states |
 | `--fj-purple-light` | `#C9B9FF` | `258 100% 87%` | Accent highlights, subtle backgrounds |
 | `--fj-green` | `#37CA37` | `120 57% 50%` | Wellness/passing indicators, health metrics |
@@ -30,7 +32,7 @@ FJ SafeSpace is a **technology-driven indoor air quality and wellness platform**
 ### 2.2 Semantic Colors
 
 | Semantic | Hex | Usage |
-|----------|-----|-------|
+| ---------- | ----- | ------- |
 | **Healthy / Pass** | `#37CA37` | Certified sites, within threshold |
 | **Warning / Advisory** | `#F6AD55` | Near threshold, needs monitoring |
 | **Critical / Fail** | `#E93D3D` | Exceeds threshold, immediate action |
@@ -62,7 +64,7 @@ FJ SafeSpace is a **technology-driven indoor air quality and wellness platform**
 ### 3.1 Font Families
 
 | Role | Font | Weight | Source |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | **Headlines** | Montserrat | 500–700 | fjsafespace.com |
 | **Body** | Open Sans | 400–600 | fjsafespace.com |
 | **Data / Code** | Inter | 400–600 | Dashboard numbers, badges |
@@ -71,7 +73,7 @@ FJ SafeSpace is a **technology-driven indoor air quality and wellness platform**
 ### 3.2 Type Scale
 
 | Element | Size | Weight | Line-height | Letter-spacing |
-|---------|------|--------|-------------|----------------|
+| --------- | ------ | -------- | ------------- | ---------------- |
 | H1 (page title) | 32px / `text-3xl` | 700 | 1.2 | -0.02em |
 | H2 (section) | 24px / `text-2xl` | 600 | 1.3 | -0.01em |
 | H3 (card title) | 18px / `text-lg` | 600 | 1.4 | 0 |
@@ -80,6 +82,7 @@ FJ SafeSpace is a **technology-driven indoor air quality and wellness platform**
 | Data / Metric | 28px+ / `text-4xl` | 700 | 1.1 | -0.03em |
 
 ### 3.3 Typography Rules
+
 - **Never use more than 2 font families per view** (Montserrat for headings + Inter for body/data)
 - **Data numbers** should always use `tabular-nums` font feature
 - **Uppercase labels** use `tracking-widest` (0.1em) for tech feel
@@ -90,19 +93,23 @@ FJ SafeSpace is a **technology-driven indoor air quality and wellness platform**
 ## 4. Layout & Spacing
 
 ### 4.1 Grid System
+
 - **Desktop**: 12-column grid, `max-w-7xl` container, `px-6` padding
 - **Tablet**: 8-column grid
 - **Mobile**: 4-column grid, full bleed
 
 ### 4.2 Spacing Scale
+
 Use Tailwind's default spacing scale. Key patterns:
+
 - **Card gap**: `gap-4` (16px) between cards
 - **Section gap**: `gap-6` (24px) between sections
 - **Card padding**: `p-6` (24px) internal
 - **Page padding**: `p-6` (24px) on main content area
 
 ### 4.3 Card Anatomy
-```
+
+```text
 ┌─────────────────────────────────────┐
 │  [Icon]  Card Title          [Badge]│  ← Header: icon + title + optional badge
 │                                     │
@@ -115,6 +122,7 @@ Use Tailwind's default spacing scale. Key patterns:
 ```
 
 ### 4.4 Border Radius
+
 - **Cards**: `rounded-xl` (16px) — matches brand radius
 - **Buttons**: `rounded-full` (pill) for primary CTAs, `rounded-md` for secondary
 - **Badges**: `rounded-full` (pill)
@@ -127,25 +135,29 @@ Use Tailwind's default spacing scale. Key patterns:
 These subtle touches differentiate the dashboard from a generic admin panel:
 
 ### 5.1 Data Visualization Style
+
 - **Charts**: Clean lines, no grid clutter, smooth curves (`tension: 0.4`)
 - **Sparklines**: Inline mini-charts for trend indicators
 - **Pulse animations**: Subtle `animate-pulse` on live data indicators
 - **Monospace numbers**: Use `font-mono tabular-nums` for metric values
 
 ### 5.2 Status Indicators
-```
+
+```text
 ● Live    — green dot with animate-pulse
 ● Syncing — amber dot with animate-ping
 ● Offline — gray dot, static
 ```
 
 ### 5.3 Micro-interactions
+
 - **Hover on cards**: `transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5`
 - **Active nav items**: `bg-muted` with left border accent (`border-l-2 border-primary`)
 - **Button press**: `active:scale-95` for tactile feedback
 - **Loading states**: Skeleton shimmer, not spinners (where possible)
 
 ### 5.4 Tech Accents (use sparingly)
+
 - **Subtle grid pattern** on hero/overview backgrounds (`bg-[url(...)]` or CSS pattern)
 - **Gradient borders** on featured cards (`border-gradient` effect)
 - **Glass morphism** on overlays: `backdrop-blur-sm bg-white/80`
@@ -158,7 +170,7 @@ These subtle touches differentiate the dashboard from a generic admin panel:
 ### 6.1 Buttons
 
 | Variant | Style | Use When |
-|---------|-------|----------|
+| --------- | ------- | ---------- |
 | **Primary** | `bg-primary text-white rounded-full` | Main actions (Upload, Generate Report) |
 | **Secondary** | `border border-primary/20 text-primary rounded-md` | Supporting actions |
 | **Ghost** | `hover:bg-muted rounded-md` | Tertiary actions, filters |
@@ -177,7 +189,7 @@ These subtle touches differentiate the dashboard from a generic admin panel:
 ### 6.3 Badges
 
 | Variant | Style | Use |
-|---------|-------|-----|
+| --------- | ------- | ----- |
 | **Healthy** | `bg-green-100 text-green-800` | PASS, Certified |
 | **Warning** | `bg-yellow-100 text-yellow-800` | Advisory, Improvement |
 | **Critical** | `bg-red-100 text-red-800` | FAIL, Critical |
@@ -185,6 +197,7 @@ These subtle touches differentiate the dashboard from a generic admin panel:
 | **Purple** | `bg-primary/10 text-primary` | Brand badges, source type |
 
 ### 6.4 Tables
+
 - **Striped rows**: `even:bg-muted/50` for readability
 - **Sticky header**: `sticky top-0 bg-white z-10`
 - **Hover row**: `hover:bg-muted`
@@ -192,6 +205,7 @@ These subtle touches differentiate the dashboard from a generic admin panel:
 - **Alignment**: Numbers right-aligned, text left-aligned
 
 ### 6.5 Forms
+
 - **Labels**: Above input, `text-sm font-medium text-foreground`
 - **Required**: Red asterisk `*` after label text
 - **Error state**: Red border + helper text below input
@@ -202,13 +216,15 @@ These subtle touches differentiate the dashboard from a generic admin panel:
 ## 7. Iconography
 
 ### 7.1 Icon Library
+
 - **Lucide React** as primary icon set (already in use)
 - **Size**: `h-4 w-4` inline, `h-5 w-5` standalone, `h-6 w-6` hero
 - **Stroke**: `stroke-width: 2` (default)
 
 ### 7.2 Icon Mappings
+
 | Concept | Icon | Context |
-|---------|------|---------|
+| --------- | ------ | --------- |
 | Upload | `UploadCloud` | CSV ingest |
 | Findings | `Search` / `AlertTriangle` | Rule violations |
 | Report | `FileText` | Report generation |
@@ -224,17 +240,20 @@ These subtle touches differentiate the dashboard from a generic admin panel:
 ## 8. Data Presentation Rules
 
 ### 8.1 Numbers
+
 - **Wellness Index**: Always show as `XX/100` with color-coded background
 - **Percentages**: Always 1 decimal place (`85.3%`)
 - **Concentrations**: Include units inline (`450 ppm CO₂`)
 - **Dates**: `YYYY-MM-DD` format in tables, `DD MMM YYYY` in reports
 
 ### 8.2 Thresholds
+
 - **Within range**: Green text or badge
 - **±10% of threshold**: Amber warning
 - **Exceeds threshold**: Red text or badge + bold
 
 ### 8.3 Empty States
+
 - Never show blank tables — use illustration + text + CTA
 - Pattern: "No data yet" → "Upload a scan to get started" → [Upload Button]
 
@@ -243,12 +262,14 @@ These subtle touches differentiate the dashboard from a generic admin panel:
 ## 9. Responsive Behavior
 
 ### 9.1 Breakpoints
+
 - **sm** (640px): Mobile, single column
 - **md** (768px): Tablet, 2-column grids
 - **lg** (1024px): Desktop, 3-4 column grids
 - **xl** (1280px): Wide desktop, sidebar + content
 
 ### 9.2 Mobile Adaptations
+
 - **Sidebar**: Becomes bottom nav or hamburger menu
 - **Tables**: Card-based list view on mobile
 - **Charts**: Full width, reduced height
@@ -280,7 +301,7 @@ These subtle touches differentiate the dashboard from a generic admin panel:
 ## 12. Reference: fjsafespace.com Design Alignment
 
 | Website Element | Dashboard Equivalent |
-|-----------------|---------------------|
+| ----------------- | --------------------- |
 | Purple CTA buttons | Primary buttons use `#8700E3` |
 | Green health indicators | Wellness Index uses `#37CA37` |
 | Clean white cards on mint bg | Same pattern in dashboard |

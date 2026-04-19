@@ -1,9 +1,11 @@
 # FJDashboard — CLAUDE.md
 
 ## Project Overview
+
 FJDashboard is the operational and reporting interface for the FJ SafeSpace Indoor Air Quality (IAQ) platform. It processes rule-based findings into traceable reports for operations and executive views.
 
 ### Core Architecture
+
 - **Backend:** FastAPI (Python 3.12+), SQLModel (SQLAlchemy), Alembic for migrations.
 - **Frontend:** Next.js 15 (App Router), TypeScript, Tailwind CSS, Shadcn UI, Recharts.
 - **Database:** PostgreSQL (local via Docker Compose, production via Render/Supabase).
@@ -12,8 +14,8 @@ FJDashboard is the operational and reporting interface for the FJ SafeSpace Indo
 - **Database:** PostgreSQL (Supabase production: `jertvmbhgehajcrfifwl`, local via Docker Compose).
 - **Environment:** Single `.env` at project root for both backend and frontend.
 - **Workflows:**
-    - **Workflow A:** Standards governance (Reference Vault → Citation Units → Rulebook).
-    - **Workflow B:** Scan-to-Report operations (Upload → Readings → Findings → Report).
+  - **Workflow A:** Standards governance (Reference Vault → Citation Units → Rulebook).
+  - **Workflow B:** Scan-to-Report operations (Upload → Readings → Findings → Report).
 
 ---
 
@@ -41,7 +43,7 @@ FJDashboard is the operational and reporting interface for the FJ SafeSpace Indo
 The project has been simplified from 3 phases with multiple pages down to 2 views:
 
 | View | Route | Purpose |
-|---|---|---|
+| --- | --- | --- |
 | **Operations** | `/ops` | Upload CSV, review findings, generate reports (3 tabs) |
 | **Executive** | `/executive` | Results summary, top risks/actions, historical scan selector |
 
@@ -182,6 +184,7 @@ All 9 QA gate tests (QA-G1 to QA-G9) must pass before merging to `main`. Key gat
 - If any gate fails, do NOT generate or export the PDF.
 
 ### Design Principles
+
 - **Evidence Before Aesthetics:** Accuracy and traceability take precedence over visual flair.
 - **Synchronous Pipeline:** All processing (parsing and PDF generation) is currently synchronous.
 - **Surgical Updates:** When modifying schema or API contracts, ensure the TDD version is bumped and recorded in the Decision Log.
@@ -237,38 +240,46 @@ All 9 QA gate tests (QA-G1 to QA-G9) must pass before merging to `main`. Key gat
 ---
 
 ## Workflow A: IAQ Rule Governor
+
 Governs the Reference Vault → Citation Units → Rulebook pipeline.
 
 ### Ingesting a New Standard
+
 1. Register `ReferenceSource` with appropriate `source_currency_status`.
 2. Create `CitationUnit` records for specific clauses, ensuring verbatim `exact_excerpt`.
 3. Draft `RulebookEntry` records linked to new citations.
 
 ### Updating Thresholds
+
 1. Locate existing `RulebookEntry`.
 2. Mark old entry as `superseded` and set `effective_to`.
 3. Create new `RulebookEntry` with updated values, increment `rule_version`.
 
 ### Guardrails
+
 - No rule can exist without at least one linked `CitationUnit`.
 - Models: `backend/app/models/workflow_a.py`
 
 ---
 
 ## Workflow B: Report Template Stylist
+
 Governs WeasyPrint HTML/CSS templates for PDF reports.
 
 ### Creating/Updating Templates
+
 - Use `Jinja2` syntax in `backend/app/templates/`.
 - Define `@page` rules in CSS for A4 margins and header/footer.
 - Template must branch for `ASSESSMENT` and `INTERVENTION_IMPACT` report types.
 
 ### Executive Brief
+
 - Display status: `HEALTHY_WORKPLACE_CERTIFIED`, `HEALTHY_SPACE_VERIFIED`, etc.
 - Highlight top 3 findings by `alert_priority`.
 - Include reviewer name and date (QA-G8 requirement).
 
 ### Previewing Templates
+
 ```bash
 python scripts/preview_report.py --template assessment.html --data assets/sample_finding_data.json --output preview.pdf
 ```
@@ -276,6 +287,7 @@ python scripts/preview_report.py --template assessment.html --data assets/sample
 ---
 
 ## QA Compliance Audit
+
 ```bash
 python scripts/run_qa_audit.py --upload-id <UPLOAD_UUID>
 ```
