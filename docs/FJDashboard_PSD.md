@@ -67,13 +67,15 @@ Deliver the dashboard layer of FJ SafeSpace that converts approved, rule-based f
 
 ### Out of Scope
 
-- Findings generation or threshold setting (governed by Rulebook governance workflow)
+- Findings generation or threshold setting (governed by Rulebook, populated via seed script)
 - Any path for manual threshold override — permanently disabled at service level
+- Admin CRUD UI for rulebook management (Phase 1/2) — rules are curated via seed script
 - Customer self-service report editing
 - BMS/IoT control automation
 - Alert queue management, ticket assignment, and action due dates
 - Real-time Intervention Tracker UI — multi-scan before/after comparison tools are deferred to Phase 2; the Intervention Impact Report is a single-scan product
 - Live uHoo API ingestion before Phase 3 API feasibility sprint is complete
+- LLM-assisted PDF extraction for rulebook population (future enhancement, deferred)
 
 ---
 
@@ -116,6 +118,18 @@ Approved Report + Certification Outcome
   → Renewal Trigger → in-app + email → recertification workflow prompt
 ```
 
+### Workflow A — Rulebook Population (Seed-Driven)
+
+```
+Curated Seed Script (code)
+  → Populate ReferenceSource, CitationUnit, RulebookEntry tables
+    → Approved Rulebook entries (rule_version, thresholds, citations)
+      → Read-only API (GET /api/rulebook/*)
+        → Workflow B: CSV readings evaluated against rulebook
+```
+
+> **Note**: Workflow A rules are populated via a curated Python seed script (`scripts/seed_rulebook_v1.py`), not a manual admin UI. Standards (WHO AQG 2021, SS554, etc.) are read by a human and encoded directly in code. This is accurate, auditable via code review, and sufficient for Phase 1/2 where we have a small, stable set of standards. LLM-assisted PDF extraction is a future enhancement (deferred).
+
 
 ---
 
@@ -150,9 +164,25 @@ All fields from PSD-01 §4 — `site_name`, `zone_name`, `device_id`, `reading_t
 
 ## 5. Service Architecture
 
-> All three services consume the Rulebook runtime API in **read-only** mode. No service in the dashboard layer may write to or mutate the Rulebook.
+> All three services consume the Rulebook runtime API in **read-only** mode. No service in the dashboard layer may write to or mutate the Rulebook. The Rulebook is populated by a seed script (`scripts/seed_rulebook_v1.py`), not by any dashboard service or admin UI.
 
-### 5.1 Dashboard Aggregation Service
+### 5.1 Rulebook Population (Workflow A)
+
+**Method**: Curated Python seed script — standards are read by a human and encoded directly in code.
+
+**Inputs**: Human-curated threshold values from WHO AQG 2021, SS554, and other certification standards.
+
+**Outputs**:
+
+- `ReferenceSource` records — one per standard (title, publisher, jurisdiction, currency status).
+- `CitationUnit` records — verbatim excerpts from the standard with metric/condition tags.
+- `RulebookEntry` records — approved runtime thresholds with interpretation templates and wellness index weights.
+
+**Update process**: When a standard updates, the developer edits the seed script, bumps `rule_version`, marks old entries as `superseded`, and re-runs.
+
+**Future enhancement**: LLM-assisted PDF extraction — upload a PDF, LLM extracts thresholds, human reviews and approves. Deferred until manual update burden becomes significant.
+
+### 5.2 Dashboard Aggregation Service
 
 **Purpose:** Compute and serve site/zone summary cards for all role views.
 

@@ -2,12 +2,12 @@
 
 | Field | Value |
 |---|---|
-| **Document** | FJDashboard TDD v0.1 |
-| **Date** | 2026-04-12 |
+| **Document** | FJDashboard TDD v0.2 |
+| **Date** | 2026-04-12 (Revised: 2026-04-18) |
 | **Owner** | Jeff |
 | **PM** | Lyra |
 | **Status** | Draft for Review |
-| **Parent PRD** | FJDashboard PRD v1.1 (`FJDashboard_PRD.md`) |
+| **Parent PRD** | FJDashboard PRD v1.2 (`FJDashboard_PRD.md`) |
 | **Parent PSD** | FJDashboard PSD-02 v0.2 (`FJDashboard_PSD.md`) |
 
 ---
@@ -77,10 +77,10 @@
 
 | Workflow | Purpose | Access |
 |---|---|---|
-| **Workflow A** | Standards governance (Reference Vault → Rulebook) | Admin console at `/admin` only |
+| **Workflow A** | Rulebook population via seed script | `scripts/seed_rulebook_v1.py` only |
 | **Workflow B** | Scan-to-Report operations | Core dashboard application |
 
-> Dashboard services **never write to Rulebook tables**. Workflow A admin console uses a separate DB role with full privileges.
+> Dashboard services **never write to Rulebook tables**. The Rulebook is populated by a seed script that directly inserts approved entries. No admin UI or CRUD routes exist in Phase 1/2.
 
 ### 1.4 Deployment Model
 
@@ -471,7 +471,7 @@ app/
 │       └── reports/[id]/page.tsx       ← Report preview + QA checklist
 │
 ├── admin/
-│   └── page.tsx                        ← Workflow A: Rulebook governance console
+│   └── page.tsx                        ← Placeholder (Phase 1/2; future admin UI)
 │
 ├── customer/                           ← Phase 3 only; Clerk middleware required
 │   ├── layout.tsx                      ← customer shell (tenant-scoped nav)
@@ -564,12 +564,11 @@ backend/
 ### 6.4 Rulebook Write Protection
 
 | DB Role | Tables | Permissions |
-|---|---|---|
+| ------ | ------ | ------ |
 | App role (`DATABASE_URL`) | All Workflow B tables | Full read/write |
 | App role (`DATABASE_URL`) | `RulebookEntry`, `CitationUnit`, `ReferenceSource` | `SELECT` only |
-| Admin role (`ADMIN_DATABASE_URL`) | All tables | Full read/write |
 
-> No Route Handler in the dashboard codebase uses `ADMIN_DATABASE_URL`. Workflow A admin console is an isolated module.
+> The Rulebook is populated exclusively by the seed script (`scripts/seed_rulebook_v1.py`) which runs with direct database access. No API route in the dashboard writes to Rulebook tables. LLM-assisted PDF extraction (future) will require a separate admin DB role.
 
 ---
 
@@ -695,9 +694,9 @@ volumes:
 ### 9.4 Environment Variables
 
 | Variable | Ph 1/2 | Ph 3 | Description |
-|---|---|---|---|
+| ------ | ------ | ------ | ------ |
 | `DATABASE_URL` | ✅ | ✅ | DB connection string for SQLAlchemy |
-| `ADMIN_DATABASE_URL` | ✅ | ✅ | Workflow A admin DB role (full rulebook access) |
+| `ADMIN_DATABASE_URL` | ❌ | ✅ | Admin DB role for future LLM-assisted rule ingestion (deferred) |
 | `RESEND_API_KEY` | ✅ | ✅ | Email dispatch via Resend |
 | `APPROVER_EMAIL` | ✅ | ✅ | Jay Choy's email — enforced in report approval gate |
 | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | ❌ | ✅ | Clerk publishable key |

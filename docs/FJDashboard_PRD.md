@@ -1,6 +1,6 @@
 # FJDashboard — Product Requirements Document
-**Version:** 1.1
-**Date:** 2026-04-11
+**Version:** 1.2
+**Date:** 2026-04-11 (Revised: 2026-04-18)
 **Owner:** Jeff
 **PM:** Lyra
 **Parent PRD:** FJ SafeSpace PRD v0.4
@@ -359,28 +359,38 @@ Minimum evidence pack (mandatory for Pass / Conditional / Fail):
 
 ---
 
-## 23. Standards Governance Model
+## 23. Standards Governance Model (Revised 2026-04-18)
 
-- Product scope includes a Reference Vault, ingestion pipeline, review queue, and approved Rulebook DB.
+- Product scope includes a Reference Vault populated via a curated seed script (`scripts/seed_rulebook_v1.py`).
+- Standards (WHO AQG 2021, SS554, etc.) are read by a human, and threshold values, citation excerpts, and interpretation templates are encoded directly in the seed script.
 - Report outputs must include citation IDs and rule version used for each non-obvious claim.
 - RAG is advisory only; Rulebook remains the runtime source of truth for thresholds and compliance framing.
 - Decision model is strictly rule-based; no expert override path in current operating model.
 - SLA measurement starts at analyst upload time (not last sensor reading time).
 - Final approval authority is Jay Choy only for: rule changes, customer report release, and certification outcomes.
+- Future enhancement: LLM-assisted PDF extraction for rulebook population (deferred).
 
 ---
 
-## 24. Dual Workflow Operating Model (Locked 2026-04-08)
+## 24. Dual Workflow Operating Model (Locked 2026-04-08, Revised 2026-04-18)
 
-### Workflow A — Standards and Reference Governance
+### Workflow A — Rulebook Population (Seed-Driven)
 
-Purpose: Maintain an accurate and auditable Rulebook.
+Purpose: Maintain an accurate and auditable Rulebook via curated code, not manual UI entry.
+
+**Method**: A Python seed script (`scripts/seed_rulebook_v1.py`) enculates threshold values from certification standards (WHO AQG 2021, SS554, etc.) directly in code. A human reads the standard, extracts the relevant thresholds, and writes them into the script. The script is reviewed, merged, and run to populate the database.
+
+**Why seed script over admin UI**: Standards change infrequently (annually at most). We have a small, known set of standards (~3-5). A full admin CRUD console with approval workflows adds hundreds of lines of code for minimal Phase 1/2 value. The seed script is accurate, auditable via code review, and instant.
+
+**Update process**: When a standard updates, the developer edits the seed script, bumps `rule_version`, marks old entries as `superseded`, and re-runs.
+
+**Future enhancement**: LLM-assisted PDF extraction — upload a PDF, LLM extracts thresholds, human reviews and approves. Deferred until manual update burden becomes significant.
 
 Steps:
-1. Ingest raw standards/research documents into Reference Vault.
-2. Extract candidate clauses, thresholds, and applicability context.
-3. Perform human review and approval.
-4. Publish approved Rulebook version (vX.Y).
+1. Curate threshold values from standard documents (WHO AQG 2021, SS554, etc.).
+2. Encode values in `scripts/seed_rulebook_v1.py` with verbatim citation excerpts.
+3. Code review and merge.
+4. Run seed script — populates approved `RulebookEntry` records.
 5. Mark superseded rule versions while preserving history.
 
 Outputs:
@@ -428,60 +438,49 @@ Outputs:
 
 ---
 
-## Appendix A — Standards Ingestion and Governance Pipeline
+## Appendix A — Standards Ingestion and Governance Pipeline (Revised 2026-04-18)
 
 ### Purpose
-Define the operational workflow to keep standards current and report logic trustworthy.
+Define how standards are converted into runtime Rulebook entries.
 
-### Pipeline Stages
+### Method: Seed Script (Phase 1/2)
 
-**Stage 1: Intake**
-- Add raw document to Reference Vault.
-- Register metadata (version, publisher, URL, checksum).
+Rulebook entries are populated via a curated Python seed script (`scripts/seed_rulebook_v1.py`). A human reads the standard document, extracts the relevant thresholds and citation excerpts, and encodes them directly in code. The script is reviewed, merged, and executed to populate the database.
 
-**Stage 2: Extraction**
-- Parse document into citation units.
-- Tag candidate metrics and thresholds.
-- Mark low-confidence extracts for manual review.
+**Rationale**: We have a small, known set of standards (~3-5) that change infrequently. A seed script is accurate, auditable via code review, and avoids building a full admin CRUD UI for Phase 1/2.
 
-**Stage 3: Review**
-- Reviewer validates excerpt accuracy.
-- Reviewer confirms applicability context.
-- Reviewer assigns confidence and approval notes.
+### Update Process
 
-**Stage 4: Rule Drafting**
-- Convert approved citation units into proposed rules.
-- Attach interpretation and recommendation templates.
+1. Developer reads the updated standard document.
+2. Edits `scripts/seed_rulebook_v1.py` — updates/adds `ReferenceSource`, `CitationUnit`, and `RulebookEntry` records.
+3. Bumps `rule_version` for changed entries.
+4. Marks old entries as `superseded` with `effective_to` date.
+5. Code review and merge.
+6. Run seed script to populate the database.
 
-**Stage 5: Approval and Publish**
-- Approver signs off rule version.
-- Rule is promoted to runtime Rulebook.
-- Superseded rules stay archived but queryable.
+### Future Enhancement: LLM-Assisted Extraction (Deferred)
 
-**Stage 6: Monitoring**
-- Track source updates quarterly.
-- Trigger re-ingestion when new editions are detected.
+When the manual update burden becomes significant, a future enhancement will add LLM-assisted PDF extraction: upload a PDF, LLM extracts thresholds and citations, human reviews and approves. This is deferred until needed.
 
 ### Roles and Responsibilities
 
 | Role | Responsibility |
-|---|---|
-| Intake Owner | Captures source and metadata |
-| Reviewer | Validates extraction and applicability |
-| Approver | Signs off production rule changes |
-| Product Owner | Confirms business-language policy |
+| ------ | ------ |
+| Curator | Reads standard documents, encodes thresholds in seed script |
+| Reviewer | Code-reviews seed script changes for accuracy |
+| Approver | Signs off production rule changes (Jay Choy) |
 
 ### SLAs
 
 | Task | SLA |
-|---|---|
-| New source intake | Within 3 business days |
-| Extraction review | Within 5 business days |
+| ------ | ------ |
+| New standard intake (seed script update) | Within 3 business days |
 | Critical standard update publish | Within 7 business days |
 
 ### Release Gates
-- Gate A: source metadata complete
-- Gate B: citation accuracy verified
+
+- Gate A: source metadata complete in seed script
+- Gate B: citation accuracy verified against source document
 - Gate C: rule impact assessed
 - Gate D: approval sign-off complete
 

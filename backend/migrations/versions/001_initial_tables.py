@@ -20,9 +20,9 @@ def _guid_pk(col_name: str = 'id') -> sa.Column:
     return sa.Column(col_name, sa.String(length=36), primary_key=True)
 
 
-def _guid_fk(col_name: str, foreign_table: str, nullable: bool = False) -> sa.Column:
+def _guid_fk(col_name: str, foreign_table: str, nullable: bool = False, unique: bool = False) -> sa.Column:
     """Foreign key column referencing a string-based UUID."""
-    return sa.Column(col_name, sa.String(length=36), sa.ForeignKey(f'{foreign_table}.id'), nullable=nullable)
+    return sa.Column(col_name, sa.String(length=36), sa.ForeignKey(f'{foreign_table}.id'), nullable=nullable, unique=unique)
 
 
 # revision identifiers, used by alembic.
@@ -118,10 +118,10 @@ def upgrade() -> None:
     # ── report (from workflow_b.py) ──────────────────────────────────────
     op.create_table(
         'report',
-        sa.Column('id', sqlmodel.sql.sqltypes.GUID(), primary_key=True),
+        _guid_pk(),
+        _guid_fk('upload_id', 'upload', unique=True),
+        _guid_fk('site_id', 'site'),
         sa.Column('report_type', sa.String(), nullable=False, server_default='ASSESSMENT'),
-        sa.Column('upload_id', sqlmodel.sql.sqltypes.GUID(), sa.ForeignKey('upload.id'), unique=True, nullable=False),
-        sa.Column('site_id', sqlmodel.sql.sqltypes.GUID(), sa.ForeignKey('site.id'), nullable=False),
         sa.Column('report_version', sa.Integer(), nullable=False, server_default='1'),
         sa.Column('rule_version_used', sa.String(), nullable=False),
         sa.Column('citation_ids_used', sa.String(), nullable=False),
@@ -135,7 +135,7 @@ def upgrade() -> None:
     # ── reference_source (from workflow_a.py) ────────────────────────────
     op.create_table(
         'reference_source',
-        sa.Column('id', sqlmodel.sql.sqltypes.GUID(), primary_key=True),
+        _guid_pk(),
         sa.Column('title', sa.String(), nullable=False),
         sa.Column('publisher', sa.String(), nullable=False),
         sa.Column('source_type', sa.String(), nullable=False),
@@ -156,8 +156,8 @@ def upgrade() -> None:
     # ── citation_unit (from workflow_a.py) ───────────────────────────────
     op.create_table(
         'citation_unit',
-        sa.Column('id', sqlmodel.sql.sqltypes.GUID(), primary_key=True),
-        sa.Column('source_id', sqlmodel.sql.sqltypes.GUID(), sa.ForeignKey('reference_source.id'), nullable=False),
+        _guid_pk(),
+        _guid_fk('source_id', 'reference_source'),
         sa.Column('page_or_section', sa.String(), nullable=True),
         sa.Column('exact_excerpt', sa.String(), nullable=False),
         sa.Column('metric_tags', sa.String(), nullable=False),
@@ -172,7 +172,7 @@ def upgrade() -> None:
     # ── rulebook_entry (from workflow_a.py) ──────────────────────────────
     op.create_table(
         'rulebook_entry',
-        sa.Column('id', sqlmodel.sql.sqltypes.GUID(), primary_key=True),
+        _guid_pk(),
         sa.Column('metric_name', sa.String(), nullable=False),
         sa.Column('threshold_type', sa.String(), nullable=False),
         sa.Column('min_value', sa.Float(), nullable=True),
@@ -191,6 +191,7 @@ def upgrade() -> None:
         sa.Column('approval_status', sa.String(), nullable=False),
         sa.Column('approved_by', sa.String(), nullable=True),
         sa.Column('approved_at', sa.DateTime(), nullable=True),
+        sa.Column('citation_unit_ids', sa.String(), nullable=False),
     )
 
 

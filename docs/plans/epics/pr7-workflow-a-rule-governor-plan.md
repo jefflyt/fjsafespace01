@@ -1,178 +1,79 @@
-# Epic Plan: PR7 - Workflow A: IAQ Rule Governor (Phase 1)
+# Epic Plan: PR7 - Workflow A: Rulebook Population (Phase 1)
+
+**Status: COMPLETE (2026-04-19)** — All 3 sub-tasks implemented, seeded, and verified.
 
 ## 1. Feature/Epic Summary
 
-- **Objective**: Build the admin console that allows authorized users to ingest certification standards (WHO, BCA, SS554, etc.), extract citation units, draft/approve rulebook entries, and manage threshold versioning. This is the governance layer that powers the rule evaluation engine used by Workflow B.
-- **User Impact**: Without this feature, the system has no rules to evaluate against — all findings would return "Insufficient Evidence." This is a foundational gap that blocks PR2 (rule evaluation), PR3 (citation badges), PR4 (QA gates), and PR5 (PDF generation).
-- **Dependencies**: None from prior PRs — this is a parallel/preceding track. Requires the database migration fix (GUID type compatibility) before any routes work.
+- **Objective**: Populate the Rulebook tables with IAQ thresholds from certification standards (WHO AQG 2021, SS554, etc.) so that Workflow B (Scan-to-Report) has rules to evaluate CSV readings against. The rulebook is the single source of truth for all report generation.
+- **User Impact**: Without rules in the database, all findings return "Insufficient Evidence." This is a foundational gap that blocks PR2 (rule evaluation), PR3 (citation badges), PR4 (QA gates), and PR5 (PDF generation).
+- **Dependencies**: None from prior PRs — this is a parallel/preceding track. Requires the database migration fix (GUID type compatibility) before any tables can be created.
 
 ## 2. Complexity & Fit
 
-- **Classification**: Multi-PR (6 PRs)
-- **Rationale**: This epic spans three distinct concern areas — (a) infrastructure fix to unblock all database access, (b) a full admin CRUD backend with dual-DB-role routing, and (c) a multi-step admin UI with validation, approval workflows, and versioning. Each concern touches different layers (backend routes, admin frontend, migration, service logic) and should be merged independently for safe testing.
+- **Classification**: Single PR (3 sub-tasks)
+- **Rationale**: Rather than building a full admin CRUD console with approval workflows and version tracking, we use a **seed script approach**. Standards are curated by a human reading the PDF and encoding the thresholds directly in code. This is pragmatic: we have ~3-5 standards that change infrequently (annually at most). A full admin UI adds hundreds of lines of code, form validation, and dual-DB role complexity for very little value in Phase 1/2.
 
 ## 3. Full-Stack Impact
 
-- **Frontend**: Single-page admin at `/admin` using a 3-tab layout (Sources | Citations | Rulebook) with inline editing via dialogs. No nested routes, no separate detail pages. Reuses existing Shadcn components (Table, Badge, Dialog, Select, Input, Textarea, Card). New lightweight components: `SourceCurrencyBadge`, `StatusPill`, `InlineEditor`. Admin gets a navbar link in [Navbar.tsx](frontend/components/layout/Navbar.tsx).
-
-- **Backend**: Admin-only CRUD routes for ReferenceSource, CitationUnit, RulebookEntry under `/api/admin/*`. Read-only GET routes for rulebook at `/api/rulebook/*` (currently 501 stubs). Dual-database-role wiring (`DATABASE_URL` SELECT-only vs `ADMIN_DATABASE_URL` full write). PDF/document ingest service. Supersession/versioning logic.
-
+- **Frontend**: No admin UI needed in Phase 1/2. The existing `/admin` page can remain as a placeholder. No new frontend components.
+- **Backend**: Database migration fix (GUID type), seed script to populate rulebook tables, and implementation of the existing stubbed GET routes in `rulebook.py` so Workflow B can consume rulebook data.
 - **Data**: Workflow A tables already defined in migration 001 but never created due to `sqlmodel.sql.sqltypes.GUID` incompatibility. No new schema fields needed — the existing model is complete.
-
----
-
-## UI Design Principles (Simplified)
-
-**One page, three tabs, zero navigation depth.** The entire admin console lives at `/admin`. No drill-down pages, no nested routes. Every action is 1-2 clicks from the tab.
-
-```text
-/admin
-├── Tab 1: Sources  (list table + "Add Source" dialog)
-├── Tab 2: Citations (list table filtered by selected source + "Add Citation" dialog)
-└── Tab 3: Rulebook (list table with status filter + "Add Rule" dialog + inline approve/supersede)
-```
-
-### Click-minimized workflows
-
-| Workflow | Steps | How |
-| --- | --- | --- |
-| Add a new standard | 2 | Tab "Sources" → "Add Source" → fill form → Submit |
-| Add citations to a source | 3 | Tab "Sources" → click source row → auto-switches to "Citations" tab filtered → "Add Citation" → fill → Submit |
-| Create a rule from a citation | 3 | Tab "Citations" → click citation → auto-switches to "Rulebook" tab with citation pre-linked → "Add Rule" → fill → Submit |
-| Approve a rule | 1 | Tab "Rulebook" → click "Approve" button on draft row → confirm dialog |
-| Supersede a rule | 2 | Tab "Rulebook" → click "Supersede" on approved row → confirm dialog |
-| Upload a PDF to a source | 2 | Tab "Sources" → click "Upload" on source row → file picker → Submit |
-| Check governance health | 0 | Summary bar always visible at top of `/admin` (counts of sources, citations, approved rules, pending) |
-
-### Rejected complexity
-
-- **No separate detail pages** — all editing happens in Dialog overlays. User never leaves `/admin`.
-- **No version diff viewer** (deferred) — superseded rules are visible in the Rulebook table with a "Superseded" badge. Full diff view is a nice-to-have, not essential.
-- **No multi-step wizard** for rule creation — single form with all fields. Required fields only (metric, threshold type, values, unit, context, 1 citation link, template text).
-- **No separate "Governance" tab** — governance summary is a persistent top bar. Advisory warnings are inline badges on rows.
 
 ---
 
 ## 4. PR Roadmap
 
-### PR 7.1: Database Migration Fix + Admin DB Role Wiring
+### PR 7.1: Database Migration Fix ✅ COMPLETE
 
-- **Goal**: Fix the Alembic migration GUID type incompatibility and wire up dual-database-role access.
+- **Goal**: Fix the Alembic migration GUID type incompatibility so all tables can be created.
 - **Scope (in)**:
-  - Fix `sqlmodel.sql.sqltypes.GUID` import error — replace with compatible UUID column type or install correct SQLModel version.
+  - Fix `sqlmodel.sql.sqltypes.GUID` import error — replaced with `sa.String(length=36)` in migration (matches the model's `str(uuid4())` approach).
+  - Fixed duplicate `upload_id`/`site_id` columns on `report` table.
+  - Added `citation_unit_ids` column to `rulebook_entry`.
+  - Fixed `alembic.ini` interpolation error — uses programmatic override in `env.py`.
   - Verify `alembic upgrade head` creates all tables including Workflow A tables (`reference_source`, `citation_unit`, `rulebook_entry`).
-  - Wire `ADMIN_DATABASE_URL` in `backend/app/core/config.py` and `backend/app/database.py`.
-  - Create a separate SQLAlchemy engine/session factory for admin writes.
-  - Update `alembic.ini` to accept `DATABASE_URL` from environment variable without interpolation errors.
-  - Backend health endpoint that verifies both DB roles can connect.
-- **Scope (out)**: No admin UI, no CRUD routes. Infrastructure only.
-- **Key Changes**: `backend/migrations/versions/001_initial_tables.py`, `backend/app/core/config.py`, `backend/app/database.py`, `backend/alembic.ini`, `backend/requirements.txt`.
-- **Testing**: `alembic upgrade head` succeeds. Both `DATABASE_URL` and `ADMIN_DATABASE_URL` connect and pass read/write permissions check. Unit tests verify admin engine can INSERT into Workflow A tables while dashboard engine cannot.
-- **Dependencies**: None. This must be merged first to unblock everything.
+- **Scope (out)**: No admin UI, no CRUD routes, no dual-DB role wiring. Infrastructure only.
+- **Key Changes**: `backend/migrations/versions/001_initial_tables.py`, `backend/alembic.ini`, `backend/app/models/workflow_a.py`
+- **Testing**: `alembic upgrade head` succeeds. All 9 tables exist in PostgreSQL.
 
-### PR 7.2: Reference Source Admin — CRUD + File Upload
+### PR 7.2: Rulebook Seed Script ✅ COMPLETE
 
-- **Goal**: Admin can register, list, edit, supersede, and delete certification standard sources. Supports uploading PDF documents to `bytea` storage.
+- **Goal**: A Python script that populates the rulebook with WHO AQG 2021 and SS554 thresholds.
 - **Scope (in)**:
-  - `POST /api/admin/sources` — create a new ReferenceSource (admin engine).
-  - `GET /api/admin/sources` — list all sources with filtering by status, type, jurisdiction.
-  - `GET /api/admin/sources/{id}` — get a single source.
-  - `PUT /api/admin/sources/{id}` — update source metadata.
-  - `POST /api/admin/sources/{id}/supersede` — mark source as superseded.
-  - `DELETE /api/admin/sources/{id}` — soft delete (set status to retired).
-  - `POST /api/admin/sources/{id}/upload` — upload a PDF standard document, store in `bytea` column, compute checksum.
-  - `GET /api/admin/sources/{id}/download` — download stored PDF.
-  - Validation: required fields (title, publisher, source_type, jurisdiction, status, source_currency_status).
-  - **Frontend**: `/admin` Sources tab — table list of sources with "Add Source" button (opens Dialog form). Click a source row to select it (highlighted), which auto-filters the Citations tab. Inline "Upload" and "Supersede" action buttons per row. Status shown via `SourceCurrencyBadge` (green = CURRENT_VERIFIED, amber = PARTIAL_EXTRACT, grey = SUPERSEDED).
-- **Scope (out)**: No citation extraction yet. No rulebook entry creation.
-- **Key Changes**: `backend/app/api/routers/admin_sources.py`, new admin router registration in `__init__.py`, Pydantic request/response schemas for sources, PDF checksum utility. `frontend/app/admin/page.tsx` — tab shell + Sources tab with table + add dialog. `frontend/components/SourceCurrencyBadge.tsx`.
-- **Testing**: Unit tests for CRUD operations. Integration test: upload PDF → verify checksum stored → download returns identical bytes. Test that dashboard engine (DATABASE_URL) cannot POST to admin routes (405 or 403).
-- **Dependencies**: PR 7.1 (database working).
+  - `scripts/seed_rulebook_v1.py` — creates ReferenceSource, CitationUnit, and RulebookEntry records for:
+    - **WHO AQG 2021** — PM2.5 annual (5 µg/m³), PM2.5 24h (15 µg/m³), TVOC (300 µg/m³).
+    - **SS554** — CO2 (1000 ppm), PM2.5 (35 µg/m³), Temperature (23–26°C), Humidity (40–70%RH).
+  - All entries created with `approval_status=approved`, `rule_version=v1.0`, `source_currency_status=CURRENT_VERIFIED`.
+  - Script is idempotent — safe to re-run without creating duplicates.
+  - `index_weight_percent` values set: CO2 25%, PM2.5 20%, TVOC 15%, Temp 10%, Humidity 10%.
+- **Scope (out)**: No admin UI, no API routes, no LLM-assisted extraction (deferred — see Future Features).
+- **Key Changes**: `scripts/seed_rulebook_v1.py` (new file), `backend/app/models/workflow_a.py` (added `citation_unit_ids`).
+- **Testing**: Seed script ran successfully — 2 sources, 7 citations, 7 approved rules populated.
 
-### PR 7.3: Citation Unit Admin — Extract, Tag, Edit
+### PR 7.3: Rulebook Read-Only API + Dashboard Integration ✅ COMPLETE
 
-- **Goal**: Admin can create citation units from a source, tag them with metrics/conditions, and mark them for review.
+- **Goal**: Implement the existing stubbed GET routes in `rulebook.py` so Workflow B can consume rulebook data.
 - **Scope (in)**:
-  - `POST /api/admin/sources/{source_id}/citations` — create a CitationUnit linked to a source.
-  - `GET /api/admin/sources/{source_id}/citations` — list all citations for a source.
-  - `GET /api/admin/citations/{id}` — get a single citation.
-  - `PUT /api/admin/citations/{id}` — edit citation fields (exact_excerpt, metric_tags, condition_tags, extracted values).
-  - `DELETE /api/admin/citations/{id}` — remove a citation.
-  - Validation: `exact_excerpt` required. `metric_tags` and `condition_tags` must be valid JSON arrays. `source_id` must exist.
-  - **Frontend**: Citations tab — table filtered by the source selected in Sources tab. "Add Citation" dialog with fields: source (auto-filled from selection), exact_excerpt (textarea), metric_tags (multi-select chips), condition_tags (multi-select chips), extracted_threshold_value, extracted_unit. Click "Needs Review" toggle. Inline edit/delete per row.
-- **Scope (out)**: No rulebook entry creation yet. No bulk import from PDF.
-- **Key Changes**: `backend/app/api/routers/admin_citations.py`, Pydantic schemas for citation create/update. `frontend/app/admin/page.tsx` — Citations tab with table + add dialog. `frontend/components/MetricTagSelect.tsx` reusable chip selector.
-- **Testing**: Unit tests for CRUD. Integration test: create citation without source → 400/404. Create citation with invalid metric_tags → 400. Test that a source with no citations cannot have approved rules (pre-validation for PR 7.4).
-- **Dependencies**: PR 7.2.
-
-### PR 7.4: Rulebook Entry Admin — Draft, Approve, Supersede
-
-- **Goal**: Admin can draft rulebook entries from citations, submit for approval, and manage version lifecycle.
-- **Scope (in)**:
-  - `POST /api/admin/rules` — create a RulebookEntry draft. Must link to at least one `citation_unit_id`.
-  - `GET /api/admin/rules` — list all rulebook entries with filters (metric_name, context_scope, approval_status, rule_version).
-  - `GET /api/admin/rules/{id}` — get a single rule with its linked citation_units.
-  - `PUT /api/admin/rules/{id}` — edit a draft rule. Cannot edit approved rules.
-  - `POST /api/admin/rules/{id}/approve` — approve a draft (sets approval_status=approved, approved_by, approved_at).
-  - `POST /api/admin/rules/{id}/supersede` — supersede an approved rule (sets approval_status=superseded, effective_to). Creates a new draft copy for re-drafting.
-  - Validation guardrails:
-    - Cannot approve a rule without at least one linked citation_unit.
-    - Cannot approve a rule from a non-CURRENT_VERIFIED source.
-    - Cannot edit an approved or superseded rule.
-    - `index_weight_percent` must sum to 100% across all metrics in a given rule_version (or be advisory-only).
-  - **Frontend**: Rulebook tab — table with status filter pills (All | Draft | Approved | Superseded). "Add Rule" dialog with fields: metric_name (select), threshold_type (select), min/max values, unit, context_scope (select), interpretation/business_impact/recommendation templates (textareas), citation_unit (select from Citations tab selection), index_weight_percent (number). Draft rows show "Approve" button (green). Approved rows show "Supersede" button (amber). Status shown via `StatusPill` component (grey=draft, green=approved, orange=superseded).
-- **Scope (out)**: No automated threshold extraction from PDF. No rule version diff viewer.
-- **Key Changes**: `backend/app/api/routers/admin_rules.py`, Pydantic schemas for rule create/update/approve. `frontend/app/admin/page.tsx` — Rulebook tab with table + add dialog + approve/supersede actions. `frontend/components/StatusPill.tsx`. Seed script `scripts/seed_rulebook_v1.py` (populates initial WHO/SS554 rules).
-- **Testing**: Unit tests for all CRUD + approve + supersede. Guardrail tests: approve without citation → blocked. Approve from non-CURRENT_VERIFIED source → blocked. Edit approved rule → blocked. Integration test: supersede rule → verify effective_to set → new draft created.
-- **Dependencies**: PR 7.3.
-
-### PR 7.5: Rulebook Read-Only API + Dashboard Integration
-
-- **Goal**: Implement the existing stubbed GET routes in `rulebook.py` so Workflow B can consume rulebook data. Connect the aggregation service to actual rulebook data.
-- **Scope (in)**:
-  - Implement `GET /api/rulebook/rules` — returns RulebookEntry[] with optional filters (metricName, contextScope, approvalStatus). Only returns `approved` entries.
-  - Implement `GET /api/rulebook/rules/{id}` — returns a single rule with linked citation_units.
-  - Implement `GET /api/rulebook/sources` — returns ReferenceSource[] with sourceCurrencyStatus.
-  - Enforce read-only: PUT/POST/DELETE on rulebook routes return 405.
-  - Fix the aggregation service (`backend/app/services/aggregation.py`) to use real rulebook data for wellness index calculation.
-  - Update Workflow B services (parser, evaluator) to fetch `rule_version` and `citation_id` from rulebook instead of hardcoded values.
-- **Scope (out)**: No admin UI changes. No new admin routes.
-- **Key Changes**: `backend/app/api/routers/rulebook.py` (replace 501 stubs), `backend/app/services/aggregation.py`, `backend/app/services/rule_engine.py` (if exists).
-- **Testing**: Unit tests for each GET route. Read-only enforcement test: POST to `/api/rulebook/rules` → 405. Integration test: create approved rule → GET returns it → create draft rule → GET does not return it. Wellness index calculation test: verify weights pulled from rulebook, not hardcoded.
-- **Dependencies**: PR 7.4 (approved rules must exist).
-
-### PR 7.6: Admin UI Polish + Navbar Integration
-
-- **Goal**: Polish the admin UI, add navbar link, advisory badges, and seed initial rules.
-- **Scope (in)**:
-  - Add "Admin" link to top navbar ([Navbar.tsx](frontend/components/layout/Navbar.tsx)) — positioned after "Executive".
-  - Advisory badges on rows: rules from non-CURRENT_VERIFIED sources get amber "Advisory" badge inline.
-  - Governance summary bar at top of `/admin`: compact stat cards showing source count, citation count, approved rules count, pending drafts.
-  - Responsive layout: ensure tabs collapse gracefully on smaller screens.
-  - Seed script `scripts/seed_rulebook_v1.py` — pre-populates v1.0 with WHO AQG 2021 and SS554 thresholds so the system works out of the box.
-- **Scope (out)**: No automated PDF parsing or AI-assisted extraction. No version diff viewer (deferred).
-- **Key Changes**: `frontend/components/layout/Navbar.tsx` — add Admin link. `frontend/app/admin/page.tsx` — governance summary bar. `scripts/seed_rulebook_v1.py`.
-- **Testing**: Verify navbar link navigates to `/admin`. Test advisory badges render on non-CURRENT_VERIFIED rows. Run seed script → verify all tabs populate with data. Test responsive layout at 768px breakpoint.
-- **Dependencies**: PR 7.5 (rulebook API returning data).
+  - Implemented `GET /api/rulebook/rules` — returns approved RulebookEntry[] with filters (metricName, contextScope, approvalStatus, includeSuperseded).
+  - Implemented `GET /api/rulebook/rules/{id}` — returns a single rule with linked citation_units.
+  - Implemented `GET /api/rulebook/sources` — returns ReferenceSource[] with sourceCurrencyStatus.
+  - Read-only enforced — only GET routes defined (PUT/POST/DELETE return 405 automatically).
+  - Aggregation service (`backend/app/services/aggregation.py`) already wired to real rulebook data via `_get_rulebook_weights`.
+- **Scope (out)**: No admin UI. No write endpoints.
+- **Key Changes**: `backend/app/api/routers/rulebook.py` (replaced all 501 stubs with working implementations).
+- **Testing**: All three endpoints return correct data. Filters work (metric_name, context_scope). 404 for missing rule IDs.
 
 ---
 
-## 5. Milestones & Sequence
+## 5. Milestones & Sequence ✅ ALL COMPLETE
 
-```
-PR 7.1 (DB fix + admin role)
-  → PR 7.2 (Source CRUD + upload)
-    → PR 7.3 (Citation editor)
-      → PR 7.4 (Rulebook draft/approve/supersede)
-        → PR 7.5 (Read-only API + dashboard integration)
-          → PR 7.6 (Admin UI polish + navbar + seed script)
+```text
+PR 7.1 (DB migration fix)              ✅ Complete
+  -> PR 7.2 (Seed script populates WHO AQG 2021 + SS554)   ✅ Complete
+    -> PR 7.3 (Read-only API + dashboard integration)      ✅ Complete
 ```
 
-**Critical path**: PR 7.1 → 7.2 → 7.3 → 7.4 → 7.5 → 7.6 (sequential — each PR depends on the previous).
-
-**Parallel opportunity**: PR 7.6 (frontend) can begin while PR 7.5 backend is being finalized, using mock data for the admin UI components.
-
-**Unblock priority**: PR 7.1 must be merged before any other PR can be tested end-to-end. Without it, all database operations fail.
+All three sub-tasks implemented, seeded, and verified against the running database (2026-04-19).
 
 ---
 
@@ -181,28 +82,61 @@ PR 7.1 (DB fix + admin role)
 ### Risks
 
 | Risk | Impact | Mitigation |
-|------|--------|------------|
-| **R1: SQLModel GUID compatibility** | Blocks all database access | PR 7.1 addresses this directly. Alternative: use `sa.Column(sa.Uuid(), ...)` in Alembic if SQLModel GUID isn't available in installed version. |
-| **R2: Admin security in Phase 1/2** | No auth = anyone with laptop access can modify rules | Acceptable for Phase 1/2 (internal laptop only). Document that admin routes are unprotected. Phase 3 must add Clerk auth + role-based access for admin. |
-| **R3: Manual data entry burden** | Admins must manually type exact_excerpt, thresholds, templates from PDF standards | Acceptable for MVP. Future enhancement: AI-assisted PDF parsing to auto-extract citations. |
-| **R4: Rule version weight validation** | index_weight_percent may not sum to 100% across metrics | Add validation in PR 7.4 approve endpoint. Warn (not block) if weights are incomplete — allow partial-weight advisory rules. |
-| **R5: Supersession cascade** | Superseding a rule may invalidate existing findings that reference it | Document that findings are immutable and reference the rule_version at time of evaluation. Superseding creates new versions; old findings remain valid for their context. |
+| ------ | ------ | ------ |
+| **R1: SQLModel GUID compatibility** | Blocks all database access | PR 7.1 addresses this directly. Use `sa.String(length=36)` to match model's `str(uuid4())` approach. |
+| **R2: Seed script accuracy** | Wrong thresholds in seed script → wrong findings → wrong reports | Seed script values must be cross-referenced against actual WHO AQG 2021 and SS554 documents. Jay Choy must approve before use in production reports. |
+| **R3: Standard updates** | When WHO or SS554 publish new editions, the seed script must be manually updated | Document the process. When a standard updates: edit the seed script, bump `rule_version` to `v2.0`, mark old entries as `superseded`, re-run. |
+| **R4: Manual burden for new standards** | Adding a new standard requires code changes and re-running the seed script | Acceptable for Phase 1/2 (3-5 standards, infrequent changes). Future enhancement: LLM-assisted PDF extraction (see Future Features). |
 
 ### Trade-offs
 
 | Decision | Rationale |
-|----------|-----------|
-| **bytea storage for PDFs** vs Supabase Storage | Lean MVP approach. Matches existing TDD decision. Can migrate to Supabase Storage later if file sizes grow. |
-| **Manual citation entry** vs automated PDF parsing | Automated extraction is complex (layout parsing, OCR, NLP). Manual entry ensures accuracy for the initial rulebook. Can add AI assist in a future PR. |
-| **Admin routes in same FastAPI app** vs separate service | Simpler deployment, same codebase. Security boundary is the `ADMIN_DATABASE_URL` role separation, not network isolation. Adequate for Phase 1/2. |
-| **No approval workflow UI** (single-click approve) vs multi-step review | The PSD names Jay Choy as sole approval authority. Single-click approve with email/name capture is sufficient. Multi-step workflow can be added if team grows. |
+| ------ | ------ |
+| **Seed script over admin CRUD** | Standards change infrequently. A full admin console (CRUD, approval workflows, version tracking, dual-DB roles) adds hundreds of lines of code for minimal Phase 1/2 value. Seed script is accurate, auditable (code review), and instant. |
+| **No admin UI in Phase 1/2** | The `/admin` page remains a placeholder. When standards need updating, the developer edits the seed script and re-runs. This is faster and less error-prone than a web form for the expected scale. |
+| **bytea storage for PDFs** | Matches existing TDD decision. Can migrate to Supabase Storage later if file sizes grow. |
+| **Approved-only entries in seed** | All seed entries are created as `approval_status=approved` with `approved_by="Jay Choy (seed)"`. In a future admin UI, a proper approval workflow can be added. |
 
 ### Open Questions
 
-1. **Q1: Seed script scope** — The seed script (`scripts/seed_rulebook_v1.py`) is planned for PR 7.6. Should it include WHO AQG 2021 + SS554 as default, or leave it minimal (1-2 entries) for testing only? Recommendation: include both standards fully — it saves manual setup and serves as the initial rulebook.
+1. **Q1: Seed script scope** — Should the seed include WHO AQG 2021 + SS554 fully, or leave it minimal? Recommendation: include both standards fully — it saves manual setup and serves as the initial rulebook.
 
-2. **Q2: How should rule versions be numbered?** — Current schema uses `rule_version: str`. Should this follow semver (`1.0.0`, `1.1.0`, `2.0.0`) or simple increments (`v1`, `v2`)? Recommendation: simple `v1`, `v2` for now — the TDD uses `v1.0` format.
+2. **Q2: Rule version numbering** — Current schema uses `rule_version: str`. Recommendation: use `v1.0`, `v2.0` format — simple, ordered, human-readable.
 
-3. **Q3: Should superseded rules be visible in the read-only API?** — Currently `GET /api/rulebook/rules` only returns `approved` entries. Should it also return superseded entries (for audit/history)? Recommendation: add `?include_superseded=true` query param to the GET endpoint.
+3. **Q3: Should superseded rules be visible in the read-only API?** — Currently `GET /api/rulebook/rules` only returns `approved` entries. Recommendation: add `?include_superseded=true` query param for audit/history access.
 
-4. **Q4: What happens when a source is superseded?** — Should all its citations and rules be automatically marked as superseded, or should the admin handle this manually? Recommendation: supersede source → prompt admin to review linked rules. Don't auto-supersede rules — they may still be valid under other sources.
+---
+
+## 7. Future Features (Deferred)
+
+### Feature: LLM-Assisted Standard Ingestion (Option B)
+
+**Description**: Upload a PDF standard → LLM reads and extracts citation units and threshold values → creates draft rulebook entries → human reviews and approves.
+
+**Why deferred**:
+
+- Complex to build reliably (PDF layouts vary, tables are hard, hallucination risk).
+- Needs LLM API costs and infrastructure.
+- Essentially a whole product on its own.
+- Not needed for Phase 1/2 — we have a known, small set of standards.
+
+**When to revisit**: When you need to ingest new or unknown standards regularly, or when the manual seed script update burden becomes significant.
+
+**High-level architecture** (for future reference):
+
+1. PDF upload → text extraction (PyPDF2 / pdfplumber).
+2. LLM prompt: extract IAQ thresholds, metrics, units, and context from the text.
+3. Validate extracted data against known metric names and units.
+4. Create draft `CitationUnit` and `RulebookEntry` records with low confidence.
+5. Human review in admin UI: confirm/edit/approve entries.
+6. Approved entries promoted to runtime Rulebook.
+
+**Risks**:
+
+- LLM hallucination — extracted thresholds may be wrong.
+- PDF parsing failures — scanned documents, complex layouts, tables.
+- Requires human-in-the-loop review regardless; the seed script is effectively the same workflow but done manually.
+
+---
+
+*Revised 2026-04-18: Replaced admin CRUD console approach with seed script. Original plan (PR 7.1-7.6 with full admin UI, approval workflows, dual-DB roles) was overkill for Phase 1/2 scale.*

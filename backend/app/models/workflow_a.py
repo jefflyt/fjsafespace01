@@ -17,7 +17,6 @@ from typing import Optional
 from sqlmodel import Field, Relationship, SQLModel
 
 from app.models.enums import (
-    BenchmarkLane,
     ConfidenceLevel,
     MetricName,
     Priority,
@@ -114,3 +113,5 @@ class RulebookEntry(SQLModel, table=True):
     approval_status: str
     approved_by: Optional[str] = None
     approved_at: Optional[datetime] = None
+    # Comma-separated citation unit IDs linked to this rule
+    citation_unit_ids: str
