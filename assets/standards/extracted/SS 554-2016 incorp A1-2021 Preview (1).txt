@@ -1,0 +1,582 @@
+SS 554:2016+A1:2021
+(ICS 13.040.20; 91.040.01)
+
+SINGAPORE STANDARD
+
+Code of practice for indoor air quality for airconditioned buildings
+Incorporating Amendment No. 1
+
+SS 554:2016+A1:2021
+(ICS 13.040.20; 91.040.01)
+
+SINGAPORE STANDARD
+
+Code of practice for indoor air-quality for airconditioned buildings
+
+Published by Enterprise Singapore
+All rights reserved. Unless otherwise specified, no part of this Singapore Standard may
+be reproduced or utilised in any form or by any means, electronic or mechanical, including
+photocopying and microfilming, without permission in writing from Enterprise Singapore.
+Request for permission can be sent to: standards@enterprisesg.gov.sg.
+
+© Enterprise Singapore 2021
+ISBN 978-981-5024-72-2
+
+SS 554:2016+A1:2021
+
+Contents
+Page
+Foreword
+
+4
+
+1
+
+Scope
+
+6
+
+2
+
+Normative references
+
+6
+
+3
+
+Definitions
+
+7
+
+4
+
+Preamble
+
+11
+
+4.1
+
+General
+
+11
+
+4.2
+
+Impact of IAQ on productivity and health
+
+11
+
+5
+
+Guidelines for achieving acceptable IAQ
+
+11
+
+5.1
+
+Design
+
+11
+
+5.2
+
+Construction
+
+15
+
+5.3
+
+Renovation work
+
+15
+
+5.4
+
+Commissioning
+
+16
+
+5.5
+
+Operation and maintenance
+
+16
+
+6
+
+Indoor air quality parameters and measurement
+
+17
+
+6.1
+
+IAQ parameters
+
+17
+
+6.2
+
+Indoor air quality audit
+
+17
+
+6.3
+
+Measurement of indoor air quality
+
+25
+
+7
+
+Competency of IAQ personnel
+
+26
+
+Annexes
+A
+
+IAQ and work productivity and health
+
+27
+
+B
+
+Sources and control of indoor air contaminants
+
+31
+
+C
+
+Information on indoor air contaminants and micro-biological agents including
+guidelines on mould remediation
+
+34
+
+D
+
+Exposure control – Ventilation
+
+40
+
+E
+
+Air filtration and other air cleaning techniques
+
+42
+
+F
+
+Source control – Emissions from building materials
+
+47
+
+G
+
+Sample checklist for building inspection
+
+51
+
+H
+
+Maintenance of ACMV systems
+
+53
+
+I
+
+Sample confidential questionnaire for building occupants
+
+55
+
+J
+
+Indoor air quality assessment report
+
+57
+
+Mitigating risk of aerosol-mediated transmission of infectious diseases
+
+59
+
+As amended, K
+Sep 2021
+
+2
+COPYRIGHT
+
+SS 554:2016+A1:2021
+
+Page
+Tables
+1
+
+Recommended IAQ parameters
+
+19
+
+2
+
+Target contaminants triggered by specific sources
+
+23
+
+3
+
+Sampling requirements for a multi-storey building
+
+25
+
+4
+
+Sampling requirements for indoor environment
+
+26
+
+E.1
+
+Minimum efficiency reporting value (MERV) parameters
+
+44
+
+E.2
+
+Air filter classification according to EN
+
+44
+
+E.3
+
+Air filter classification and possible applications
+
+45
+
+F.1
+
+Labelling schemes for low emission flooring products
+
+47
+
+F.2
+
+Labelling schemes for control of VOC emissions from coating
+
+49
+
+H.1
+
+Recommended intervals for ACMV system cleanliness inspection
+
+53
+
+H.2
+
+Recommended portions to inspect
+
+53
+
+H.3
+
+Recommended location of test points
+
+54
+
+H.4
+
+Recommended conditions requiring ACMV system cleaning
+
+54
+
+H.5
+
+Recommended surface deposit limits requiring ACMV system cleaning
+
+54
+
+K.1
+
+Risk factors and enhanced measures
+
+63
+
+Figures
+1
+
+Indoor air quality audit methodology
+
+24
+
+A.1
+
+Predicted trends in illness of sick leave versus ventilation rate
+
+28
+
+A.2
+
+Relative performance in relation to the reference value at 6.5 L/s-person versus
+average ventilation rate
+
+28
+
+A.3
+
+Relative performance in office work depending on the PAQ
+
+29
+
+A.4
+
+Relative performance versus temperature: maximum performance is set equal to 1
+
+29
+
+Bibliography
+
+67
+
+3
+COPYRIGHT
+
+As amended,
+Sep 2021
+
+SS 554:2016+A1:2021
+
+Foreword
+
+This Singapore Standard Code of Practice was prepared by the Technical Committee on Building
+Maintenance and Management under the direction of the Building and Construction Standards
+Committee.
+This Code specifies indoor air quality that will be acceptable to the majority of building occupants, and
+will minimise the risk of adverse health effects. It also provides information, advice and guidance on
+measures to improve the quality of air in air-conditioned environments.
+This code is a revision of SS 554: 2009. The key changes include:
+a)
+
+Aligning acceptable limits of indoor air quality parameters to national and international
+standards.
+
+b)
+
+Specifying the reference methods and indicative methods where relevant.
+
+c)
+
+Enhancing the recommended filter ratings and providing information on filter use.
+
+d)
+
+Specifying the number of sampling points according to floor sizes and ventilation types, in
+addition to number of floors.
+
+Minor changes include alignment with ISO 16814 : 2008 and text revision for better clarity.
+This Code is intended to complement Singapore Standard ‘Code of practice for air-conditioning and
+mechanical ventilation in buildings (SS 553).
+This Code will be useful to building owners, management corporations, building occupants, and those
+responsible for designing, operating and maintaining the building environment, as well as others
+involved in servicing the ventilation and air-conditioning systems.
+In preparing this Code, reference was made to the following publications:
+1.
+
+ISO 16814 : 2008 Building environment design – Indoor air quality – Methods of expressing the
+quality of indoor air for human occupancy
+
+2.
+
+NEA Guidelines for good indoor air quality in office premises (1996)
+
+Permission has been sought from the following organisation / authors for the reproduction of:
+3.
+
+Figures A.2 and A.4 from Dr Olli Seppanen and Dr William Fisk
+
+4.
+
+Figure A.3 from Dr Pawel Wargocki
+
+5.
+
+Table E.1 from the NAFA Guide to Air Filtration, 4th Edition 2007, Addendum 7.1 ‘A Brief
+Description of the ANSI/ASHRAE Standard 52.2 Test Method’
+
+6.
+
+Some of the definitions, 5.5.1 and B.3.2 from ISO 16814 : 2008 published by the International
+Organization for Standardization
+
+Acknowledgement is made for the use of information from the above organisations / authors.
+
+4
+COPYRIGHT
+
+SS 554:2016+A1:2021
+
+This Code is expected to be used by all stakeholders, including relevant public agencies, consultants,
+facility owners and managers and employers. Occupiers, employers and building managers functioning
+in enclosed air-conditioned premises are encouraged to use this Code to help fulfil their general duties
+as specified in the Workplace Safety and Health Act.
+Attention is drawn to the possibility that some of the elements of this Singapore Standard may be the
+subject of patent rights. Enterprise Singapore shall not be held responsible for identifying any or all of
+such patent rights.
+
+NOTE
+1. Singapore Standards (SSs) and Technical References (TRs) are reviewed periodically to keep abreast of technical
+changes, technological developments and industry practices. The changes are documented through the issue of
+either amendments or revisions. Where SSs are deemed to be stable, i.e. no foreseeable changes in them, they will be
+classified as “Mature standards”. Mature Standards will not be subject to further review, unless there are requests to review
+such standards.
+2.
+
+An SS or TR is voluntary in nature except when it is made mandatory by a regulatory authority. It can also be cited in
+contracts making its application a business necessity. Users are advised to assess and determine whether the SS or TR is
+suitable for their intended use or purpose. If required, they should refer to the relevant professionals or experts for advice on
+the use of the document. Enterprise Singapore and the Singapore Standards Council shall not be liable for any damages
+whether directly or indirectly suffered by anyone or any organisation as a result of the use of any SS or TR. Although care
+has been taken to draft this standard, users are also advised to ensure that they apply the information after due diligence.
+
+3. Compliance with a SS or TR does not exempt users from any legal obligations.
+
+5
+COPYRIGHT
+
+SS 554:2016+A1:2021
+
+Code of practice for indoor air quality for air-conditioned buildings
+
+1
+
+Scope
+
+The Code applies to all air-conditioned premises where air-conditioning is used intermittently or
+continuously, with the exception of residential premises, factory production areas, hospitals, polyclinics
+and laboratories.
+It applies to all types of air-conditioning and air-distribution systems.
+The recommended minimum ventilation rates in the Code should be used in conjunction with the
+SS 553, which provides guidance for the design, construction, installation, testing, commissioning,
+operation and maintenance of air-conditioning and mechanical ventilation (ACMV) system. Neither SS
+553 nor this Code prescribes specific ventilation rate requirements for smoking zones. ASHRAE
+Standard 62.1 may be referred to if smoking zones are present (see also 5.1.6).
+In setting indoor air quality (IAQ) standard, this Code considers environmental factors, which include
+thermal, physical, chemical and biological factors. The purpose of this Code is to specify indoor air
+quality that will be acceptable to building occupants, and to minimise the potential of adverse health
+effects.
+Due to the diversity of contaminants generated from indoor and outdoor sources, the contaminants
+covered in this Code are not exhaustive. The Code provides limits for contaminants commonly found
+in an indoor environment, and limits for parameters that are indicative of the quality of the indoor air.
+Meeting the requirements of this Code may not result in an acceptable indoor air quality for everyone
+in all air-conditioned buildings. The possible reasons are:
+a)
+
+Diversity of sources and contaminants in indoor air which may warrant further investigation;
+
+b)
+
+Inadequate cleaning of outdoor air which is unacceptable;
+
+c)
+
+Variation in occupants’ perception of and preference for different levels of air temperature,
+humidity, noise, lighting etc.; or
+
+d)
+
+Variation in susceptibility of individuals.
+
+2
+
+Normative references
+
+This Code incorporates, by dated or undated reference, provisions from other publications. These
+normative references are cited at the appropriate places in the text and the publications are listed
+thereafter. For dated references, subsequent amendments to or revisions of any these publications
+apply to this Code only when incorporated in it by amendment or revision. For undated references the
+latest edition of the publication referred to applies.
+ASHRAE Standard 52.2
+
+Method of testing general ventilation air-cleaning devices for removal
+efficiency by particle size
+
+ASHRAE Standard 55
+
+Thermal environmental conditions for human occupancy
+
+ASTM D5075
+
+Standard test method for nicotine and 3-ethenylpyridine in indoor air
+
+EN 779
+
+Particulate air filters for general ventilation – Determination of the
+filtration performance
+6
+COPYRIGHT
+
+SS 554:2016+A1:2021
+
+EN 12341
+
+Ambient air. Standard gravimetric measurement method for the
+determination of the PM10 or PM2.5 mass concentration of suspended
+particulate matter
+
+ISO 7730
+
+Ergonomics of the thermal environment – Analytical determination and
+interpretation of thermal comfort using calculation of the PMV and PPD
+indices and local thermal comfort criteria
+
+ISO 8672
+
+Air quality – Determination of the number concentration of airborne
+inorganic fibres by phase contrast optical microscopy – Membrane filter
+method
+
+ISO 10312
+
+Ambient air – Determination of asbestos fibres – Direct transfer
+transmission electron microscopy method
+
+ISO 10313
+
+Ambient air – Determination of the mass concentration of ozone –
+Chemiluminescence method
+
+ISO 12039
+
+Stationary source emissions – Determination of carbon monoxide,
+carbon dioxide and oxygen – Performance characteristics and
+calibration of automated measuring systems
+
+ISO 14966
+
+Ambient air – Determination of numerical concentration of inorganic
+fibrous particles – Scanning electron microscopy method
+
+ISO 16000
+
+Indoor air
+Part 2: Sampling strategy for formaldehyde
+Part 3: Determination of formaldehyde and other carbonyl compounds
+in indoor air and test chamber air – Active sampling method
+Part 6: Determination of volatile organic compounds in indoor and test
+chamber air by active sampling on Tenax TA sorbent, thermal
+desorption and gas chromatography using MS or MS-FID
+Part 15: Sampling strategy for nitrogen dioxide (NO2)
+
+NIOSH 0800
+
+Bioaerosol sampling (indoor air)
+
+NIOSH Method 2551
+
+Nicotine
+
+SS 553
+
+Code of practice for air-conditioning and mechanical ventilation in
+buildings
+
+7
+COPYRIGHT
+
+

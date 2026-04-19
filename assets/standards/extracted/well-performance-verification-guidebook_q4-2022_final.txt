@@ -1,0 +1,2903 @@
+THE
+
+WELL
+PERFORMANCE
+VERIFICATION
+GUIDEBOOK
+Applies to WELL v1, WELL v2
+pilot, WELL v2 and the WELL
+Performance Rating
+
+TABLE OF CONTENTS
+INTRODUCTION ..................................................................................................................... 3
+Performance Verification ................................................................................................................................. 3
+Purpose of this Guidebook ............................................................................................................................... 3
+WELL Performance Testing Agent ..................................................................................................................... 3
+
+GENERAL INFORMATION AND SET-UP .................................................................................... 5
+Scope .............................................................................................................................................................. 5
+Sampling Point Selection .................................................................................................................................. 6
+Equipment and Laboratories ............................................................................................................................ 6
+Compliance with Instructions and Protocols ...................................................................................................... 6
+
+PERFORMANCE TESTING PROTOCOLS FOR WELL .................................................................... 8
+Air ................................................................................................................................................................... 8
+Water ............................................................................................................................................................ 14
+Light .............................................................................................................................................................. 18
+Thermal Comfort............................................................................................................................................ 21
+Sound ............................................................................................................................................................ 24
+
+CONTINUOUS MONITORING PROTOCOLS FOR WELL ............................................................ 33
+RECERTIFICATION ................................................................................................................ 38
+Reduced Sample Points .................................................................................................................................. 38
+Annually Aggregated Data .............................................................................................................................. 39
+
+GLOSSARY ........................................................................................................................... 41
+
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+2
+
+Introduction
+The WELL Performance Verification Guidebook contains details regarding the Performance Verification
+phase of WELL. The processes described apply to the WELL Building Standard version 1 (WELL v1),
+including WELL Core & Shell and WELL v1 pilots, the WELL Building Standard version 2 (WELL v2) and
+WELL v2 pilot, including WELL Core, and the WELL Performance Rating.
+For more information on WELL Certification and the steps involved in scheduling WELL performance
+testing, refer to the complete WELL Certification Guidebook.
+
+Performance Verification
+Performance Verification entails collecting on-site measurements, either through a site visit by a WELL
+Performance Testing Agent who conducts performance tests or through permanently installed
+continuous monitors, followed by a Performance Review by a WELL Reviewer assigned by IWBI.
+Collecting on-site measurement data is a requirement for WELL Certification and the WELL Performance
+Rating and the results of the data collected for each applicable feature are reviewed by the WELL
+Reviewer to determine whether a feature has been achieved.
+
+Purpose of this Guidebook
+This guidebook dictates the performance testing protocol for each feature that has Performance Test or
+Sensor Data included as a part of the verification method.
+WELL Performance Testing Agents are required to ensure that the performance testing activities
+executed for a given project are conducted in accordance with the instructions and requirements
+specified in this guidebook. These pathways may also be project teams wishing to engage in their own
+pre-testing of WELL requirements prior to initiating Performance Verification. Note that the results of
+any pre-testing do not affect the outcome of performance testing executed by the WELL Performance
+Testing Agent for the purposes of WELL Certification.
+Continuous monitoring and sensing technologies can be utilized to meet the requirements of select
+performance verified features and parts within the WELL Building Standard version 2 (WELL v2) and
+WELL Ratings. The Performance Testing Protocols for WELL Section of this guidebook provides
+information on the technical specifications and placement requirements for each feature and part that
+incorporates continuous monitoring and sensing pathways as part of the verification method.
+For features noted as verified by a Performance Test that may have a sensor-based measurement
+pathway, project teams are encouraged to submit an Alternative Adherence Path (AAP) explaining the
+process and demonstrating consistent, accurate results prior to test result submission.
+
+WELL Performance Testing Agent
+During the site visit, the WELL Performance Testing Agent will follow the testing protocol contained in
+this guidebook. The WELL Performance Testing Agent will ensure that the data collected during
+performance testing accurately represents the environmental and design conditions in the project at
+that time.
+The WELL Performance Testing Agent is not permitted to interfere, manipulate or alter site conditions in
+any way that might affect WELL Certification. Data collected on-site by the WELL Performance Testing
+Agent must be analyzed and the results must be reviewed by the WELL Reviewer before feature
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+3
+
+compliance can be determined; therefore, the WELL Performance Testing Agent cannot provide
+information regarding feature compliance while on site.
+
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+4
+
+General Information and Set-Up
+For purposes of certification, performance testing must take place after construction is complete and,
+for projects seeking WELL Certification, after the project has successfully passed Documentation Review.
+Core and Shell and WELL Core projects may undertake performance testing prior to their tenants’
+construction completion; however, this may negatively affect results from the on-site tests. Project
+conditions during performance testing should be representative of those normally experienced by
+occupants unless otherwise noted within this document.
+
+Scope
+Table 1 sets forth the performance testing scope that is applicable for each WELL project type. For each
+project type, all areas described in the table below are subject to performance testing and visual
+inspections or photographs and must be considered by the WELL Performance Testing Agent when
+choosing sampling zones and sampling points. If the project is made up of multiple distinct structures,
+each parameter must be tested at least once in each structure, even if that results in more than the
+number of samples listed in this document.
+Table 1: Scope of Performance Testing Activities
+WELL PROJECT TYPE
+WELL v1
+• New and Existing Buildings
+• New and Existing Interiors
+• Educational Facilities, Commercial
+Kitchens, Retail, and Restaurants
+Pilots
+
+PERFORMANCE TESTING SCOPE
+
+The entire area within the WELL project boundary, including
+any mechanical spaces and/or water fixtures servicing the
+project.
+
+WELL v2 and WELL v2 pilot
+• All project types except WELL Core
+WELL v1
+• Core & Shell
+WELL v2, WELL v2 pilot, and the WELL
+Performance Rating
+• WELL Core
+
+WELL v1, WELL v2 pilot (except for WELL
+Core), WELL v2, and the WELL Performance
+Rating
+• Multifamily Residential
+
+Refer to the guidance listed in the Core note for the relevant
+feature.
+
+For initial certification, the entire area within the WELL
+project boundary, including inside the dwelling units.
+For subsequent recertification, only the spaces directly under
+the control of the building management team (e.g., common
+areas).
+
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+5
+
+Sampling Point Selection
+The WELL Performance Testing Agent will select sample points for each performance test ahead of
+arriving on site. Upon arriving on-site, the WELL Performance Testing Agent will perform a walkthrough
+of the areas subject to performance testing and familiarize themselves with the building floor plan. In
+order to ensure access to all sampling areas, the WELL Performance Testing Agent should be guided by
+an individual from the building management team who is familiar with the space. After this
+walkthrough, the WELL Performance Testing Agent may make adjustments to the selected sampling
+locations after observing actual site conditions to comply with testing protocol. For example, the WELL
+Performance Testing Agent may move a sampling point from an area of low occupancy to an area of
+typical occupancy.
+Whenever a calculation results in a fractional sampling point, round up to the next whole number,
+unless otherwise indicated. Additionally, please note that the number of sampling locations represents a
+minimum. The WELL Performance Testing Agent may include additional sampling points.
+
+Multifamily Residential
+For sample point selection of multi-family residential projects, the project team must indicate how many
+different unit types there are based on the following criteria. Every dwelling unit of each unit type must:
+•
+•
+•
+•
+
+Be under the same ownership and management
+Be part of the same construction contract
+Use the same heating and ventilation methods
+Use the same building materials, finishes and furnishings throughout
+
+Each unit of a given unit type may differ in layout and size (e.g., number of bedrooms, window
+placements, ceiling heights, difference in area, etc.)
+
+Equipment and Laboratories
+In all cases, the equipment used must be maintained and calibrated according to the manufacturer’s
+specifications and instructions from the manufacturer must be followed when taking measurements.
+Any applicable laboratory analyses must be performed in a third-party laboratory that is accredited by
+an agency recognized by the International Laboratory Accreditation Cooperative (ILAC) or is accredited
+to meet ISO 17025-2017 by an accreditation body authorized by the local government and has no
+financial or other interest in the outcome of WELL Certification or Performance Verification.
+Accreditation must be valid for the test methods used to measure the parameters listed in WELL
+feature(s) being assessed. Laboratory samples must be collected, packaged and analyzed in accordance
+with instructions provided by the third-party laboratory.
+WELL Performance Testing Agents must be aware of restrictions on laboratory operations and
+transportation and how this affects scheduling performance tests. For example, water samples for
+coliform analysis are often not permitted to be shipped on a Friday due to the risk of delays in custody
+transfer and degradation of samples in storage.
+
+Compliance with Instructions and Protocols
+WELL Performance Testing Agents are required to ensure that performance testing is conducted in
+accordance with the instructions and requirements specified in this guidebook. If, due to site conditions
+or other factors beyond the WELL Performance Testing Agent’s control, it is necessary to deviate from
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+6
+
+the protocols described in this guidebook during performance testing, the WELL Performance Testing
+Agent must note and provide an explanation for the deviation in performance testing documentation
+and/or final report.
+To demonstrate compliance, the WELL Performance Testing Agent must submit full data of all tests
+taken on-site in addition to the summarized value used for comparison of compliance. In addition, the
+agent must provide:
+•
+•
+•
+•
+
+List and specs of equipment used to confirm that it meets the requirements described in this
+guidebook.
+Certificates of calibration for the equipment used confirming that all equipment is properly
+calibrated.
+Floor plans showing the locations of the sample points along with the date and time each
+sample is collected.
+Photographs of representative sample locations including, when possible, photographs of the
+actual measurement device.
+
+Measurement Tolerance
+For projects registered under WELL v2 or WELL v2 pilot, several on-site performance testing parameters
+include a tolerance that is added to the requirement’s threshold. For example, for PM 2.5, compliance is
+based on the requirement in WELL + a tolerance of 20%. Thus, since the threshold is a maximum of 15
+μg/m3, the acceptable threshold for PM2.5 is 18 μg/m3 or lower). These tolerances are not applicable to
+projects registered under WELL v1. Pathways using permanently installed continuous monitors use their
+own compliance calculations, and do not include tolerances.
+
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+7
+
+Performance Testing Protocols for WELL
+Air
+General Guidelines
+Unless otherwise noted, these rules apply to all parameters within the Air concept.
+
+Test Locations & Conditions
+•
+•
+•
+•
+•
+
+•
+
+•
+
+Testing should be conducted under regular project conditions. For example, for naturally
+ventilated spaces, the windows should be open during testing.
+The WELL Performance Testing Agent should note whether the HVAC system (or any ventilation
+or air treatment method) is on or off during the data collection period.
+Sampling points must be representative of typical occupiable areas within the sampling zone
+and located where occupants would typically be situated (e.g., at workstations).
+Sampling points must be at a height of 1.1-1.7 m [3.6-5.6] ft above the finished floor.
+Sampling points must be at least 1 m [3.3 ft] away from walls, doors, windows, air
+supply/exhaust outlets and any occupants that are present during testing. To the extent
+possible, sampling points should be at least 5 m [16.4 ft] from exterior doors.
+For projects with multiple floors, measurements must be distributed across different floors,
+including the lowest and highest regularly occupied floor (excluding floors with only leased
+space in WELL Core and Core & Shell).
+For WELL v2 and WELL v2 pilot projects, where sampling points for A01 and A05 are the same,
+tests used for A01 can be analyzed to determine whether results meet A05 requirements (i.e.,
+separate tests are not required for A05 if all necessary parameters are available from samples
+taken for A01). This also applies to the “Enhanced thresholds” features in the WELL Performance
+Rating (PA2, PA4, PA6).
+
+Test Quantity
+Table 2: Number of Sampling Points Required Based on Project Area and Number of Floors
+
+Floors
+1
+2
+3-4
+5-7
+8-10
+11-15
+16-20
+>20
+
+•
+
+TOTAL PROJECT AREA
+<50,000 ft2
+≥50,000 ft2
+2
+2
+<4,600 m
+≥4,600 m
+2
+3
+2
+4
+3
+5
+3
+6
+4
+7
+5
+8
+6
+9
+7
+10
+
+For Core & Shell and WELL Core projects, to determine the number of sampling points:
+o For WELL v2 and WELL v2 pilot Feature A01 and WELL v1 Feature 01 (preconditions), use the
+project’s total non-leased area for the purpose of project area in this table. Testing in the
+leased area is not required unless the non-leased area does not make up the minimum
+required testable area.
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+8
+
+o
+
+•
+
+For WELL v2 and WELL v2 pilot Feature A05 (optimization), use the project’s total area. In
+addition to testing in non-leased areas, the WELL Performance Testing Agent must have
+access to test within tenant spaces (either before or after fit-out), representing at least 10%
+of the leased area.
+For areas of the project with dwelling units, to determine the number of sampling points:
+o Projects with 10 dwelling units or fewer: two of each unit type
+o Projects with more than 10 dwelling units: 5% of each unit type, with a minimum of three
+and a maximum of 10 units of each unit type
+o For all other areas, to determine sampling points, follow Table 2 sampling point guidance for
+the total area of regularly occupied spaces only, not the total project area (e.g., occupied
+lobbies and gyms are considered regularly occupied spaces and therefore would be included
+in the Table 2 calculations; common areas such as hallways are not considered regularly
+occupied spaces and therefore would not be included in the calculations).
+
+PM2.5 and PM10
+Features
+•
+•
+•
+
+WELL v1: Feature 01, Part 2
+WELL v2 and WELL v2 pilot: Features A01, Part 1; A05, Part 1
+WELL Performance Rating: PA1, PA2, PM1
+
+Test Locations & Conditions
+•
+
+See General Guidelines.
+
+Test Method
+•
+•
+
+Measurement method: direct reading instrument.
+Duration of measurement: minimum of one continuous hour (10 minutes of acclimation time
+followed by 50 minutes of measurement time), with measurements recorded at least once
+every minute.
+
+Test Quantity
+•
+
+See Table 2 in General Guidelines.
+
+Reporting & Compliance
+•
+
+Compliance is based on the median value collected during the measurement time at each
+sampling point compared against the requirement in WELL + a tolerance of 20%.
+
+Device Requirements
+•
+•
+•
+•
+•
+•
+•
+
+Instrument type: light-scattering airborne particle counter
+Measurement range: 1-1,000 μg/m3
+Instrument accuracy (at the size specified by the manufacturer): ≤ 15%
+On-screen resolution: 1 μg/m3
+Lower detectable limit: 1 μg/m3
+Reporting interval: one-minute maximum
+Calibration: instrument must be calibrated within the manufacturer’s specification (maximum
+interval: one year), and the calibration record (i.e., the measurement result obtained during
+calibration) must be traceable to a National Metrological Institute, such as NIST, NPL or PTB.
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+9
+
+Formaldehyde and Acetaldehyde
+Features (formaldehyde)
+•
+•
+•
+
+WELL v1: Feature 1, Part 1
+WELL v2 and WELL v2 pilot: Features A01, Part 2; A05, Part 2
+WELL Performance Rating: PA3, PA4, PM1
+
+Features (acetaldehyde)
+•
+•
+
+WELL v2: Feature A05, Part 2
+WELL Performance Rating: PA4
+
+Test Locations & Conditions
+•
+
+See General Guidelines.
+
+Test Method
+•
+•
+•
+
+Samples are taken through an active collection in accordance with ISO 16000-3, ASTM D5197,
+NIOSH 2016, EPA TO-11 (or 11A) or EPA Compendium Method IP-6 (or 6A).
+Minimum of one continuous hour OR the duration of sampling volume prescribed by the
+referenced testing methodology.
+A minimum of one exposure field blank sample must be prepared and analyzed per day of
+sampling.
+
+Test Quantity
+•
+
+See Table 2 in General Guidelines.
+
+Reporting & Compliance
+•
+
+Compliance is based on the measured concentration at each location compared against the
+requirement in WELL + tolerance of 20%.
+
+Device Requirements
+•
+•
+
+•
+
+Laboratory materials and/or samplers must be prepared according to the referenced testing
+methodology and meet the referenced testing methodology requirements.
+Single tube sampling at each test location is acceptable as an alternative to distributed volume
+pair sampling. Note that any impact to data quality (e.g., insufficient sample volume,
+breakthrough) is the responsibility of the testing agent.
+Air sampling pumps utilized in active collection measurements must be capable of meeting the
+airflow rates prescribed by the referenced testing methodology (if applicable).
+
+VOCs (other than Formaldehyde and Acetaldehyde)
+Features
+Total VOCs
+•
+
+WELL v1: Feature 01, Part 1
+
+Component VOCs:
+•
+•
+
+v1: Feature 01, Part 1 AAP
+WELL v2 and WELL v2 pilot: Features A01, Part 2; A05, Part 2
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+10
+
+•
+
+WELL Performance Rating: PA3, PA4, PM1
+
+Test Locations & Conditions
+•
+
+See General Guidelines.
+
+Test Method
+•
+•
+
+•
+
+Samples are taken through an active collection in accordance with ISO 16000-6, ASTM D5197,
+EPA TO-15 or EPA TO-17.
+The following methods are acceptable alternatives for speciating individual VOCs:
+o Acrylonitrile: NIOSH 1604 (modified methodology acceptable to reach ppb
+concentrations.
+o Caprolactam: OSHA PV2012 (modified methodology acceptable to reach ppb
+concentrations).
+A minimum of one exposure field blank sample per day of sampling must be prepared and
+analyzed.
+
+Test Quantity
+•
+•
+
+See Table 2 for the number of sampling locations.
+Minimum of one continuous hour OR the duration of sampling volume prescribed by the
+referenced testing methodology.
+
+Reporting & Compliance
+•
+•
+
+For tests for WELL v2 Features A01 or A05, compliance is based on the measured concentration
+at each location compared against each VOC’s requirement in WELL + tolerance of 5%.
+For tests of WELL v1 Feature 01, compliance is based on each location either meeting the
+conditions above or the measured TVOC concentration compared against the requirement in
+WELL.
+
+Device Requirements
+•
+•
+
+•
+
+Laboratory materials and/or samplers must be prepared according to the referenced testing
+methodology and meet the referenced testing methodology requirements.
+Single tube sampling at each test location is acceptable as an alternative to distributed volume
+pair sampling. Note that any impact to data quality (e.g., insufficient sample volume,
+breakthrough) is the responsibility of the testing agent.
+Air sampling pumps utilized in active collection measurements must be capable of meeting the
+airflow rates prescribed by the referenced testing methodology (if applicable).
+
+Carbon monoxide
+Features
+•
+•
+•
+
+WELL v1: Feature 1, Part 2
+WELL v2 and WELL v2 pilot: Features A01, Part 3; A05, Part 3
+WELL Performance Rating: PA5, PA6, PM1
+
+Test Locations & Conditions
+•
+
+See General Guidelines.
+
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+11
+
+Test Method
+•
+
+Minimum of one continuous hour (10 minutes of acclimation time followed by 50 minutes of
+measurement time), with measurements recorded at least once every minute.
+
+Test Quantity
+•
+
+See Table 2 in General Guidelines.
+
+Reporting & Compliance
+•
+
+Compliance is based on the median value collected during the measurement time at each
+sampling compared with the WELL requirements.
+
+Device Requirements
+•
+•
+•
+•
+•
+
+Direct reading instrument.
+Measurement range: 0-25 ppm
+Instrument resolution: 0.1 ppm
+Lower detectable limit: 0.1 ppm
+Calibration: instrument must be within the calibration period
+
+Ozone
+Features
+•
+•
+•
+•
+
+WELL v1: Feature 01, Part 2
+WELL v2 pilot: Features A01, Part 3; A05, Part 3
+WELL v2: Feature A01, Part 3
+WELL Performance Rating: PA5, PM1
+
+Test Locations & Conditions
+•
+
+See General Guidelines.
+
+Test Method
+•
+
+Minimum of one continuous hour (10 minutes of acclimation time followed by 50 minutes of
+measurement time), with measurements recorded at least once every minute.
+
+Test Quantity
+•
+
+See Table 2 in General Guidelines.
+
+Reporting & Compliance
+•
+
+Compliance is based on the median value collected during the measurement time at each
+sampling point compared against the requirement in WELL + a tolerance of 5%.
+
+Device Requirements
+•
+•
+•
+•
+•
+
+Direct reading instrument.
+Measurement range: 0-500 ppb
+On-screen resolution: 1 ppb
+Lower detectable limit: 3 ppb
+Calibration: instrument must be within the calibration period
+
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+12
+
+Nitrogen dioxide
+Features
+•
+•
+
+WELL v2 and WELL v2 pilot: Feature A05, Part 3
+WELL Performance Rating: PA6, PM1
+
+Test Locations & Conditions
+•
+
+See General Guidelines.
+
+Test Method
+•
+
+Duration: up to one hour
+
+Test Quantity
+•
+
+See Table 2 in General Guidelines.
+
+Reporting & Compliance
+•
+
+Compliance is based on the median value collected during the measurement time at each
+sampling point compared against the requirement in WELL + a tolerance of 20%.
+
+Device Requirements
+•
+•
+•
+
+Measurement range: 0-500 ppb
+Lower detectable limit: 5 ppb
+Calibration: instrument must be within the calibration period
+
+Radon
+Features
+•
+
+WELL v1: Features 01, Part 3
+
+Test Locations & Conditions
+•
+
+•
+
+Measurements are only required in the lowest occupied level of the project site. If the project
+does not contain the ground floor of the building (defined as the first aboveground floor) or any
+below-grade floors, radon testing is not required.
+Radon samplers must be located a minimum distance of:
+o 0.91 m [3 ft] from windows and exterior doors
+o 20.3 cm [12 in] from exterior walls
+o 50.8 cm [20 in] above the finished floor
+
+Test Method
+•
+
+Active or short- or long-term passive testing samples are permitted.
+
+•
+
+Minimum of 48 hours for passive testing samples. The entire length of the performance
+verification is required for active testing samples.
+
+Test Quantity
+•
+
+One radon sampler is required in each 2300 m2 [25,000 ft2] of the project area on the lowest
+occupied level.
+
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+13
+
+Reporting & Compliance
+•
+
+Compliance is based on every test location complying with the requirement in WELL.
+
+Device Requirements
+•
+
+Passive or active radon sampler.
+
+Water
+General Guidelines
+Unless otherwise noted, these rules apply to all parameters within the Water concept.
+
+Test Locations & Conditions
+•
+
+•
+
+These tests use a sample of water from the cold-water fixture, when possible. If conditions exist
+preventing adjustment of the water temperature, perform the testing at the temperature of the
+water provided and make note of conditions.
+For WELL v1 Core & Shell, WELL v2 Core and WELL v2 pilot Core projects, samples must come
+from points that deliver water of the same quality as what is available to tenant spaces. Samples
+may be taken after point-of-use treatment devices only if the project has documented policies
+giving allowances to tenants to acquire and install such units.
+
+Test Method
+•
+
+Run the water for at least 30 seconds before gathering a water sample (unless the sample is
+drawn immediately following a previous sample).
+
+Test Quantity
+•
+•
+•
+•
+
+For each configuration of in-building water treatment, determine the total number of fixtures
+(as applicable) for drinking water, handwashing, showers/baths and for cooking purposes.
+Of these, test at 5% (round up), with a maximum of four per configuration.
+Include the most distal (furthest from the main supply) outlet in the tests.
+For dwelling units, unless otherwise stated, sample points should be taken as follows:
+o Projects with 20 units or fewer: one unit of each configuration
+o Projects with 21-100 units: two units of each configuration
+o Projects with more than 100 units: three units of each configuration
+
+Turbidity
+Features
+•
+•
+•
+
+WELL v1: Feature 30, Part 1
+WELL v2 and WELL v2 pilot: Feature W01, Part 1
+WELL Performance Rating: PW1
+
+Test Locations & Conditions
+•
+•
+
+See General Guidelines.
+This parameter is tested at drinking water fixtures, handwashing fixtures, fixtures for showers
+and baths, and water fixtures used for cooking purposes for commercial kitchens (as applicable).
+
+Test Method
+•
+
+See General Guidelines.
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+14
+
+•
+•
+
+Mix the sample to thoroughly disperse the solids. Wait until air bubbles disappear, then pour
+the sample into the turbidimeter tube.
+Repeat turbidity test twice, for a total of three samples at a water fixture.
+
+Test Quantity
+•
+
+See General Guidelines.
+
+Reporting & Compliance
+•
+•
+
+At each fixture, average the turbidity of the three samples.
+Compliance is based on the average at each fixture meeting the requirements listed in WELL.
+
+Device Requirements
+•
+•
+•
+•
+•
+•
+
+Turbidimeter meets or exceeds requirements of EPA Method 180.1.
+Measurement range: 0-40 NTU or greater
+Reporting resolution: 0.02 NTU or finer
+Accuracy: ±2% of reading
+Lowest detectable limit: 0.05 NTU or lower
+Maintain device calibration in accordance with the manufacturer’s instructions.
+
+Coliforms
+Features
+•
+•
+•
+•
+
+WELL v1: Feature 30, Part 2
+WELL v2: Feature W01, Part 1
+WELL v2 pilot: Feature W01, Part 2
+WELL Performance Rating: PW1
+
+Test Locations & Conditions
+•
+•
+
+See General Guidelines.
+This parameter is tested at drinking water fixtures, handwashing fixtures, fixtures for showers
+and baths, and water fixtures used for cooking purposes for commercial kitchens (as applicable).
+
+Test Method
+•
+•
+•
+
+See General Guidelines
+Do not “flame” (sanitize) or remove aerator from faucet.
+Package and ship sample to testing laboratory per the laboratory’s instructions. Total coliforms
+sampling analysis is time sensitive and the samples should be shipped overnight to the
+laboratory the same day they are collected, or couriered or driven to the laboratory the day
+they are collected.
+
+Test Quantity
+•
+
+See General Guidelines.
+
+Reporting & Compliance
+•
+
+Each sample analyzed must comply with the requirement in WELL.
+
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+15
+
+Laboratory Requirements
+•
+
+Water samples are evaluated by a third-party laboratory in accordance with 40 CFR 141.74(a)(1)
+or ISO 9308-1:2001 or a more recent version.
+
+Disinfectants
+Features
+•
+•
+•
+•
+
+WELL v1: Feature 34, Part 1
+WELL v2: Feature W02, Part 1
+WELL v2 pilot: Feature W02, Part 6 b and c
+WELL Performance Rating: PW2
+
+Test Locations & Conditions
+•
+•
+
+See General Guidelines.
+This parameter is tested at drinking water fixtures and water fixtures used for cooking purposes
+(as applicable) for commercial kitchens. If a kitchen is equipped with a secondary faucet used for
+drinking water, projects may take samples from the drinking water fixture and exclude the main
+kitchen faucet from testing.
+
+Test Method
+•
+•
+
+•
+
+See General Guidelines.
+Take measurements of total and free chlorine of samples by adding the appropriate reagents as
+specified by the chlorine meter manufacturer. To calculate residual chloramines, subtract the
+free chlorine value from the total chlorine value.
+Repeat the process twice, for a total of three samples per water fixture tested.
+
+Test Quantity
+•
+
+See General Guidelines.
+
+Reporting & Compliance
+•
+
+At each fixture, the average of the three samples must comply with the requirements in WELL.
+
+Device Requirements
+•
+•
+•
+
+Measurement range: 0-5 mg/L
+Reporting resolution: 0.01 mg/L or finer
+Accuracy: ±0.05 mg/L at 1.00 mg/L
+
+Lead
+Features
+•
+•
+•
+
+WELL v1: Feature 31, Part 1
+WELL v2 and WELL v2 pilot: Feature W02, Part 1
+WELL Performance Rating: PW2
+
+Test Locations & Conditions
+•
+•
+
+See General Guidelines.
+This parameter is tested at drinking water fixtures and water fixtures used for cooking purposes
+(as applicable) for commercial kitchens. If a kitchen is equipped with a secondary faucet used for
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+16
+
+drinking water, projects may take samples from the drinking water fixture and exclude the main
+kitchen faucet from testing.
+
+Test Methods
+•
+•
+•
+
+Run the water for at least 30 seconds before gathering a water sample (unless the sample is
+drawn immediately following a previous sample).
+Appropriate sampling vials must be obtained from the laboratory prior to performance testing.
+Follow all laboratory procedures for collecting and packaging the sample.
+
+Test Quantity
+•
+•
+•
+•
+•
+
+Samples are selected with the following priority:
+a distal (furthest floor from the main supply, or as far as possible in single-floor projects) outlet.
+a proximal (close to the main supply) outlet.
+For each configuration of in-building water treatment, determine the total number of fixtures
+(as applicable) for drinking water, handwashing, showers/baths and for cooking purposes.
+Of these, test at 5% (round up), with a maximum of four per configuration.
+
+Reporting & Compliance
+•
+
+The sample from every fixture tested must meet the requirements in WELL for lead.
+
+Laboratory-based Contaminants (except Lead)
+Features
+•
+•
+•
+•
+
+WELL v1: Features 31, Part 1; 32, Part 1; 33, Parts 1 and 2; 34, Part 3; 37, Part 1
+WELL v2: Features W02, Parts 1, 2; W04, Part 1
+WELL v2 pilot: Features W02, Parts 1, 2, 3, 4, 5 and 6a; W04, Part 1
+WELL Performance Rating: PW2, PW3, PW4
+
+Test Locations & Conditions
+•
+•
+
+See General Guidelines.
+This parameter is tested at drinking water fixtures and water fixtures used for cooking purposes
+(as applicable) for commercial kitchens. If a kitchen is equipped with a secondary faucet used for
+drinking water, projects may take samples from the drinking water fixture and exclude the main
+kitchen faucet from testing.
+
+Test Method
+•
+•
+•
+•
+•
+
+See General Guidelines.
+Appropriate sampling vials must be obtained from the laboratory prior to performance testing.
+Follow all laboratory procedures for collecting and packaging the sample.
+Package and ship sample to third party testing laboratory per the laboratory’s instructions.
+This parameter is tested at drinking water fixtures and water fixtures used for cooking purposes
+for commercial kitchens (as applicable).
+
+Test Quantity
+•
+•
+
+For each configuration of in-building water treatment, determine the total number of fixtures
+(as applicable) for drinking water, handwashing, showers/baths and for cooking purposes.
+Of these, test at 5% (round up), with a maximum of two per configuration.
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+17
+
+•
+
+Include the most distal (furthest from the main supply) outlet in the tests.
+
+Reporting & Compliance
+•
+•
+
+The sample from every fixture tested must meet the requirements in WELL for each of the
+contaminants being tested.
+For Styrene samples, a "Not Detected" measurement with a limit of detection of .001 mg/L is
+considered acceptable.
+
+Light
+Visual Lighting
+Features
+•
+•
+•
+
+WELL v1: Feature 53, Part 1
+WELL v2 and WELL v2 pilot: Feature L02, Part 1
+WELL Performance Rating: PL1
+
+Test Locations & Conditions
+•
+•
+
+•
+•
+•
+
+•
+
+This parameter is measured on the horizontal plane.
+For WELL v1 Feature 53, the surface of a desk may be considered as the working plane for both
+sitting and standing desk surfaces. For WELL v2 and WELL v2 pilot Feature L02, working plane
+heights and target illumination levels are to be provided by project teams.
+This parameter is to be measured using only electric lighting. Take measurements at night to
+avoid daylight contribution.
+If supplemental lighting is used, the lighting should be turned on and positioned as per regular
+conditions.
+The WELL Performance Testing Agent may follow instructions by the project team to turn
+screens on or off. However, agents are not to alter field conditions in any other way including
+influencing or controlling lighting automation (changing brightness levels, color or color
+temperature) and/or directing the adjustments made by the project team.
+The measurements must be conducted at various locations across the project boundary,
+including both interior and exterior spaces.
+
+Test Method
+•
+•
+
+The measuring instrument is placed in the center of the flat surface of the working plane with
+the aperture facing upward.
+Ensure that the shadow of the WELL Performance Testing Agent does not fall on the measuring
+instrument while the measurements are taken.
+
+Test Quantity
+•
+
+At least three measurements are taken for each task and/or application submitted by the
+project team. Tasks/applications may include, but are not limited to:
+o Circulation corridor
+o Reception desk
+o Aerobic exercise area
+o Food preparation
+o Reading and writing in a classroom
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+18
+
+•
+
+•
+
+•
+
+Measurements are conducted across one floor in projects that consist of one to four floors, or
+across two floors for projects of more than four flours, provided this area includes all tasks
+submitted. If some tasks only take place on certain floors, then measurements must occur on
+additional floors to capture those tasks.
+o The floor that is identified for measurements must be regularly used by a representative
+sample of the occupants. For example, if a project has four floors out of which one
+consists of the lobby and the other three consist of offices, the measurements must be
+conducted on one floor that contains offices.
+To identify sampling points, apply a grid with 3 m x 3 m [10 ft x 10 ft] squares across the entire
+floor(s) that has been identified for measurement.
+o Take one measurement per square, up to a maximum of 50 measurements per floor,
+provided at least three measurements per task/application are taken.
+o Reaching three measurements per task/application may require multiple measurements
+in a single grid square or more than 50 measurements per floor.
+o Within each square, measurements are to be taken at a point that is representative of
+the occupant’s position. For example, for a workstation, the sampling point would lie at
+the center of the desk in front of the occupant; for a corridor, the sampling points would
+be at the center of the corridor.
+o All sampling points must be representative of typical occupied areas within the sampling
+zone.
+For dwelling units, unless otherwise stated, sampling should be distributed between different
+unit types. At least one of each type of room described in the feature in each unit is evaluated:
+o Projects with 15 units or fewer: four units
+o Projects with 16-50 units: 25% of the units
+o Projects with more than 50 units: 15 units
+
+Reporting & Compliance
+•
+•
+
+The average light levels across identical tasks must meet the target illuminance throughout the
+project boundary.
+The lowest light level measured across workspaces must be at least half of the target
+illuminance.
+
+Device Requirements
+•
+•
+•
+•
+•
+
+All illuminance measurements are to be conducted with a cosine corrected illuminance meter.
+Range: 5-50,000 lux
+Maximum acceptable overall error: ±5% (at values up to 2000 lux)
+Resolution: 1 lux (at values up to 2000 lux)
+The illuminance meter is calibrated as per manufacturer specifications in an ISO/IEC 17025:2017
+Accredited Calibration Lab, or calibration must be traceable to a National Metrological Institute,
+such as NIST, NPL, or PTB.
+
+Circadian Lighting
+Features
+•
+•
+
+WELL v1: Feature 54, Part 1
+WELL v2 and WELL v2 pilot: Feature L03, Part 1
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+19
+
+•
+
+WELL Performance Rating: PL2
+
+Test Locations & Conditions
+•
+•
+•
+
+•
+
+•
+
+•
+•
+
+•
+
+•
+
+This parameter is to be measured on the vertical plane to simulate the light entering the eye of
+the occupant.
+Sampling points must be representative of the common occupant position in the space under
+regular conditions.
+For space types with workstations, this parameter must be measured 45 cm [18 in] above the
+working plane (the surface of a desk may be considered as the working plane for both sitting
+and standing desk surfaces).
+For dwelling units, the sampling points must be located in non-sleeping areas such as the living,
+kitchen, and study (e.g., home office). If a sample furniture layout is not provided, the sample
+points may be considered in the center of each room.
+If no working planes are present in the space type (for instance, a living room or a commercial
+interior before tenant buildout), four measurements are to be conducted at the height indicated
+in the feature language in orthogonal directions. The median value of the four measurements is
+to be used as the measurement value for each sampling point.
+If supplemental lighting is used, the lighting should be turned on and positioned as per regular
+conditions.
+The WELL Performance Testing Agent may follow instructions by the project team to turn
+computer screens (if present) on or off. However, they are not to alter field conditions in any
+other way, including influencing or controlling lighting automation (changing brightness levels,
+color or color temperature), modifying furniture and/or directing the adjustments made by the
+project team.
+The measurements of WELL v1 Feature 54, Part 1.b and WELL v2 and WELL v2 pilot Feature L03
+are taken under electric lighting only. Take measurements at night to avoid daylight
+contribution.
+The measurements of WELL v1 Feature 54, Part 1.a include the contributions of daylight and are
+measured between 9:00 am and 1:00 pm. Thus, for WELL v1 projects, take measurements under
+both daylight and nighttime conditions.
+
+Test Method
+•
+•
+•
+
+Measurements must be recorded on a vertical plane (perpendicular to the floor) to simulate the
+light entering the eye of the occupant.
+The measuring instrument must be mounted on a tripod and placed on a stable surface for each
+measurement.
+Ensure that the shadow of the WELL Performance Testing Agent does not fall on the measuring
+instrument as the measurements are taken.
+
+Test Quantity
+•
+
+For applicable areas that are not dwelling units, the total number of tests for this parameter is
+68𝑁
+
+𝑛 = 𝑁+67 , where N is the total number of workstations and desks within classrooms. For a
+•
+
+commercial interior before tenant buildout, use default occupancy assumptions to determine N.
+The measurements must be distributed across different floors (if applicable).
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+20
+
+•
+
+For dwelling units, take one sample in the applicable rooms with a maximum of 3 rooms per
+dwelling unit.
+
+Reporting & Compliance
+•
+
+•
+
+•
+•
+
+Report the lux levels and the spectral power at 5 nm increments from 380 nm to 730 nm. The
+methodology described in Table L2 in WELL (EML = lux × melanopic ratio) will be used to
+calculate the equivalent melanopic lux using the recorded spectral power values.
+For WELL v1 Feature 54, Part 1.b in v1 and WELL v2 and WELL v2 pilot Feature L03, the median
+light levels must meet the EML threshold and the lowest value must be at least half the
+threshold.
+For WELL v1 Feature 54, Part 1.a, the 25th percentile of the measurements must meet the EML
+threshold.
+A tolerance of -5% EML may be considered for the measurements taken.
+
+Device Requirements
+•
+•
+
+•
+
+All measurements are to be conducted with a cosine corrected optical spectrometer.
+The instrument must function within the limits of the performance specifications in the below
+requirements when operated in accordance with the operation manual:
+o Wavelength range: 380-780 nm
+o Maximum acceptable overall error: ±5%
+o Optical Resolution: 10 nm or less
+o Range: 5-50,000 lux
+o Resolution: 1 lux (at values up to 2000 lux)
+The meter is calibrated as per manufacturer specifications in an ISO/IEC 17025:2017 Accredited
+Calibration Lab, or calibration must be traceable to a National Metrological Institute, such as
+NIST, NPL or PTB.
+
+Alternate Device Requirements & Protocol
+•
+
+A spectrometer that is not cosine corrected but which meets the other device requirements may
+be used for testing this parameter in conjunction with a photometer that meets the device
+requirements for Visual Lighting parameter. In this case, measurements from both the
+photometer and spectrometer are taken in the same position, as described in Test Method. In
+the formula EML = lux × melanopic ratio, the melanopic ratio is calculated using the data from
+the spectrometer and the lux value is taken from the cosine-corrected photometer.
+
+Thermal Comfort
+General Guidelines
+Unless otherwise noted, these rules apply to all parameters within the Thermal Comfort concept.
+
+Test Locations & Conditions
+•
+•
+
+Sampling points must be representative of typical occupied areas within the sampling zone.
+Sampling points must be located at least 1 m [3.3 ft] away from windows, walls, doors, direct
+sunlight, mechanical system supply outlets, fans, heaters or any other significant source of heat
+or cold. To the extent possible, sampling points should be at least 5 m [16.4 ft] from exterior
+doors.
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+21
+
+•
+•
+
+For projects with multiple floors, the measurements must be distributed across different floors,
+including the lowest and the highest regularly occupied floor.
+The measurements must be conducted at various locations across the building floor area,
+including both interior space and in proximity to façades with different orientations.
+
+Test Method
+•
+•
+
+Total of 10 minutes, with measurements recorded at least once every minute.
+The WELL Performance Testing Agent should note whether the HVAC system (or any ventilation
+and air treatment method) is on or off during the data collection period.
+
+Test Quantity
+•
+•
+
+Measurements are recorded in 8% of the total number of each regularly occupied room type in
+the project (at least one of each room type).
+For areas of the project with dwelling units, to determine the number of sampling points:
+o Projects with 10 dwelling units or fewer: two of each unit type
+o Projects with more than 10 dwelling units: 5% of each unit type, with a minimum of
+three and a maximum of 10 units of each unit type
+o For all other areas, to determine sampling points, follow Table 2 sampling point
+guidance for the total area of regularly occupied spaces only, not the total project area
+(e.g., occupied lobbies and gyms are considered regularly occupied spaces and therefore
+would be included in the Table 2 calculations; common areas such as hallways are not
+considered regularly occupied spaces and therefore would not be included in the
+calculations).
+
+Dry-bulb Temperature
+Features
+•
+•
+•
+•
+
+WELL v1: Feature 76, Parts 1, 2 and 3
+WELL v2 pilot: Features T01, Part 1; T02, Part 1
+WELL v2: Feature T01, Part 1
+WELL Performance Rating: PT1
+
+Test Locations & Conditions
+•
+•
+
+See General Guidelines.
+Each sampling point is tested at three heights: 0.1 m, 0.6 m and 1.1 m (4 in, 24 in and 43 in,
+respectively) for seated occupants or 0.1 m, 1.1 m and 1.7 m (4 in, 43 in and 67 in, respectively)
+for standing occupants.
+
+Test Method
+•
+
+See General Guidelines.
+
+Test Quantity
+•
+
+See General Guidelines.
+
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+22
+
+Reporting & Compliance
+•
+
+The median value of the average of the measurements at the three test heights collected during
+the measurement time at each sampling point is reported and used to determine compliance
+with the WELL requirements.
+
+Device Requirements
+•
+•
+•
+•
+•
+
+Method of measurements: direct reading instrument
+Measurement range: 10 °C to 40 °C [50 °F to 100 °F]
+On-screen resolution: 0.5 °C [0.9 °F]
+Instrument accuracy: ±0.5 °C [±0.9 °F]
+Calibration: instrument must be within the calibration period
+
+Mean Radiant Temperature
+Features
+•
+•
+•
+•
+
+WELL v1: Feature 76, Parts 1, 2 and 3
+WELL v2 pilot: Features T01, Part 1; T02, Part 1
+WELL v2: Feature T01, Part 1
+WELL Performance Rating: PT1
+
+Test Locations & Conditions
+•
+•
+
+See General Guidelines.
+Each sampling point is tested at 0.6 m [24 in] for seated occupants or 1.1 m [43 in] for standing
+occupants.
+
+Test Method
+•
+
+•
+
+Mean radiant temperature can be determined one of two ways, both described in ASHRAE
+Handbook of Fundamentals, Chapter 9.10.:
+o It can be determined with a spherical or ellipsoidal shape globe thermometer method.
+o It can be calculated from the measured temperature of surrounding walls and surfaces
+and their positions with respect to the person (with the emissivity assumption that all
+surfaces in the room are considered to be black). This method can be practically
+accomplished by pointing a radiometer with a 90-degree acceptance cone toward each
+of the six surrounding surfaces and averaging the readings to produce one mean radiant
+temperature value.
+Total of 10 minutes, with measurements recorded at least once every minute.
+
+Test Quantity
+•
+
+See General Guidelines.
+
+Reporting & Compliance
+•
+
+The median value collected during the measurement time at each sampling point is reported
+and used to determine compliance with the WELL requirements.
+
+Device Requirements
+•
+•
+
+Method of measurements: direct reading instrument
+Measurement range: 10 °C to 40 °C [50 °F to 100 °F]
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+23
+
+•
+•
+•
+•
+
+Instrument resolution: 0.5 °C [0.9 °F]
+On-screen resolution: 0.5 °C [0.9 °F]
+Instrument accuracy: ±1 °C [1.8 °F]
+Calibration: instrument must be within the calibration period
+
+Relative Humidity
+Features:
+•
+•
+•
+•
+
+WELL v1: Feature 76, Parts 1 and 3
+WELL v2 pilot: Features T01, Part 1; T02, Part 1; T07, Part 1
+WELL v2: Features T01, Part 1; T07 Part 1
+WELL Performance Rating: PT1, PT2
+
+Test Locations & Conditions
+•
+•
+
+See General Guidelines.
+Sampling points must be 1.1-1.7 m [3.6-5.6 ft] above the finished floor.
+
+Test Method
+•
+
+See General Guidelines.
+
+Test Quantity
+•
+
+See General Guidelines.
+
+Reporting & Compliance
+•
+
+•
+
+Compliance for humidity requirements (WELL v2 and WELL v2 pilot Feature T07) is based on the
+median value collected during the measurement time at each location compared against the
+requirement in WELL + tolerance of 3 percentage points.
+For PMV calculations (WELL v2 and WELL v2 pilot Feature T01), the median value collected
+during the measurement time at each sampling point Is reported and used to determine
+compliance with the WELL requirements.
+
+Device Requirements
+•
+•
+•
+•
+•
+•
+
+Direct reading instrument.
+Measurement range: 5-95%
+Instrument resolution: 0.3%
+On-screen resolution: 1%
+Instrument accuracy: ±3 percentage points from 10-90% relative humidity
+Calibration: instrument must be within the calibration period
+
+Sound
+General Guidelines
+Unless otherwise noted, these rules apply to all parameters within the Sound concept.
+
+Test Locations & Conditions
+•
+•
+
+The measurements must be taken at a minimum of 1.2 m [4 ft] above the finished floor.
+The measurements must not be taken within 1.5 m [5 ft] of noise sources, fenestration or other
+exterior penetration (e.g., piping or other externally ducted HVAC equipment).
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+24
+
+•
+•
+
+It is highly recommended that the WELL Performance Testing Agent utilizes hearing protection
+when operating loudspeakers.
+It is recommended that, when possible, the spatial average be measured by rotating the sound
+level meter at arm’s length at a speed of 15 cm [6 in] per second during sound pressure
+measurements. Note that this does not apply to Reverberation Time (RT60) tests.
+
+Test Method
+•
+
+•
+•
+
+•
+
+Avoid transient interior sounds (e.g., people talking, doors closing) during the measurement
+periods. If there are internal noises (other than the HVAC system or building services such as
+escalators or elevators) lasting longer than 10 seconds, the measurement should be deleted and
+restarted.
+To the extent possible, testing should occur when the space is unoccupied or when the fewest
+number of people are on-site or nearby.
+WELL Performance Testing Agent should note sources of noise that may impact the results of
+sampling for the benefit of potential remediation upon non-compliance with WELL thresholds.
+Examples Ie, but are not limited to, exterior noise intrusion from industrial, pedestrian, traffic,
+mechanical or weather-related sources and interior noise from mechanical, occupant,
+construction or other building services.
+For dwelling units, unless otherwise stated, sampling should be distributed between different
+unit types. At least one of each type of room described in the feature in each unit is evaluated:
+o Projects with 15 units or fewer: four units
+o Projects with 16-50 units: 25% of the units
+o Projects with more than 50 units: 15 units
+
+Device Requirements
+•
+•
+•
+•
+
+Type 1/Class A sound level meter with whole and ⅓-octave measuring capabilities.
+Sound level meter is annually calibrated in accordance with ANSI/ASA S1.4-2014, IEC 616721:2013 or regionally equivalent standard.
+Sound level meter must be capable of reporting parametric results as Leq, LMax, L90, L10 and
+both slow and fast weightings.
+Measurement Equipment Parameters:
+o Bandwidth: At least 31.5 Hz to 8 kHz
+o Accuracy: ±0.5 dB at 1 kHz
+o On-screen resolution: 0.1 dB
+
+Exterior Noise Intrusion (dBA)
+Features
+•
+
+WELL v1: Feature 74, Part 1
+
+Test Locations & Conditions
+•
+•
+•
+•
+
+See General Guidelines.
+The HVAC system must be off during the measurement periods.
+Sound masking systems (if present) must be off for the duration of the measurement period.
+The sample points must be located as close to 1 m [3.3 ft] away from the window wall as
+possible while still located where an occupant would typically be situated.
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+25
+
+•
+
+•
+•
+
+As much as possible, the sample points should be located farthest from sources of mechanical
+nIincluding HVAC system ducts and elevators, while still located where an occupant would
+typically be situated.
+The distance between any two points of measurement must be at least 3 m [10 ft].
+If the windows are normally closed, the sound level measurements must occur with the
+windows closed. If the windows are normally open (e.g., naturally ventilated spaces), the sound
+level measurements must occur with the windows open.
+
+Test Method
+•
+•
+
+See General Guidelines.
+Each measurement should last at minimum 30 seconds at each test location.
+
+Test Quantity
+•
+
+At least one measurement in each room type listed for at least 10% of the total number of floors
+in the project. The preference for the first sampling point is given to the floor that is at or
+nearest to the ground level. The preference for the second sampling point (if applicable) is the
+floor at a similar height to adjacent rooftop mechanical equipment or other elevated exterior
+sources of noise. The preference for third sampling point (if applicable) is the floor beneath
+rooftop mechanical equipment.
+
+Reporting & Compliance
+•
+
+The time-averaged, slow-weighted and A-weighted sound pressure level (Leq) recorded during
+the measurement period will be used to determine compliance with the WELL threshold.
+
+Device Requirements
+•
+
+See General Guidelines.
+
+Internally Generated Noise (NC or NR)
+Features
+•
+
+WELL v1: Feature 75, Part 2
+
+Test Locations & Conditions
+•
+•
+•
+•
+•
+•
+•
+•
+
+See General Guidelines.
+The HVAC system must be on during the measurement periods.
+Sound masking systems (if present) must be off during the measurement period.
+The measurements must be located where an occupant would typically be situated within the
+space.
+As much as possible, measurements should be located in regularly occupied spaces near sources
+of mechanIoise, including HVAC system ducts and elevators.
+As much as possible, measurements should be located away from walls containing windows.
+The distance between any two points of measurement must be at least 3 m [10 ft].
+Windows and doors in the measurement location must be closed.
+
+Test Method
+•
+•
+
+See General Guidelines.
+Each measurement should last at minimum 30 seconds in each test location.
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+26
+
+Test Quantity
+•
+•
+
+•
+
+At least one measurement in each room type specified in WELL v1 Feature 75 for 10% of the
+total number of applicable floors.
+PreferI in selecting which floors are measured must be given firstly to floors where base building
+mechanical equipment rooms are present, and secondly to floors that locate directly beneath
+rooftop mechanical equipment.
+In open workspaces, one measurement should be taken for every 46 m2 [500 ft2].
+
+Reporting & Compliance
+•
+
+The time-averaged, slow-weighted and A-weighted sound pressure level (L90) measured at each
+of the following octave band frequencies is plotted against noise criteria curves and rounded
+down to the nearest increment of 1 NC/NR for maximum noise level to determine the noise
+criterion: 31.5 Hz (for Noise Rating), 63 Hz, 125 Hz, 250 Hz, 500 Hz, 1 kHz, 2 kHz, 4 kHz, and 8 kHz
+(for Noise Criterion).
+
+Device Requirements
+•
+
+See General Guidelines.
+
+Disruptive Noise Limitation
+Features
+•
+
+WELL v1: Feature 75 Part 7
+
+Test Locations & Conditions
+•
+•
+•
+•
+•
+•
+
+See General Guidelines.
+The measurements must be performed when the space is unoccupied (e.g., prior to opening or
+after hours).
+Music must be off for one ambient measurement, and music must be on for at least one
+measurement.
+As much as possible, avoid transient sounds (e.g., people talking, traffic noise, etc.) during
+measurement.
+As much as possible, measurements should be taken away from walls and other building
+structures. The sampling points must be located a minimum of 1.2 m [48 in] above the ground.
+If the conditions specified above are violated during the measurement, the measurement must
+be halted, data must be discarded, and the measurement must be restarted.
+
+Test Method
+•
+•
+
+See General Guidelines.
+Each measurement should last a minimum of 30 seconds in each test location.
+
+Test Quantity
+•
+
+At least two measurements (maximum of four) and measured at a distance of 4.5 m [15 ft]
+outside of the entrance to the space.
+
+Reporting & Compliance
+•
+
+The time-averaged, A-weighted sound pressure level recorded during the measurement period
+will be used to determine compliance with the WELL threshold.
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+27
+
+•
+
+Note any existing intruding sounds that may interfere with an accurate measurement of noise
+criterion (e.g., traffic noise).
+
+Device Requirements
+•
+
+See General Guidelines.
+
+Background Noise Levels
+Features
+•
+•
+
+WELL v2 and WELL v2 pilot: Feature S02
+WELL Performance Rating: PS1
+
+Test Locations & Conditions
+•
+•
+•
+•
+•
+•
+•
+
+•
+
+See General Guidelines.
+The HVAC system and other sound emitting building services (e.g., escalators, elevators,
+appliances) must be on during the measurement periods.
+Sound masking systems (if present) must be off for the duration of the measurement period.
+The sample points must be located at the location where an occupant would typically be
+situated within the space.
+As much as possible, the sample points must be located 1 m [3.3 ft] from any windows or walls,
+while still located where an occupant would typically be situated.
+The distance between any two points of measurement must be at least 3 m [10 ft].
+If the windows are normally closed, the sound level measurements must occur with the
+windows closed. If the windows are normally open, the sound level measurements must occur
+with the windows open.
+For WELL v2 pilot, with regards to the thresholds for Residential Sleeping Areas, “Daytime”
+measurements are taken after 7:00 a.m. and before 10:00 p.m. and “Nighttime” measurements
+are after 10:00 p.m. and before midnight.
+
+Test Method
+•
+•
+
+•
+
+See General Guidelines.
+Each measurement should last at minimum five minutes at each test location, except for open
+workspaces. Measurements in open workspaces should last at minimum 30 seconds at each test
+location.
+For WELL v2 projects, dwelling unit measurements must be taken over the course of a 12-hour
+minimum period which includes, at minimum, the hours of 10:00 pm to 7:00 am.
+
+Test Quantity
+•
+
+For all spaces except dwelling units, measurements are taken in 10% of rooms for each room
+type listed for each category.
+o For Categories 1, 2 and 4, one measurement is taken in each room type (e.g., area for
+conferencing) that is being measured.
+o For Category 3, one measurement is taken for every 46 m2 [500ft2] up to a maximum of
+10 measurements for each room type (e.g., area with regularly used PA systems) that is
+being measured.
+
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+28
+
+•
+
+•
+
+If measurements must be taken on multiple floors, the preference for the first sampling point is
+given to the floor that is at or nearest to the ground level. The preference for the second
+sampling point, if applicable, is the floor at a similar height to adjacent rooftop mechanical
+equipment or other elevated exterior sources of noise. The preference for the third sampling
+point, (if applicable), is the floor beneath the rooftop mechanical equipment.
+In dwelling units, one measurement is taken in one bedroom that is representative of a typical
+bedroom within the project. Preference is given to dwelling units that are located near sources
+of exterior noise (e.g., road traffic, rooftop mechanical equipment, garage doors) and local floor
+mechanical equipment rooms.
+
+Reporting & Compliance
+•
+
+•
+
+Compliance of the Leq values is based on the A-weighted and C-weighted measurement
+achieving the optimal level within a +4 dB tolerance. Compliance of the Lmax values is based on
+the A-weighted and C-weighted measurement achieving the optimal level within a +9 dB
+tolerance. All measurements are taken using slow weighting.
+All measurements taken in open workspaces should be averaged to a single time-averaged slowweighted sound pressure level for each criterion (dBA and dBC for both Leq and LMax).
+
+Device Requirements
+•
+
+See General Guidelines.
+
+Sound Masking
+Features
+•
+•
+
+WELL v1: Feature 79, Part 2
+WELL v2 pilot: Feature S05, Part 1
+
+Test Locations & Conditions
+•
+•
+•
+•
+
+See General Guidelines.
+The HVAC system must be on during the measurement periods.
+Sound masking system must be on during the measurement periods.
+The measurements must be taken where an occupant would typically be situated.
+
+Test Method
+•
+•
+
+See General Guidelines.
+Each measurement should last atd minimum 30 seconds in each test location.
+
+Test Quantity
+•
+
+At least 10% of the total number of regularly occupied spaces where sound masking is present.
+
+Reporting & Compliance
+•
+
+The slow-weighted, A-weighted L90 sound pressure level recorded during the measurement
+period will be used to determine compliance with the WELL threshold.
+
+Device Requirements
+•
+
+See General Guidelines.
+
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+29
+
+Sound Insulation
+Features
+•
+•
+•
+
+WELL v2 pilot: Feature S03, Part 1
+WELL v2: Feature S03, Part 2
+WELL Performance Rating: PS2
+
+Test Locations & Conditions
+•
+•
+•
+•
+•
+•
+•
+
+See General Guidelines.
+The HVAC system must be on during the measurement periods.
+Sound masking systems (if present) must be on during the measurement period.
+The measurements must be located where an occupant would typically be situated within the
+space.
+As much as possible, measurements should be located away from walls containing windows.
+The distance between any two points of measurement must be at least 3 m [10 ft].
+Windows and doors in the measurement location must be closed.
+
+Test Method
+•
+•
+
+•
+•
+
+See General Guidelines.
+Loudspeaker should be placed near the wall at the opposite side of the room from the wall that
+is being tested. If a non-omnidirectional speaker is used, to the extent possible, it should be
+aimed into a trihedral corner along this wall (i.e., where two walls join at right angles).
+The minimum level of the operating loudspeaker should be at least 90 dBA.
+Each measurement should last at minimum 30 seconds in each receiving room measurement
+location. If the receiving room has already been assessed for compliance with WELL v2 or WELL
+v2 pilot Feature S02 Part 1, data from the measurement (L90) may be used for Reporting &
+Compliance in lieu of taking an additional NIC/Dw measurement in that receiving room.
+
+Test Quantity
+•
+
+•
+
+•
+
+One measurement is taken for 10% of each combination of source and receiving rooms (e.g.,
+10% of all walls separating loud zones and circulation zones and 10% of enclosed quiet zones
+and enclosed offices).
+For WELL v2 pilot projects, preference should be given to rooms that separate two acoustically
+sensitive spaces such as conference rooms, wellness rooms or where the requirement is SPP-80
+or greater.
+Preference should be given to walls with any element of glazing and/or doors.
+
+Reporting & Compliance
+•
+•
+
+•
+
+Sound isolation and speech privacy metrics must be reported by following one of the following
+methods, as applicable:
+Noise Isolation Class (NIC) is calculated from L10 of the source measurement, L90 of the
+receiving location with source on, and L90 of the ambient background level (source off) of the
+receiving room (see below). L10 and L90 measurements for NIC calculations are evaluated
+across 125 Hz and 4 kHz.
+Sound Insulation (Dw) is calculated from Leq of the source measurement and receiving room
+with source on and off, assuming a room reverberation time of 0.5 seconds (unless known
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+30
+
+•
+•
+
+through evaluation of S04.1, as applicable). Both Dw and dBA L90 measurements are evaluated
+across 100 Hz and 3150 Hz.
+Speech Privacy Potential (SPP) is the sum of either Noise Criteria (NC) + Noise Isolation Class
+(NIC) OR background noise (dBA L90) + sound insulation (Dw).
+Noise Criteria (NC) is the single number criteria based on L90 background noise measurement
+from 63 Hz to 8 kHz taken in the receiving room space (see Reporting & Compliance for
+Internally Generated Noise for additional guidance).
+
+Device Requirements
+•
+•
+
+Sound Level Meter:
+o See General Guidelines.
+Loudspeaker:
+o Minimum 0.25 m [10 in] diameter
+o Minimum frequency response of at least 100 Hz – 4 kHz
+o Maximum output of at least 100 dB
+o Noise generator capable of producing white/pink noise of equal sound energy across all
+frequencies of interest
+
+Reverberation Time (RT60)
+Features
+•
+•
+•
+
+WELL v1: Feature 78, Parts 1 and 2
+WELL v2 and WELL v2 pilot: Feature S04, Part 1
+WELL Performance Rating: PS3
+
+Test Locations & Conditions
+•
+•
+•
+•
+•
+
+See General Guidelines.
+The HVAC system must be on during the measurement periods.
+Sound masking systems (if present) must be on during the measurements.
+The sampling points should be located at least 1 m [3.3 ft] from any sound-reflecting surfaces.
+The impulse sound source must be at least 1 m [3.3 ft] from both the sound measuring device
+and sound-reflecting surfaces.
+
+Test Method
+•
+•
+•
+
+•
+
+See General Guidelines.
+For the noise source impulse:
+If generated via balloon burst, inflate balloon to 0.4 m [16 in] diameter. Then, arm or ready the
+sound level meter by measuring the baseline background noise level. Once the meter is armed
+for impulse, burst balloon using a pen or similar. Allow approximately 10 seconds for the meter
+to capture impulse response at all frequencies.
+If generated via loudspeaker, arm and ready the meter by measuring the baseline background
+noise level. Then, excite the room by turning the loudspeaker on to approximately 90 dBA using
+a white/pink noise generator. Once the sound level meter is armed for impulse measurement,
+turn off the sound source and wait approximately 10 seconds for the sound level meter to
+capture the impulse response at all frequencies.
+
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+31
+
+Test Quantity
+•
+•
+
+Three measurements of approximately 10 seconds (or however long is needed to capture
+impulse response across all frequencies) per measurement location.
+At least 10% of each room type (note that rooms of the same type but of different volumes are
+considered the same room type).
+
+Reporting & Compliance
+•
+
+The average RT60 value from 500 Hz - 1 kHz of the three measurements per measurement
+location is used to determine compliance with the WELL threshold.
+
+Device Requirements
+•
+•
+
+Sound Level Meter:
+o See General Guidelines
+Balloon of minimum diameter 0.4 m [16 in]
+OR
+
+•
+
+Loudspeaker:
+o Minimum 0.25 m [10 in] diameter
+o Minimum frequency response of at least 100 Hz – 4 kHz
+o Maximum output of at least 100 dB
+o Noise generator capable of producing white/pink noise of equal sound energy across
+the frequencies of interest
+
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+32
+
+Continuous Monitoring Protocols for WELL
+General Guidelines
+Several WELL features within the WELL Building Standard version 2 (WELL v2) and WELL Ratings can be
+pursued through the implementation of permanently installed continuous monitors that measure
+environmental parameters through sensor technology. This section describes the continuous monitoring
+protocol for each feature and part that incorporates continuous monitoring as part of the verification
+method. Unless otherwise noted, these rules apply to all parameters in Table 3.
+Note: continuous monitoring and sensor technology are rapidly developing; therefore this section may
+be frequently updated to stay current with industry best practices
+Table 3: Parameters and Features/Parts that Incorporate Continuous Monitoring Pathways
+Parameter
+
+WELL v2 Feature/Part
+A01 Part 1; A01 Part 5; A05
+Part 1; A07 Part 2; A08 Part 1
+A01 Part 1; A01 Part 5; A05
+Part 1; A07 Part 2; A08 Part 1
+A01 Part 2; A01 Part 5; A08
+Part 1
+A01 Part 3; A01 Part 5; A05
+Part 3; A08 Part 1
+A01 Part 3; A01 Part 5; A08
+Part 1
+A01 Part 4; A01 Part 5
+A03 Part 1; A06 Part 1; A08
+Part 1
+
+WELL Performance
+Rating Feature
+
+Particulate Matter 2.5
+
+PM2.5
+
+Particulate Matter 10
+
+PM10
+
+Total Volatile Organic Compounds
+
+TVOC
+
+Carbon Monoxide
+
+CO
+
+Ozone
+
+O3
+
+Radon
+
+Rn
+
+Carbon Dioxide
+
+CO2
+
+Formaldehyde
+
+HCOH
+
+A01 Part 5; A08 Part 1
+
+PM1, PM2
+
+Nitrogen Dioxide
+
+NO2
+
+A05 Part 3; A08 Part 1
+
+PA6, PM2
+
+Temperature (dry-bulb)
+
+Tdb
+
+Relative Humidity
+
+RH
+
+A07 Part 2; T01 Part 1; T01
+Part 2; T06 Part 1
+A07 Part 2; T01 Part 1; T01
+Part 2; T06 Part 1; T07 Part 1
+
+PA1, PA2, PM1, PM2
+PA1, PA2, PM1, PM2
+PA3, PA4, PM1, PM2
+PA5, PA6, PM1, PM2
+PA5, PA6, PM1, PM2
+PA9
+PA7, PA8, PM2
+
+PT1, PM4, PM5
+PT1, PT2, PM4, PM5
+
+Monitor Placement
+•
+
+Installation Location Options:
+o Monitors are installed on a wall (vertically), at a height of 1.1-1.7 m [3.6-5.6 ft] above
+the finished floor.
+o Monitors are installed on a ceiling (horizontally). This placement option is only
+applicable in spaces, 1) with ceilings are no greater than 3.7 m [12 ft] above the finished
+floor, 2) that do not utilize displacement ventilation, and 3) there is evidence that the air
+is evenly mixed. Evidence for evenly mixed air within a space is submitted in the sensor
+data package as a Letter of Assurance from an Engineer confirming that a space meets
+requirements of a ventilation guideline listed in A03: Ventilation Design Part 1: Ensure
+
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+33
+
+•
+
+•
+
+Adequate Ventilation. Monitors utilized for this option must be designed to operate in a
+ceiling-mounted orientation.
+Monitors must be at least 1 m [3.3 ft] away from: doors, windows, air supply/exhaust outlets, air
+purifiers, or other potential influences (e.g., humidifiers, cleaning supplies, printers and
+photocopiers). To the extent possible, sampling points should be at least 5 m [16.4 ft] from
+exterior doors.
+Additionally, monitors measuring temperature and relative humidity must be at least 1 m [3.3
+ft] away from: direct sunlight, mechanical system supply outlets, fans, heaters or any other
+significant source of heat or cold.
+
+Monitor Density
+•
+
+•
+•
+
+•
+
+•
+
+•
+
+•
+
+All parameters except radon:
+o Projects with occupiable space of < 3250 m2: 1 monitor per 325 m2 [3,500 ft2] in
+occupiable spaces (minimum 2)
+o Projects with occupiable space of 3250-25,000 m2: 1 monitor per 500 m2 [5,400 ft2] in
+occupiable spaces (minimum 10)
+o Projects with occupiable space of > 25,000 m2: 1 monitor per 1000 m2 [10,800 ft2] in
+occupiable spaces (minimum 50)
+Radon:
+o 1 monitor per 2,300 m2 [25,000 ft2] of regularly occupied space at or below grade
+For WELL Core projects, to calculate number of monitors, use the area of the space(s) described
+in the WELL Core Guidance (e.g., for features that apply to non-leased space, use only the area
+of non-leased space).
+Monitors must be distributed throughout the project and to the extent possible, representative
+of all HVAC zones, faces of a building, and regularly occupied spaces (e.g., open office areas,
+private offices, conference rooms and classrooms).
+For projects with multiple floors, monitors must be distributed across different floors, including
+the lowest and highest regularly occupied floor (excluding floors with only leased space in WELL
+Core and Core & Shell projects).
+Multifamily Residential projects may only utilize continuous monitoring pathways in nondwelling unit spaces—dwelling units must meet performance requirements through methods
+described in the Performance Testing Protocols for WELL section. To determine the monitor
+density for all other non-dwelling unit spaces, follow monitor density rate for the total area of
+the non-dwelling unit spaces only.
+For projects containing large open spaces (e.g., gyms, ball rooms, etc.), one monitor is sufficient
+for an area of up to 2,500 m2 [27,000 ft2] if there is evidence that the air is evenly mixed and
+contaminant sources are uniform (e.g., testing and balancing report indicating ventilation rate is
+even throughout the space, IAQ report indicating ventilation rate and contaminant levels are
+even throughout a space). Projects may submit an AAP prior to documentation review to verify
+which spaces are eligible to utilize the alternative monitor density rate.
+
+Hardware Requirements
+•
+
+Measurements are taken at intervals not larger than 1 hour for radon and not larger than 15
+minutes for other parameters. Sensors which report more frequently (e.g., 1 minute, 5
+minutes) may report at the greater frequency or average (mean) their results within each
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+34
+
+•
+
+•
+
+•
+•
+
+15-minute interval. Radon sensors that can only provide output hourly measurements
+should be reported in intervals not larger than 15 minutes until a newer measurement is
+provided by the sensor system.
+Calibration:
+o All sensors measuring air quality parameters are recalibrated or replaced annually,
+and projects submit documentation attesting to their calibration or replacement
+annually through the WELL digital platform.
+o All sensors measuring thermal comfort parameters are recalibrated or replaced
+every three years, and projects submit documentation attesting to their calibration
+or replacement every three years through the WELL digital platform.
+o Note: field calibrations using a reference sensor are acceptable provided that the
+procedure allows the sensors to perform within manufacturer’s listed specifications.
+The calibration period must capture a sufficient range and concentration of
+contaminant—either using known span gases or exposure to ambient pollution—to
+accurately perform adjustments.
+Sensors must provide continuous measurements during occupied hours; missing
+measurements and data loss will be interpreted as a threshold/range exceedance for that
+time period when calculating compliance.
+o If sensors are returned to manufacturers for calibration, up to one continuous
+month of sensor data may be excluded at no penalty to account for this. Project
+team should submit documentation which clearly documents the dates the sensor is
+away for calibration
+Informative Note: continuous monitors connected to a permanent power source reduces
+potential monitor downtime attributed to power loss.
+Table 4 provides sensor technical specification requirements. Alternatively, continuous
+monitors that are RESET accredited Grade B or above can be utilized for features and parts
+that can be met with continuous monitors. RESET accredited monitors utilized for WELL
+projects must still meet the calibration and measurement interval and reporting frequencies
+outlined in the Performance Verification Guidebook.
+
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+35
+
+Table 4: Sensor Technical Specification Requirements
+
+Sensor Data: Submission and Reporting Requirements
+Projects that utilize continuous monitor measurements for performance verification must submit data
+for performance review, which includes the following documents:
+•
+
+Monitor Master List: a list of all continuous monitors and static parameters for a project.
+The following data are provided for each monitor (refer to sensor data file template):
+o WELL Project ID
+o Project Name
+o Project Location
+o Local Time Zone
+o Device ID
+o File Name
+o Device Location #
+o Device Location Name
+o Installation Date
+o Installation Height
+o Sensor(s) Type
+o Sensor(s) Range
+o Sensor(s) Accuracy
+o Sensor(s) Calibration Date
+o Sensor(s) Calibration Validity
+o Correction factors (PM2.5, PM10, TVOC sensors only)
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+36
+
+•
+
+•
+•
+•
+
+Sensor Data File: measurements are taken intervals not larger than 15 minutes—devices
+which report more frequently (e.g., 1 minute, 5 minutes) may report at the greater
+frequency or average (mean) their results within each 15-minute interval. Radon sensors
+that can only provide output hourly measurements shall be reported in intervals not larger
+than 15 minutes until a newer measurement is provided by the sensor. The following values
+are provided for each continuous measurement recording (refer to sensor data file
+template):
+o Timestamp.
+o Currently Occupied: whether that monitor location is typically occupied during that
+time period.
+o Measurement Data:
+▪ Corrected Measurement Data: expressed in units consistent thresholds
+units listed in WELL v2 or WELL Ratings.
+▪ Raw Measurement Data: the raw value provided by a sensor, prior to the
+application of calibration (e.g., gain, offset, user factors, etc.) or correction
+adjustments to the data. This field only needs to be populated if the sensor
+system applies adjustments to raw values.
+An annotated floor plan with the project size and monitor locations.
+Photographs of each monitor location including, when possible, the background of the
+space to provide context (e.g., height, away from potential influences).
+Data are submitted annually through the WELL digital platform in one the following formats:
+CSV or Excel file format. Refer to templates for specific guidance.
+
+Calculating Compliance
+•
+•
+
+Air and Thermal Comfort parameters: determined based on each sensor’s data meeting the
+threshold listed in the feature for at least 90% of regularly occupied hours.
+For initial award, at least one calendar month of data is required; for recertification/renewal,
+the time period since the previous award date is considered.
+
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+37
+
+Recertification
+WELL Certification is valid for three years and WELL Ratings are valid for one year, at which point
+projects must undergo recertification or renewal to maintain their certified or rated status. During this
+process, the project is re-evaluated to verify that it continues to perform as designed. The requirements
+for retesting performance verified features depend on the extent of alterations made to the project
+since initial certification.
+
+Reduced Sample Points
+This section applies to on-site tested metrics only. For measurements generated from
+permanently installed continuous monitors, data from all sensors will be considered,
+regardless of whether there have been any changes to the project.
+If a WELL Certified project has not undergone applicable alterations (see Project Alterations), it is eligible
+for a reduced amount of testing. Table 5 lists the level of retesting that is required for each of the
+parameters in this guidebook at recertification for a project without applicable alterations, as follows:
+•
+•
+•
+
+Full: the parameter is assessed in the same manner as for initial WELL certification.
+Reduced: the parameter is assessed at half the number of test locations as required for initial
+certification (round down, minimum 1).
+None: no performance testing is required.
+
+The reduction in sampling is only available for features previously awarded at WELL Certification.
+Projects targeting features in addition to those achieved at the project’s initial certification do not
+qualify for reduced sampling points for these additional features.
+WELL Performance Testing Agents are encouraged to vary the locations of sampling points each time
+they conduct testing for recertification.
+
+Project Alterations
+As part of recertification, projects will fill out a form to document any changes that have taken place
+since its previous (re)certification. Applicable alterations include changes made to:
+•
+•
+•
+•
+•
+
+Interior design: doors, appliances, furniture, finishes, layout and lighting.
+Exterior design: building grounds, exterior lighting.
+Mechanical systems: heating, ventilation and air conditioning.
+Structure: building envelope and fenestration.
+Plumbing systems: water distribution and treatment.
+
+Table 5 provides details on which types of project alterations impact the number of test locations.
+Projects that have made changes to at least 10% of the scope covered in each category are considered
+to have applicable alterations. For example, a project which replaced 50% of its lights and one of its 25
+workstations would undergo full retesting for visual lighting and circadian lighting. However, the
+changes to furniture would be small enough that it is still eligible for reduced retesting for VOCs and
+formaldehyde and no retesting for reverberation time.
+Parameters are reassessed with a preference given to spaces located within or near the modifications
+that have occurred.
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+38
+
+Table 5: Eligibility for Reduced Sampling Points Based on Extent of Alterations
+
+Air
+
+Water
+
+Light
+Thermal
+Comfort
+
+Sound
+
+PM2.5 and PM10
+Carbon Monoxide
+VOCs
+Formaldehyde
+Ozone
+Radon
+Turbidity
+Coliforms
+Disinfectants
+Lab-Based Contaminants
+Visual Lighting
+Circadian Lighting
+Dry-bulb Temperature
+Mean Radiant Temperature
+Relative Humidity
+Exterior Noise Intrusion
+Disruptive Noise Limitation
+Internally Generated Noise
+Background Noise Level
+Reverberation Time
+Sound Insulation
+Sound Masking
+
+✓
+✓
+
+✓
+✓
+✓
+✓
+✓
+
+✓
+✓
+
+Level of testing
+
+✓
+✓
+
+✓
+✓
+
+✓
+✓
+
+✓
+✓
+✓
+
+With
+relevant
+alteration
+
+Reduced
+Reduced
+Reduced
+Reduced
+Reduced
+None
+Full
+Full
+Full
+Reduced
+None
+None
+Reduced
+Reduced
+Reduced
+None
+None
+None
+Reduced
+None
+None
+None
+
+Full
+Full
+Full
+Full
+Full
+Full
+Full
+Full
+Full
+Full
+Full
+Full
+Full
+Full
+Full
+Full
+Full
+Full
+Full
+Full
+Full
+Full
+
+✓
+✓
+
+✓
+
+✓
+
+✓
+✓
+✓
+✓
+
+No relevant
+alteration
+
+✓
+✓
+
+✓
+✓
+✓
+
+Treatment
+
+Water Distribution
+
+Fenestration
+
+Overall Plumbing
+Structure System
+
+Building Envelope
+
+Air Conditioning
+
+Ventilating
+
+Heating
+
+Lighting
+
+Lighting
+
+Layout
+
+Finishes
+
+Furniture
+
+Parameter
+
+Doors
+
+Concept
+
+Appliances
+
+Interior Design
+
+Building Grounds
+
+Extent of alterations
+Exterior
+Mechanical
+Design
+System
+
+✓
+
+✓
+✓
+✓
+✓
+✓
+✓
+✓
+
+✓
+✓
+✓
+✓
+✓
+✓
+✓
+
+✓
+✓
+✓
+✓
+✓
+✓
+✓
+
+✓
+✓
+
+✓
+✓
+
+✓
+✓
+
+✓
+✓
+✓
+✓
+✓
+✓
+✓
+
+✓
+✓
+✓
+✓
+✓
+✓
+✓
+
+✓
+✓
+
+✓
+
+✓
+✓
+
+✓
+
+The categories of alterations are shown in the columns and the parameters are listed in the rows. A checkmark in a
+cell indicates that a project with this type of alteration must undergo “Full” testing at recertification, instead of
+“Reduced” or “None”.
+
+Annually Aggregated Data
+This section applies to on-site tested metrics only. For measurements generated from
+permanently installed continuous monitors, data from all sensors will be considered,
+For select performance verified features in WELL v2 and WELL v2 pilot (as identified in the Note of that
+feature in the digital standard), WELL Certified projects have the option to aggregate annual data
+collected in accordance with the Performance Verification Guidebook for recertification. To be eligible
+for this pathway, the project must use a WELL Performance Testing Agent for all annual testing for the
+relevant feature(s). Note that even if a project has used a WELL Performance Testing Agent to collect the
+annual data, they are not required to aggregate their data and may still elect to use results from
+recertification testing after three years.
+As with testing at recertification, WELL Performance Testing Agents are encouraged to vary the location
+of sampling points each year if there are multiple locations that meet the requirements in the Test
+Locations & Conditions sections.
+The number of locations for annual tests is based on the guidance in the Reduced Sample Points section.
+For the purposes of determining eligibility for reduction of sampling points, consider alterations to the
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+39
+
+project only in the 12 months prior to the annual test. Annual data is aggregated, including years with
+and without reduced sampling points.
+
+Air
+For each pollutant listed in A01 Parts 1, 2 and 3, average the values submitted to the WELL Reviewer for
+Part 5. Compare this average against the thresholds listed in the feature plus the applicable tolerances
+mentioned in the Reporting & Compliance sections.
+For example, take the following PM2.5 concentrations from a sample project which requires two
+sampling locations for A01.
+Test location
+Open office
+Enclosed office
+Conference room #1
+Conference room #2
+
+Annual PM2.5 Levels (µg/m3)
+Year 1
+Year 2
+Year 3
+Average
+15
+15
+20
+19
+16
+14
+13
+-
+
+The average of 16 µg/m3 is less than the threshold of 15 µg/m3 + the 20% tolerance described in this
+guidebook and meets feature requirements.
+
+Water
+In WELL v2 pilot only, for each pollutant listed in W01 Parts 1 and 2 and W02 Parts 1-6, average the
+values submitted to the WELL Reviewer for Part 7. Compare this average against the thresholds listed in
+the feature.
+
+Thermal Comfort
+For T01, average the absolute values (i.e., positive value) of the PMV calculated from each semiannual
+measurement. Compare this average against the upper and lower PMV thresholds listed in the feature.
+Test location
+Open office
+Enclosed office
+Conference room #1
+Conference room #2
+
+Year 1
+0.2
+|-0.5| = 0.5
+-
+
+Annual PMV Levels
+Year 2
+Year 3
+0.4
+0.1
+|-0.7| = 0.7
+|-0.1| = 0.1
+
+Average
+0.33
+
+The average of the absolute values in this example is 0.33 and hence complies with the ±0.5
+requirements of T01.
+
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+40
+
+Glossary
+Configuration: With water, a configuration refers to the water treatment method used if water is
+treated at all. For example, a bathroom sink and kitchen sink that both use point-of-use sediment filters
+are of the same configuration; conversely, a drinking water fountain with a point-of-use filter and
+another drinking water fountain that uses base building water with no further treatment are of different
+configurations. Sinks and dispensers in different buildings are considered different configurations.
+Continuous Monitors: Permanently installed hardware system that includes sensor technology to
+measure environmental conditions and a mechanism to store data, either locally or through
+cloud/network storage. To measure multiple parameters, continuous monitors may include more than
+one sensor.
+Leased Spaces: All areas within the project boundary that are leased or owned by tenants.
+Non-leased Spaces: All areas within the project boundary that are not considered leased space.
+On-going Monitoring: Activities required in certain features of WELL wherein projects engage in ongoing measurements of environmental parameters.
+Parameter: A particular physical condition that is measured (e.g., dry-bulb temperature, formaldehyde
+concentration).
+Performance Testing: On-site component of the WELL process wherein an independent agent, trained in
+the testing protocols of the WELL Performance Verification Guidebook, conducts tests on environmental
+parameters, collects samples, submits them to labs and analyzes data.
+Regularly occupied space: Area within the project boundary where a particular individual normally
+spends at least one continuous hour or, cumulatively, at least two hours per day, such as an office,
+conference room, bedroom or classroom.
+Sensor: A device—often integrated into continuous monitoring systems—which measures or detects a
+physical stimulus (e.g., carbon dioxide, heat, sound) and transmits the information to downstream
+hardware.
+WELL Performance Testing Agent: An agent who is trained and qualified to conduct performance testing
+for WELL. This may refer to GBCI agents or individuals from other organizations who are trained and
+approved by GBCI.
+Performance Review: Review is carried out by a WELL Reviewer of performance testing data to verify
+that all testing and analysis is accurate and conducted in accordance with the WELL Performance
+Verification Guidebook.
+WELL Reviewer: An agent approved by IWBI who reviews and approves all documentation and
+performance test results for WELL. WELL Reviewers are trained to understand proper adherence to
+testing protocols for evaluating WELL performance criteria and confirm that all design, construction,
+operational and policy documentation submitted by the project accurately attest to achievement of
+WELL features.
+Copyright
+© 2014-2022 by International WELL Building Institute pbc. All rights reserved.
+
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+41
+
+International WELL Building Institute pbc authorizes individual use of this WELL™ Performance Verification Guidebook. In
+exchange for this authorization, the user agrees:
+1.
+
+to retain all copyright and other proprietary notices contained in the Performance Verification Guidebook.
+
+2.
+
+not to sell or modify the Performance Verification Guidebook,
+
+3.
+
+not to reproduce, display or distribute the Performance Verification Guidebook in any way for any public or
+commercial purpose, unless authorized in writing by IWBI, and
+
+4.
+
+to ensure that any and all authorized uses of the Performance Verification Guidebook, including excerpts thereof,
+should be accompanied by attribution, including the appropriate addendum (indicated, for example, by "Q4 2022").
+
+Unauthorized use of the Performance Verification Guidebook violates copyright, trademark and other laws and is prohibited.
+INTERNATIONAL WELL BUILDING INSTITUTE, IWBI, THE WELL BUILDING STANDARD, WELL V2, THE WELL COMMUNITY
+STANDARD, WELL CERTIFIED, WELL PORTFOLIO, WELL SCORE, WELL AP, WELL HEALTH-SAFETY RATING, WELL HEALTH-SAFETY
+RATED, WELL PERFORMANCE RATED, WE ARE WELL, THE WELL CONFERENCE, WELL, and others and their related logos are
+trademarks or certification marks of the International WELL Building Institute pbc in the United States and other countries.
+Disclaimer
+None of the parties involved in the funding or creation of the WELL Building Standard, the WELL Building Standard version 2
+(“WELL v2”) and the Performance Verification Guidebook and related resources and materials, including IWBI, its affiliates and
+its and its affiliates’ respective its owners, affiliates, members, employees, or contractors, assume any liability or responsibility to
+the user or any third-parties for the accuracy, completeness, or use of or reliance on any information contained in the WELL
+Building Standard, WELL v2 and the Performance Verification Guidebook and related resources and materials, or for any injuries,
+losses, or damages (including, without limitation, equitable relief) arising from such use or reliance. Although the information
+contained in the WELL Building Standard, WELL v2 and the Performance Verification Guidebook is believed to be reliable and
+accurate, all materials set forth within are provided without warranties of any kind, either express or implied, including but not
+limited to warranties of the accuracy or completeness of information or the suitability of the information for any particular
+purpose. This document, the WELL Building Standard and WELL v2 are intended to educate and assist real estate owners, building
+and community stakeholders, tenants, occupants and users in their efforts to create healthier work and living spaces, and nothing
+in this document, the WELL Building Standard and WELL v2 should be considered, or used as a substitute for, quality control,
+safety analysis, legal compliance (including zoning), comprehensive urban planning, medical advice, diagnosis or treatment. IWBI
+materials may reference the use by customers of third-party testing organizations, devices or technologies and user acknowledges
+and agrees that any use of such third party organization, device or technology is subject to and user is responsible for reviewing
+any third party policies, protocols and agreements and IWBI shall have no liability for use of or reliance upon any such third party
+organizations, devices or technologies. Achievement of WELL Certification or of any designation under WELL v2 does not in any
+way guarantee, represent or warrant that the individuals in a space, building or organization will be healthy or healthier, nor does
+it indicate that a project is in compliance with any applicable laws/regulations or guarantee that a space will be free from viruses,
+pathogens, bacterial allergens or volatile organic compounds.
+As a condition of use, the user covenants not to sue and agrees to waive and release the International WELL Building Institute
+pbc, its owners, affiliates, members, employees, or contractors from any and all claims, demands, and causes of action for any
+injuries, losses or damages (including, without limitation, equitable relief) that the user may now or hereafter have a right to
+assert against such parties as a result of the use of, or reliance on, the WELL Building Standard, WELL v2 or the Performance
+Verification Guidebook.
+
+WELL Performance Verification Guidebook, Q4 2022
+© 2014-2022 by International WELL Building Institute PBC. All rights reserved.
+
+42
+
+

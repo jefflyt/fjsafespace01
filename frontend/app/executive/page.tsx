@@ -1,23 +1,3 @@
-/**
- * frontend/app/executive/page.tsx
- *
- * PR 6.3: Executive Dashboard UI.
- *
- * Displays:
- * - Page header with portfolio health summary
- * - Wellness Index leaderboard sorted by score DESC
- * - Top 3 Risks panel (color-coded: Green/Amber/Red/Grey)
- * - Top 3 Actions panel
- *
- * Color coding (PSD §6.1):
- *   Green  >= 90  HEALTHY_WORKPLACE_CERTIFIED
- *   Amber  75-89  HEALTHY_SPACE_VERIFIED
- *   Red    < 75   IMPROVEMENT_RECOMMENDED
- *   Grey   N/A    INSUFFICIENT_EVIDENCE
- *
- * Reference: PLAN docs/plans/epics/pr6-executive-dashboard/PLAN.md § PR 6.3
- */
-
 "use client"
 
 import { useEffect, useState } from "react"
@@ -26,14 +6,13 @@ import { cn } from "@/lib/utils"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { AlertTriangle, ShieldCheck, ShieldX, ShieldAlert, Loader2, TrendingUp } from "lucide-react"
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { AlertTriangle, ShieldCheck, ShieldX, ShieldAlert, Loader2, Activity } from "lucide-react"
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -78,6 +57,15 @@ interface ExecutiveDashboardData {
   top_risks: TopRisk[]
   top_actions: TopAction[]
   health_ratings: HealthRatings
+}
+
+interface UploadSummary {
+  id: string
+  file_name: string
+  site_id: string
+  parse_status: string
+  uploaded_at: string
+  report_type: string | null
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -152,99 +140,41 @@ function formatDate(dateStr: string | null): string {
 function HealthSummaryCard({ ratings }: { ratings: HealthRatings }) {
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <TrendingUp size={20} />
+      <CardHeader className="pb-3">
+        <CardTitle className="font-heading flex items-center gap-2 text-lg">
+          <Activity className="h-5 w-5 text-primary" />
           Portfolio Health
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
           <div className="text-center">
-            <div className="text-3xl font-bold">{ratings.total_sites}</div>
-            <div className="text-xs text-muted-foreground uppercase tracking-wider">Total Sites</div>
+            <div className="font-heading text-3xl font-bold tabular-nums">{ratings.total_sites}</div>
+            <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Total Sites</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl font-bold text-green-600">{ratings.certified}</div>
-            <div className="text-xs text-muted-foreground uppercase tracking-wider">Certified</div>
+            <div className="font-heading text-3xl font-bold tabular-nums text-green-600">{ratings.certified}</div>
+            <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Certified</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl font-bold text-amber-600">{ratings.verified}</div>
-            <div className="text-xs text-muted-foreground uppercase tracking-wider">Verified</div>
+            <div className="font-heading text-3xl font-bold tabular-nums text-amber-600">{ratings.verified}</div>
+            <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Verified</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl font-bold text-red-600">{ratings.improvement_recommended}</div>
-            <div className="text-xs text-muted-foreground uppercase tracking-wider">Needs Work</div>
+            <div className="font-heading text-3xl font-bold tabular-nums text-red-600">{ratings.improvement_recommended}</div>
+            <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Needs Work</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl font-bold text-gray-400">{ratings.insufficient_evidence}</div>
-            <div className="text-xs text-muted-foreground uppercase tracking-wider">No Data</div>
+            <div className="font-heading text-3xl font-bold tabular-nums text-gray-400">{ratings.insufficient_evidence}</div>
+            <div className="text-[11px] uppercase tracking-wider text-muted-foreground">No Data</div>
           </div>
         </div>
-        <div className="mt-4 pt-4 border-t text-center">
-          <span className="text-sm text-muted-foreground">Average Wellness Index: </span>
-          <span className={cn("text-lg font-bold", getScoreColorClass(ratings.average_wellness_index))}>
+        <div className="mt-4 border-t pt-4 text-center">
+          <span className="text-xs text-muted-foreground">Average Wellness Index: </span>
+          <span className={cn("font-heading text-lg font-bold tabular-nums", getScoreColorClass(ratings.average_wellness_index))}>
             {formatScore(ratings.average_wellness_index)}%
           </span>
         </div>
-      </CardContent>
-    </Card>
-  )
-}
-
-function LeaderboardTable({ rows }: { rows: LeaderboardRow[] }) {
-  if (rows.length === 0) {
-    return (
-      <Card>
-        <CardContent className="pt-6 text-center text-muted-foreground py-12">
-          No sites available. Upload scan data to populate the leaderboard.
-        </CardContent>
-      </Card>
-    )
-  }
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Site Leaderboard</CardTitle>
-        <p className="text-sm text-muted-foreground">
-          Ranked by Wellness Index score (descending)
-        </p>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-12">#</TableHead>
-              <TableHead>Site</TableHead>
-              <TableHead className="text-right">Wellness Index</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Last Scan</TableHead>
-              <TableHead className="text-right">Findings</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {rows.map((row, idx) => (
-              <TableRow key={row.site_id}>
-                <TableCell className="font-medium text-muted-foreground">{idx + 1}</TableCell>
-                <TableCell className="font-semibold">{row.site_name}</TableCell>
-                <TableCell className={cn("text-right font-bold text-lg", getScoreColorClass(row.wellness_index_score))}>
-                  {formatScore(row.wellness_index_score)}%
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline" className={cn("flex w-fit gap-1", getOutcomeColor(row.certification_outcome))}>
-                    {getOutcomeIcon(row.certification_outcome)}
-                    {getOutcomeLabel(row.certification_outcome)}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right text-sm text-muted-foreground">
-                  {formatDate(row.last_scan_date)}
-                </TableCell>
-                <TableCell className="text-right text-sm">{row.finding_count}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
       </CardContent>
     </Card>
   )
@@ -258,19 +188,19 @@ function RiskCard({ risk }: { risk: TopRisk }) {
       : "bg-green-50 border-green-200"
 
   return (
-    <div className={cn("rounded-lg border p-4 space-y-2", bandColor)}>
+    <div className={cn("rounded-lg border p-3 space-y-1.5", bandColor)}>
       <div className="flex items-center justify-between">
-        <span className="font-semibold text-sm">{risk.site_name}</span>
+        <span className="text-sm font-semibold">{risk.site_name}</span>
         {risk.is_advisory && (
-          <Badge variant="outline" className="text-xs text-gray-500">Advisory</Badge>
+          <Badge variant="outline" className="text-[10px] text-gray-500">Advisory</Badge>
         )}
       </div>
       <div className="flex items-center gap-2">
-        <AlertTriangle size={16} className="text-red-500" />
-        <span className="font-mono text-sm uppercase">{risk.metric_name}</span>
+        <AlertTriangle size={14} className="text-red-500" />
+        <span className="font-mono text-xs uppercase">{risk.metric_name}</span>
       </div>
-      <p className="text-sm text-muted-foreground">{risk.interpretation_text}</p>
-      <p className="text-sm font-medium">Action: {risk.recommended_action}</p>
+      <p className="text-xs text-muted-foreground">{risk.interpretation_text}</p>
+      <p className="text-xs font-medium">Action: {risk.recommended_action}</p>
     </div>
   )
 }
@@ -278,16 +208,16 @@ function RiskCard({ risk }: { risk: TopRisk }) {
 function TopRisksPanel({ risks }: { risks: TopRisk[] }) {
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <AlertTriangle size={18} className="text-red-500" />
-          Top 3 Risks
+      <CardHeader className="pb-3">
+        <CardTitle className="font-heading flex items-center gap-2 text-lg">
+          <AlertTriangle size={16} className="text-red-500" />
+          Top Risks
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-2">
         {risks.length === 0 ? (
-          <p className="text-center text-muted-foreground py-6">
-            No critical risks detected across monitored sites.
+          <p className="py-6 text-center text-sm text-muted-foreground">
+            No critical risks detected.
           </p>
         ) : (
           risks.map((risk, idx) => <RiskCard key={idx} risk={risk} />)
@@ -300,25 +230,25 @@ function TopRisksPanel({ risks }: { risks: TopRisk[] }) {
 function TopActionsPanel({ actions }: { actions: TopAction[] }) {
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Recommended Actions</CardTitle>
+      <CardHeader className="pb-3">
+        <CardTitle className="font-heading text-lg">Recommended Actions</CardTitle>
       </CardHeader>
       <CardContent>
         {actions.length === 0 ? (
-          <p className="text-center text-muted-foreground py-6">
+          <p className="py-6 text-center text-sm text-muted-foreground">
             No actions pending.
           </p>
         ) : (
-          <ul className="space-y-3">
+          <ul className="space-y-2">
             {actions.map((action, idx) => (
-              <li key={idx} className="flex items-start gap-3 p-3 rounded-lg bg-secondary/30">
+              <li key={idx} className="flex items-start gap-3 rounded-lg bg-secondary/30 p-3">
                 <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
                   {idx + 1}
                 </span>
                 <div>
-                  <p className="font-medium text-sm">{action.recommended_action}</p>
+                  <p className="text-sm font-medium">{action.recommended_action}</p>
                   <p className="text-xs text-muted-foreground">
-                    {action.site_name} &middot; {action.metric_name} &middot; Priority: {action.priority}
+                    {action.site_name} · {action.metric_name} · Priority: {action.priority}
                   </p>
                 </div>
               </li>
@@ -334,20 +264,28 @@ function TopActionsPanel({ actions }: { actions: TopAction[] }) {
 
 export default function ExecutiveDashboardPage() {
   const [data, setData] = useState<ExecutiveDashboardData | null>(null)
+  const [uploads, setUploads] = useState<UploadSummary[]>([])
+  const [selectedUpload, setSelectedUpload] = useState<string>("all")
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    api.get<ExecutiveDashboardData>("/api/dashboard/executive")
-      .then(setData)
+    Promise.all([
+      api.get<ExecutiveDashboardData>("/api/dashboard/executive"),
+      api.get<UploadSummary[]>("/api/uploads"),
+    ])
+      .then(([dashboardData, uploadsData]) => {
+        setData(dashboardData)
+        setUploads(uploadsData)
+      })
       .catch((err: Error) => setError(err.message))
       .finally(() => setLoading(false))
   }, [])
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <Loader2 size={32} className="animate-spin text-muted-foreground" />
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <Loader2 size={28} className="animate-spin text-muted-foreground" />
       </div>
     )
   }
@@ -355,8 +293,8 @@ export default function ExecutiveDashboardPage() {
   if (error) {
     return (
       <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center">
-        <p className="text-red-600 font-medium">Failed to load dashboard data</p>
-        <p className="text-sm text-muted-foreground mt-1">{error}</p>
+        <p className="font-medium text-red-600">Failed to load dashboard data</p>
+        <p className="mt-1 text-sm text-muted-foreground">{error}</p>
       </div>
     )
   }
@@ -371,18 +309,65 @@ export default function ExecutiveDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Executive Dashboard</h1>
-        <p className="text-muted-foreground mt-1">
-          Portfolio-level IAQ wellness overview across all managed sites.
-        </p>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="font-heading text-2xl font-bold tracking-tight">Executive Dashboard</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Portfolio-level IAQ wellness overview across all managed sites.
+          </p>
+        </div>
+
+        {/* Historical Scan Selector */}
+        <Select value={selectedUpload} onValueChange={setSelectedUpload}>
+          <SelectTrigger className="w-[280px]">
+            <SelectValue placeholder="Select scan results" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Scans (Latest)</SelectItem>
+            {uploads.map((upload) => (
+              <SelectItem key={upload.id} value={upload.id}>
+                {upload.file_name} — {formatDate(upload.uploaded_at)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <HealthSummaryCard ratings={data.health_ratings} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <LeaderboardTable rows={data.leaderboard} />
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2 space-y-6">
+          {/* Leaderboard kept for now — can be replaced with per-scan results */}
+          {data.leaderboard.length > 0 && (
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="font-heading text-lg">Site Results</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {data.leaderboard.map((row) => (
+                    <div key={row.site_id} className="flex items-center justify-between rounded-lg border p-3">
+                      <div>
+                        <p className="text-sm font-medium">{row.site_name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          Last scan: {formatDate(row.last_scan_date)} · {row.finding_count} findings
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <div className={cn("font-heading text-xl font-bold tabular-nums", getScoreColorClass(row.wellness_index_score))}>
+                          {formatScore(row.wellness_index_score)}%
+                        </div>
+                        <Badge variant="outline" className={cn("mt-1", getOutcomeColor(row.certification_outcome))}>
+                          {getOutcomeIcon(row.certification_outcome)}
+                          <span className="ml-1">{getOutcomeLabel(row.certification_outcome)}</span>
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
         <div className="space-y-6">
           <TopRisksPanel risks={data.top_risks} />

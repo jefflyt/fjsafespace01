@@ -1,0 +1,105 @@
+<h2>Current Architecture vs Proposed Simplification</h2>
+<p class="subtitle">Let's compare what exists now with your simplified vision</p>
+
+<div class="split">
+  <div class="mockup">
+    <div class="mockup-header">Current State — 3 Phases, Multiple Views</div>
+    <div class="mockup-body" style="padding: 16px; font-size: 13px;">
+      <div class="section">
+        <h3>Phase 1: Analyst View</h3>
+        <div class="label">Pages</div>
+        <ul style="margin: 4px 0 12px 20px;">
+          <li>/dashboard/analyst/ — Upload queue</li>
+          <li>/dashboard/analyst/upload/ — Single upload</li>
+          <li>/dashboard/analyst/uploads/ — Upload list</li>
+          <li>/dashboard/analyst/uploads/[id]/ — Upload detail</li>
+          <li>/dashboard/analyst/findings/ — Findings panel</li>
+          <li>/dashboard/analyst/reports/ — Report list</li>
+          <li>/dashboard/analyst/reports/[id]/ — Report detail</li>
+          <li>/dashboard/analyst/reports/new/ — New report</li>
+        </ul>
+      </div>
+      <div class="section">
+        <h3>Phase 2: Executive View</h3>
+        <div class="label">Pages</div>
+        <ul style="margin: 4px 0 12px 20px;">
+          <li>/dashboard/executive/ — Portfolio dashboard</li>
+          <li>Cross-site comparison</li>
+          <li>Wellness Index leaderboard</li>
+          <li>Zone/Floor drilldown</li>
+        </ul>
+      </div>
+      <div class="section">
+        <h3>Phase 3: Customer Portal</h3>
+        <div class="label">Pages + Auth</div>
+        <ul style="margin: 4px 0 0 20px;">
+          <li>/customer/ — Customer dashboard</li>
+          <li>/customer/status/ — Certification status</li>
+          <li>Clerk auth + tenant isolation</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup">
+    <div class="mockup-header">Proposed — 2 Views, Single Upload</div>
+    <div class="mockup-body" style="padding: 16px; font-size: 13px;">
+      <div class="section">
+        <h3>Ops View (Phase 1+2 merged)</h3>
+        <div class="label">Single CSV Upload → Multiple Reports</div>
+        <ul style="margin: 4px 0 12px 20px;">
+          <li>Upload one CSV at a time</li>
+          <li>Scan details + findings</li>
+          <li>Generate multiple reports from same scan</li>
+          <li>QA checklist + approval</li>
+        </ul>
+      </div>
+      <div class="section">
+        <h3>Executive View</h3>
+        <div class="label">Results + Suggestions Only</div>
+        <ul style="margin: 4px 0 12px 20px;">
+          <li>Results summary (no raw data)</li>
+          <li>Top risks + suggested actions</li>
+          <li>Select previous scan results</li>
+          <li>View past reports</li>
+        </ul>
+      </div>
+      <div class="section" style="opacity: 0.5;">
+        <h3>Customer Portal — Phase 3 Only</h3>
+        <div class="label">Deferred entirely</div>
+        <ul style="margin: 4px 0 0 20px;">
+          <li>All customer views</li>
+          <li>Clerk auth integration</li>
+          <li>Tenant isolation</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 20px;">
+  <h3>What Gets Simplified</h3>
+  <div class="options" data-multiselect>
+    <div class="option" data-choice="upload-flow" onclick="toggleSelect(this)">
+      <div class="letter">1</div>
+      <div class="content">
+        <h3>Upload Flow</h3>
+        <p>One CSV at a time → generate multiple reports from same scan</p>
+      </div>
+    </div>
+    <div class="option" data-choice="customer-defer" onclick="toggleSelect(this)">
+      <div class="letter">2</div>
+      <div class="content">
+        <h3>Customer Portal Deferred</h3>
+        <p>All customer views + Clerk auth pushed to Phase 3</p>
+      </div>
+    </div>
+    <div class="option" data-choice="view-reduction" onclick="toggleSelect(this)">
+      <div class="letter">3</div>
+      <div class="content">
+        <h3>2 Views Only</h3>
+        <p>Ops (details + reports) + Executive (results + suggestions)</p>
+      </div>
+    </div>
+  </div>
+</div>

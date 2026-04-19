@@ -658,7 +658,7 @@ backend/
 | Next.js app | `pnpm run dev` (localhost:3000) |
 | FastAPI Backend | `fastapi dev backend/app/main.py` (localhost:8000) |
 | PostgreSQL | Supabase Local Dev (`supabase start`) or Docker |
-| Environment | `.env` (Backend) & `.env.local` (Frontend) |
+| Environment | Single `.env` at project root |
 | Migrations | `alembic upgrade head` |
 
 ### 9.2 docker-compose.yml

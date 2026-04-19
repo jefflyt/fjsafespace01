@@ -24,6 +24,7 @@ from datetime import datetime
 
 from fastapi import APIRouter, HTTPException, Response, status
 from sqlmodel import select
+from weasyprint import HTML
 
 from app.api.dependencies import SessionDep
 from app.models.enums import CertificationOutcome, ReviewerStatus
@@ -36,7 +37,7 @@ from app.schemas.report import (
     ReportResponse,
     UpdateQAChecklistRequest,
 )
-from app.services.pdf_orchestrator import generate_report_pdf
+from app.services.pdf_orchestrator import build_report_snapshot
 from app.services.qa_gates import can_approve_report
 
 router = APIRouter(tags=["reports"])
@@ -66,7 +67,7 @@ def _report_to_response(report: Report) -> ReportResponse:
         qa_checks=report.qa_checks,
         data_quality_statement=report.data_quality_statement,
         certification_outcome=report.certification_outcome,
-        pdf_url=report.pdf_url,
+        report_snapshot=report.report_snapshot,
         generated_at=report.generated_at,
     )
 
@@ -185,6 +186,12 @@ async def approve_report(
     # Get findings for this report's upload
     findings = session.exec(select(Finding).where(Finding.upload_id == report.upload_id)).all()
 
+    # Get site name for snapshot
+    from app.models.workflow_b import Site
+    upload_obj = session.get(Upload, report.upload_id)
+    site_obj = session.get(Site, upload_obj.site_id) if upload_obj else None
+    site_name = site_obj.name if site_obj else "Unknown Site"
+
     # Run QA gates
     all_passed, qa_results = can_approve_report(report, findings)
 
@@ -207,6 +214,10 @@ async def approve_report(
     report.reviewer_approved_at = datetime.utcnow()
     report.qa_checks = json.dumps({r.gate: True for r in qa_results})
 
+    # Build immutable snapshot of report content at approval time
+    snapshot = build_report_snapshot(report, findings, site_name=site_name)
+    report.report_snapshot = json.dumps(snapshot)
+
     session.add(report)
     session.commit()
     session.refresh(report)
@@ -222,9 +233,8 @@ async def approve_report(
 @router.get("/reports/{report_id}/export", status_code=status.HTTP_200_OK)
 async def export_report(report_id: str, session: SessionDep):
     """
-    Streams PDF bytes from Report.pdf_url.
-    Phase 1/2: returns metadata with PDF URL.
-    Phase 5: streams actual PDF bytes via WeasyPrint.
+    Returns report snapshot JSON for dashboard rendering.
+    The snapshot contains the full structured content for HTML rendering.
     """
     report = session.get(Report, report_id)
     if not report:
@@ -236,21 +246,20 @@ async def export_report(report_id: str, session: SessionDep):
             detail="Report must be approved before export.",
         )
 
-    if not report.pdf_url:
+    if not report.report_snapshot:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="PDF not yet generated for this report.",
+            detail="Report snapshot not available.",
         )
 
-    return {"pdf_url": report.pdf_url}
+    return {"snapshot": json.loads(report.report_snapshot)}
 
 
 @router.get("/reports/{report_id}/pdf", status_code=status.HTTP_200_OK)
 async def generate_report_pdf_endpoint(report_id: str, session: SessionDep):
     """
-    Generate and stream a PDF report.
-    Only approved reports can be generated.
-    Returns PDF bytes directly for browser download.
+    Generate and stream a PDF report on-demand from the immutable snapshot.
+    Only approved reports can be generated. Returns PDF bytes for download.
     """
     report = session.get(Report, report_id)
     if not report:
@@ -262,26 +271,15 @@ async def generate_report_pdf_endpoint(report_id: str, session: SessionDep):
             detail="Report must be approved before PDF generation.",
         )
 
-    # Get site name
-    site = session.get(Upload, report.upload_id)
-    site_name = site.site_id if site else "Unknown Site"
-
-    # Get findings for this report's upload
-    findings = session.exec(select(Finding).where(Finding.upload_id == report.upload_id)).all()
-
-    if not findings:
+    if not report.report_snapshot:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No findings available for PDF generation.",
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Report snapshot not available for PDF generation.",
         )
 
-    # Generate PDF
-    pdf_bytes = generate_report_pdf(report, findings, site_name)
-
-    # Update report with generation timestamp
-    report.generated_at = __import__("datetime").datetime.utcnow()
-    session.add(report)
-    session.commit()
+    # Generate PDF from the stored HTML snapshot (immutable — no template lookup)
+    snapshot = json.loads(report.report_snapshot)
+    pdf_bytes = HTML(string=snapshot["html"]).write_pdf()
 
     filename = f"FJDashboard_Report_{report.id[:8]}.pdf"
 

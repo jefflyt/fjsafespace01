@@ -27,7 +27,7 @@ from fastapi import APIRouter, HTTPException, UploadFile, status
 from sqlmodel import Session, select
 
 from app.api.dependencies import SessionDep
-from app.models.enums import ParseOutcome, ParseStatus
+from app.models.enums import ParseOutcome, ParseStatus, ReportType
 from app.models.workflow_b import Finding, Upload
 from app.skills.data_ingestion.csv_parser import parse_csv
 from app.skills.data_ingestion.supabase_storage import SupabaseStorage, SupabaseStorageError
@@ -129,6 +129,7 @@ async def create_upload(
     upload.parse_status = ParseStatus.COMPLETE
     upload.parse_outcome = parse_result.parse_outcome
     upload.warnings = ", ".join(parse_result.warnings) if parse_result.warnings else None
+    upload.report_type = parse_result.report_type
 
     # Evaluate readings against rulebook to generate findings
     eval_findings = evaluate_readings(
@@ -185,6 +186,7 @@ async def create_upload(
         "warnings": upload.warnings,
         "uploaded_at": upload.uploaded_at.isoformat(),
         "failed_row_count": parse_result.failed_row_count,
+        "report_type": parse_result.report_type.value,
         "finding_count": len(eval_findings),
         "wellness_score": wellness_score,
         "certification_outcome": certification,
@@ -194,7 +196,8 @@ async def create_upload(
 @router.get("/uploads", status_code=status.HTTP_200_OK)
 async def list_uploads(session: SessionDep):
     """
-    Return a list of all uploads with their parse status and outcome.
+    Return a lightweight list of all uploads for the historical scan selector.
+    Only includes fields needed by the executive dropdown.
     """
     uploads = session.exec(select(Upload).order_by(Upload.uploaded_at.desc())).all()
     return [
@@ -203,8 +206,8 @@ async def list_uploads(session: SessionDep):
             "file_name": u.file_name,
             "site_id": u.site_id,
             "parse_status": u.parse_status.value,
-            "parse_outcome": u.parse_outcome.value if u.parse_outcome else None,
             "uploaded_at": u.uploaded_at.isoformat(),
+            "report_type": u.report_type.value if u.report_type else None,
         }
         for u in uploads
     ]

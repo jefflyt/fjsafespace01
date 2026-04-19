@@ -2,9 +2,9 @@
 
 | Field | Value |
 |---|---|
-| **Document** | FJDashboard PSD-02 v0.2 |
-| **Scope** | Dashboard Layer — Phase 1 (Analyst View) + Phase 2 (Internal Dashboard) + Phase 3 (Customer Portal) |
-| **Date** | 2026-04-11 (Updated: 2026-04-12) |
+| **Document** | FJDashboard PSD-02 v0.3 |
+| **Scope** | Dashboard Layer — Phase 1 (Operations + Executive) + Phase 3 (Customer Portal) |
+| **Date** | 2026-04-11 (Updated: 2026-04-19) |
 | **Owner** | Jeff |
 | **PM** | Lyra |
 | **Status** | Draft for Review |
@@ -45,8 +45,8 @@ Deliver the dashboard layer of FJ SafeSpace that converts approved, rule-based f
 
 | Phase | Scope |
 |---|---|
-| **Phase 1** | Analyst / Operations view — upload queue visibility, findings panel, report status tracking |
-| **Phase 2** | Internal dashboard — Global Portfolio (FJ Executive), Leaderboard, Cross-Site Comparison, Zone/Floor Drilldown |
+| **Phase 1** | Operations view (single CSV upload, findings panel, report builder) + Executive view (results, suggestions, historical selector) |
+| **Phase 2** | Customer profile management, Clerk auth integration, tenant isolation |
 | **Phase 3** | Customer portal — scoped building view, certification status, renewal workflow |
 
 ---
@@ -81,17 +81,17 @@ Deliver the dashboard layer of FJ SafeSpace that converts approved, rule-based f
 
 ## 3. End-to-End Workflow
 
-### Phase 1 Workflow (Analyst View)
+### Phase 1 Workflow (Operations View)
 
 ```
 Upload → Parse + Validate → Rule Evaluation → Findings Stored
-  → Dashboard Analyst View
-      ├── Upload queue status
+  → Dashboard Operations View
+      ├── Single CSV upload (inline status)
       ├── Findings panel with citation badges
       ├── Report Draft Builder
-      │     ├── [Select Report Type: Assessment | Intervention Impact]
-      │     │     Assessment          → current IAQ state framing
-      │     │     Intervention Impact → post-change contextual framing
+      │     ├── Report Type auto-detected from CSV timestamps
+      │     │     Single day → Assessment (current IAQ state)
+      │     │     Multi-day → Intervention Impact (post-change)
       │     ├── QA checklist gate
       │     └── Reviewer approval → PDF generation → Export
       └── Report status + ReportTypeBadge chip
@@ -102,8 +102,8 @@ Upload → Parse + Validate → Rule Evaluation → Findings Stored
 ```
 Approved Findings
   → Dashboard Aggregation Service
-      ├── FJ Executive View (Portfolio): Leaderboard | Space Health Rating | top risks | top actions
-      └── Analyst / Operations View: upload queue | findings panel | report draft builder
+      ├── Operations View: upload → findings → report generation (tabbed UI)
+      └── Executive View: Portfolio summary | top risks | top actions | historical scan selector
 ```
 
 ### Phase 3 Workflow (Customer Portal)
@@ -236,29 +236,22 @@ All fields from PSD-01 §4 — `site_name`, `zone_name`, `device_id`, `reading_t
 
 > **Available from:** Phase 1
 
-**A) Upload Queue Table**
+**Layout (tabbed UI at `/ops`):**
 
-| Column | Notes |
-|---|---|
-| File | File name |
-| Site | Site name |
-| Upload Timestamp | |
-| Status | `pending \| processing \| complete \| failed` |
-| Parse Outcome | `PASS \| PASS_WITH_WARNINGS \| FAIL` |
-| Actions | View parse log / Retry (if failed) / Proceed to findings |
+**Tab A) Upload** — Single file upload (no queue). Inline status shown after upload completes.
 
-**B) Findings Panel**
+**Tab B) Findings Panel**
 
 Per-metric row: `Metric Name | Current Value | Unit | Threshold Band | Rule Interpretation | Citation Badge | Confidence | Action Priority`
 
 - **Citation Badge:** clickable → shows `citation_unit_id`, source title, `source_currency_status`, `rule_version`
 - Source currency badge follows same colour coding as Operations View
 
-**C) Report Draft Builder**
+**Tab C) Report Draft Builder**
 
-- **Report Type selector** (shown at report initiation, before generation): `Assessment` / `Intervention Impact`
-  - `Assessment` — frames report as a point-in-time current IAQ state report
-  - `Intervention Impact` — frames report as a post-change IAQ check after remediation actions have been implemented
+- **Report Type auto-detected** from CSV timestamp patterns during upload:
+  - Single calendar day → `Assessment` (current IAQ state)
+  - Multiple calendar days → `Intervention Impact` (post-change contextual framing)
 - Report type is stored on the Report record and cannot be changed after generation
 - **ReportTypeBadge chip** displayed on report status card: `Assessment` (neutral) or `Intervention Impact` (accented)
 - Report status chip: `draft_generated | in_review | revision_required | approved | exported`

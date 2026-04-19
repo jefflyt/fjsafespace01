@@ -1,0 +1,99 @@
+{
+  "report_id": "rpt-sample-001",
+  "report_type": "ASSESSMENT",
+  "site_name": "New Park Estate - Office Tower",
+  "site_id": "site-npe-001",
+  "upload_id": "upload-sample-001",
+  "report_version": 1,
+  "rule_version_used": "v1.0",
+  "generated_at": "2026-04-01T16:00:00Z",
+  "data_quality_statement": "All sensor readings verified against uHoo device calibration records. No data gaps detected during the monitoring period.",
+  "certification_outcome": "HEALTHY_WORKPLACE_CERTIFIED",
+  "reviewer_name": "Jay Choy",
+  "reviewer_status": "APPROVED",
+  "reviewer_approved_at": "2026-04-02T10:30:00Z",
+  "findings": [
+    {
+      "id": "finding-001",
+      "zone_name": "Lobby",
+      "metric_name": "co2_ppm",
+      "metric_label": "CO2",
+      "current_value": 530,
+      "unit": "ppm",
+      "threshold_band": "GOOD",
+      "threshold_value": 1000,
+      "interpretation_text": "CO2 levels in the lobby are well within acceptable limits, indicating adequate ventilation.",
+      "workforce_impact_text": "No adverse effects on cognitive function or comfort expected.",
+      "recommended_action": "Continue monitoring. No intervention required.",
+      "rule_id": "rule-co2-001",
+      "rule_version": "v1.0",
+      "citation_unit_ids": ["cit-who-co2-001"],
+      "confidence_level": "HIGH",
+      "source_currency_status": "CURRENT_VERIFIED",
+      "benchmark_lane": "FJ_SAFESPACE",
+      "alert_priority": 1
+    },
+    {
+      "id": "finding-002",
+      "zone_name": "Floor 3 - Open Office",
+      "metric_name": "co2_ppm",
+      "metric_label": "CO2",
+      "current_value": 750,
+      "unit": "ppm",
+      "threshold_band": "GOOD",
+      "threshold_value": 1000,
+      "interpretation_text": "CO2 levels in the open office area are within acceptable limits but trending upward during peak occupancy.",
+      "workforce_impact_text": "Minor drowsiness possible during afternoon hours if ventilation is not adjusted.",
+      "recommended_action": "Monitor afternoon readings. Consider increasing HVAC fresh air intake during peak hours.",
+      "rule_id": "rule-co2-001",
+      "rule_version": "v1.0",
+      "citation_unit_ids": ["cit-who-co2-001"],
+      "confidence_level": "HIGH",
+      "source_currency_status": "CURRENT_VERIFIED",
+      "benchmark_lane": "FJ_SAFESPACE",
+      "alert_priority": 2
+    },
+    {
+      "id": "finding-003",
+      "zone_name": "Meeting Room A",
+      "metric_name": "co2_ppm",
+      "metric_label": "CO2",
+      "current_value": 900,
+      "unit": "ppm",
+      "threshold_band": "MODERATE",
+      "threshold_value": 1000,
+      "interpretation_text": "CO2 levels in Meeting Room A approach the upper threshold during occupied periods. This is consistent with high-density occupancy and limited air exchange.",
+      "workforce_impact_text": "Occupants may experience reduced concentration and mild headaches during extended meetings.",
+      "recommended_action": "Install CO2-triggered ventilation boost. Limit maximum occupancy to 8 persons.",
+      "rule_id": "rule-co2-002",
+      "rule_version": "v1.0",
+      "citation_unit_ids": ["cit-who-co2-002", "cit-ss554-vent-001"],
+      "confidence_level": "HIGH",
+      "source_currency_status": "CURRENT_VERIFIED",
+      "benchmark_lane": "FJ_SAFESPACE",
+      "alert_priority": 3
+    }
+  ],
+  "summary": {
+    "total_findings": 3,
+    "critical_count": 0,
+    "moderate_count": 1,
+    "good_count": 2,
+    "wellness_index_score": 85,
+    "top_risks": [
+      {
+        "metric": "CO2",
+        "zone": "Meeting Room A",
+        "severity": "MODERATE",
+        "value": "900 ppm"
+      }
+    ],
+    "top_actions": [
+      {
+        "action": "Install CO2-triggered ventilation boost in Meeting Room A",
+        "zone": "Meeting Room A",
+        "priority": "HIGH"
+      }
+    ]
+  }
+}

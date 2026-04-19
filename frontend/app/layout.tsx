@@ -1,9 +1,18 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, Montserrat } from 'next/font/google'
 import './globals.css'
 import { Navbar } from '@/components/layout/Navbar'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-sans',
+})
+
+const montserrat = Montserrat({
+  subsets: ['latin'],
+  variable: '--font-heading',
+  weight: ['500', '600', '700'],
+})
 
 export const metadata: Metadata = {
   title: 'FJDashboard | Analyst Operations',
@@ -17,11 +26,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${inter.variable} ${montserrat.variable} font-sans antialiased`}>
         <Navbar />
-        <div className="flex-1 bg-slate-50 min-h-screen">
+        <main className="flex-1 bg-background min-h-screen">
           {children}
-        </div>
+        </main>
       </body>
     </html>
   )

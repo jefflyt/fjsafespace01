@@ -1,0 +1,2643 @@
+Hw
+Green Mark 2021
+
+TECHNICAL GUIDE
+
+Revision Log
+Revision
+
+Description
+
+Effective Date
+
+R1
+
+1st Version
+
+1/11/2021
+
+R1.1
+
+Minor updates
+
+1/11/2021
+
+R1.2
+
+Minor updates
+
+1/5/2022
+
+2
+
+Contents
+HW1 Physiological ..................................................................................................................................................................... 4
+HW1.1 Active Movement Design .......................................................................................................................................... 4
+HW1.1a Active Mobility ........................................................................................................................................................ 4
+HW1.1b Active Interior ......................................................................................................................................................... 6
+HW1.2 Low VOC Materials .................................................................................................................................................... 7
+HW1.3 Air Quality and Comfort ............................................................................................................................................ 9
+HW1.3a Thermal Comfort ..................................................................................................................................................... 9
+(i) Air-Conditioned Non-Residential Buildings .................................................................................................................. 9
+(ii) Non-Air-Conditioned Functional Spaces ................................................................................................................... 10
+HW1.3b Outdoor Air Provision ........................................................................................................................................... 13
+(i) Enhanced Outdoor Air Provision ................................................................................................................................ 13
+(ii) Periodic (Post) Occupancy Evaluation ....................................................................................................................... 16
+(iii) IAQ Surveillance Audit .............................................................................................................................................. 18
+HW1.3c Clean Air ................................................................................................................................................................ 19
+(i) UVGI System for Air Disinfection ............................................................................................................................... 19
+(ii) Air Filtration .............................................................................................................................................................. 20
+(iii) Designated Smoking Points ...................................................................................................................................... 21
+HW2 Psychological................................................................................................................................................................... 22
+HW2.1 Access to Nature ..................................................................................................................................................... 22
+HW2.2 Circadian Rhythm .................................................................................................................................................... 23
+(i) Views to Outside ........................................................................................................................................................ 23
+(ii) Quality of Artificial Lighting ....................................................................................................................................... 24
+(iii) Circadian Lighting System ........................................................................................................................................ 25
+HW2.3a Sound Zoning Design Approach ............................................................................................................................ 27
+HW2.3b Interior Acoustic Comfort ..................................................................................................................................... 28
+HW3 Sociological ..................................................................................................................................................................... 34
+HW3.1 Inclusive .................................................................................................................................................................. 34
+HW3.2a Restorative and Community Spaces ...................................................................................................................... 35
+HW3.2b Outsourced Workers ............................................................................................................................................. 36
+HW3.3a Physical Activity and Mental Wellness Programmes ............................................................................................. 36
+HW3.3b Healthy Eating and Drinking .................................................................................................................................. 37
+Health and Wellbeing - Innovation .......................................................................................................................................... 38
+WELL Certification.................................................................................................................................................................... 39
+Acknowledgements: ................................................................................................................................................................ 40
+
+3
+
+HW1 Physiological
+A maximum of 5 points can be scored across RE 1 Protect section.
+
+HW1.1 Active Movement Design
+To recognise and promote an active building and to reduce sedentary behaviour which is associated with a
+number of health issues. This takes a whole of building approach from, facilitating a safe access to and around
+the site for pedestrians and cyclists, allowing for an active commute or journey to the building. To the
+provision of an active interior design and fit out for occupants.
+
+HW1.1a Active Mobility
+The design, implementation and provision of safe and segregated access for pedestrians and cyclists with the
+provision of bicycle parking and associated facilities.
+
+Assessment Criteria
+HW1.1a Active Mobility
+
+New Buildings
+
+Existing Buildings
+
+(i) Safe Access in and around the project site
+
+0.5 Point
+
+1 Point
+
+(ii) Bicycle Lots
+
+0.5 Point
+
+1 Point
+
+(i) To promote safe access within the project, pedestrians, cyclists and vehicle users should be safely and clearly
+separated and users should not have to compete for entry and exit to the site. Pedestrians should not need to
+cross over vehicular traffic to enter the site or access the building. There shall be direct connections to existing
+or planned cycle lanes and footpaths. All cycle lanes and pedestrian lanes are to be provided in accordance with
+Walking Cycling Design Guide by LTA and URA.
+(ii) Provision of bicycle parking lots with 50% more than the stipulated minimum within URA circular
+URA/PB/2018/03-DCG (or prevailing circular) and LTA’s Code of Practice - Street Work Proposal Relating to
+Development Works (or prevailing COP). For projects with GFA ≤ 1,000 m2, the number of bicycle lots would be
+evaluated based on reasonableness for the project, taking into account factors such as space, occupancy,
+visitorship and location.
+The bicycle parking lots should be sheltered, and secure for example with adequate surveillance (e.g. CCTV).
+Reference should be made to the distribution and location of short-term and long-term bicycle parking.
+The bicycle parking lots with End-of-Trip facilities should be located at accessible locations which are less than
+50m away from main entrances and/or lift lobbies, complete with proper wayfinding and signage. Proper
+consideration should be given to the connection to adjacent cycling paths/shared paths, public transportation
+nodes and amenities. The provision of End-of-Trip facilities is not applicable to residential buildings
+
+Documentation Requirements
+At Design stage (New Buildings) / Pre-retrofit stage (Existing Buildings):
+Submission of:
+•
+•
+
+•
+
+Site plans and dimensioned drawings showing pedestrian and bicycle pathways and points of connection
+with public pathways.
+An Access Statement with particular details of on people’s movement and access to the site, outlining the
+segregation of vehicular traffic from pedestrians and cyclists. The statement should provide details on
+how everyone can get to and move through the place on equal terms.
+Location and numbers of bicycle lots, end of trip facilities and distance to main entrance/ accessible lift
+lobby
+4
+
+At Verification stage (New Buildings & Existing Buildings):
+•
+
+As-built site plans with photographs of showing pedestrian and bicycle pathways and points of
+connection, bicycle lots and end of trip facilities.
+
+Guidance Notes
+As a guide, the Access Statement should include and not be limited to the following details:
+a)
+
+Outline of approach and ambition: identify the aims for accessibility, how you intend to put them into
+practice and targets that will help you monitor success. Highlight any policies that demonstrate
+commitment to ensuring that disabled people of all ages will be able get to and around site, enjoy its
+facilities and fully participate in the experiences on offer.
+b) Address key design elements: Consider how people will get to and around your development, in
+particular:
+• Approaches and entrances that provide for shared use for people of different mobility
+abilities
+• Safe and unencumbered access for pedestrians, with physical separation from motor
+vehicles, maintained throughout the journey around and within the development.
+• Cycle friendly design that removes tension between pedestrians and cyclists, and cyclists and
+motor vehicles.
+• Accessible parking and drop-off near entrances and key destination points
+• Levels and how gradients will be accommodated
+• Route widths, surfaces, colours, markings, distance
+• Emergency egress accessible to all users
+• Lighting (consider people with partial sight)
+• Seating and shelter
+• Accessible signage, information and communication
+c) Consultation with existing and potential users: how this has informed the plan
+d) Site constraints: Where environmental factors constrain best practice, identify the nature of the
+constraints, demonstrate why the relevant design standards can't be achieved and identify proposed
+alternative solutions.
+e) Management plans: Explain how the policies and approaches to making the development access
+inclusive and safe will be maintained in the longer term, for example in maintenance programmes and
+management plans.
+
+References:
+URA-LTA Walking and Cycling Design guide and the URA circular URA/PB/2018/03-DCG
+CABE Design and Access Statements: How to write, read and use them
+
+5
+
+HW1.1b Active Interior
+Active interior promotes active behaviour by influencing occupants through active interior designs
+and features.
+
+Assessment Criteria
+HW1.1b Active Interior
+
+New Buildings
+
+Existing Buildings
+
+For Non-Residential Buildings
+
+For Non-Residential Buildings
+
+1 Point
+
+1 Point
+
+[All floors = 1 point.
+≥50% of floors = 0.5point]
+
+[All floors = 1 point.
+≥50% of floors = 0.5point]
+
+For Residential Buildings
+
+For Residential Buildings
+
+1 Point
+
+1 Point
+
+[All floors = 1 point.
+≥10 floors* = 0.5point]
+
+[All floors = 1 point.
+≥10 floors* = 0.5point]
+
+*Includes basement & ground floors
+
+*Includes basement & ground floors
+
+For Non-Residential Buildings
+
+For Non-Residential Buildings
+
+1 Point
+
+1 Point
+
+[≥90% of workstations = 1 point.
+≥50% of workstations = 0.5point]
+
+[≥90% of workstations = 1 point.
+≥50% of workstations = 0.5point]
+
+For Residential Buildings
+
+For Residential Buildings
+
+N/A
+
+N/A
+
+(i) Internal staircases
+
+(ii) Active Furnishing
+
+Points shall be awarded based upon the following:
+Internal Staircases Providing internal staircases serving all floors that are highly visible, visually appealing, well
+ventilated and prominent, which encourages active movement and usage and allows convenient connections
+between multi-storey spaces or tenancies.
+Active Furnishing include standing tables, tables with easy height adjustment features (sit stand) and chairs
+with active siting features.
+
+Documentation Requirements
+At Design stage (New Buildings) / Pre-retrofit stage (Existing Buildings):
+Submission of:
+•
+•
+•
+
+Design drawings with location of the staircases indicated.
+Concept drawing with a simple write-up on design elements incorporated to make the staircase more
+appealing and prominent.
+Product catalogues of the active furnishing features.
+Design drawings with numbers and locations of these features.
+
+6
+
+At Verification stage (New Buildings & Existing Buildings):
+•
+•
+•
+•
+
+As-built drawings with location of the staircases indicated.
+Photos of the completed staircase with design elements incorporated to make the staircase more appealing
+and prominent.
+As-built drawings with numbers and locations of the active furnishing features.
+Photos of the active furnishing features
+
+HW1.2 Low VOC Materials
+Building interior materials and products with high Volatile Organic Compound (VOC) emission are harmful to
+human. Use of low VOC materials and products are encouraged for health and well-being of building
+occupants.
+
+Assessment Criteria
+HW1.2 Low VOC Materials
+
+New Buildings
+
+Existing Buildings
+
+For Non-Residential Buildings
+
+Both Residential and NonResidential Buildings
+
+1 Point
+[≥60% of all areas* = 1 point.
+≥80% common areas = 0.5 point]
+Material Finishes to be SGBP 4 tick.
+OR
+
+1 Point
+[≥80% of common areas
+OR at least 3 Material
+Finishes to be SGBP 4 tick]
+
+For Residential Buildings
+2 Points
+
+VOC emission levels stated in Table HW1.2.1
+
+[≥60% of all areas* = 2 points
+≥80% common areas = 1 point]
+*includes lettable areas for nonresidential
+developments
+and
+dwelling units for residential
+developments
+
+Points shall be awarded where the applicable interior finishes, furniture and carpentry works use
+•
+•
+
+materials and products that are certified to be Leader (4 tick rating) under the Singapore Green
+Building Product (SGBP) certification scheme. OR
+materials and products that can meet the emission levels stated in Table HW1.2.1.
+
+The area of compliance should be calculated based on the surface area of the interior.
+
+Documentation Requirements
+At Design stage (New Buildings) / Pre-retrofit stage (Existing Buildings):
+•
+
+•
+•
+
+Extracts of the tender design specification showing the requirement stating the use of
+o SGBP 4 ticks certified products on material finishes and furnishings or
+o Materials finishes, furnishings and products that meet the emission levels stated in Table HW1.2.1
+(data sheets)
+Design drawings marking the extent of use for each compliant low VOC emission products/ materials and
+the calculation of the extent of use
+Product catalogues and SGBP certificates or product/material testing reports (if the product selection is
+confirmed)
+7
+
+At Verification stage (New Buildings & Existing Buildings):
+•
+
+As-built drawings and calculation of extent of application for each product / material
+
+•
+
+SGBP 4 tick certificates or product/ material testing reports that meet the low VOC emission levels stated
+in Table HW1.2.1 within the criteria (extracted below within the guidance notes)
+Purchase Orders (POs) and Delivery Orders (DOs) of the low VOC emission products and materials used
+
+•
+
+Guidance Notes
+Applicable materials
+(a) Flooring, wall and ceiling finishes
+i.
+Adhesives and sealants used for the flooring, wall or ceilings (including tile grouts and
+sealants, carpet adhesives, wall covering adhesives.)
+ii.
+Floor coverings such as carpets, laminates and vinyl’s
+iii.
+Wall coverings such as laminates, fabrics and wall papers
+iv.
+Ceiling coverings such as ceiling boards
+v.
+Varnish, stains, lacquers, paints or other finishes
+(b) Furniture and carpentry (where provided)
+i.
+ii.
+iii.
+iv.
+(c) Doors
+i.
+ii.
+iii.
+iv.
+
+Desks
+Chairs
+Cabinetry including wardrobes, kitchen, pantry and bathroom cabinets.
+Cubicle partitions
+Paints
+Varnishes
+Lacquers
+Other finishes
+
+Material Emissions Requirements for non SGBP 4 tick labelled products
+For products, finishes and furnishings
+
+•
+•
+
+Paints, Varnishes, lacquers,
+
+•
+•
+
+TVOC emission rate shall be ≤ 0.25 mg m-3 h-1 after 24
+hours
+Formaldehyde emission rate shall be
+≤ 0.02 mg m-3 h-1 after 48 hours
+VOC content for trim, stains and varnishes shall be ≤
+75gL-1
+VOC content for paints (water-based) shall be ≤ 25 gL1 for matt, ≤ 30 gL-1 for low sheen, ≤ 75 gL-1 for
+semi-gloss
+
+Limits for products are based upon ASTM D5116-90, “Standard Guide for Small-Scale Environmental Chamber
+Determinations of Organic Emissions from Indoor Materials/Products”.
+Test methods for paints and coatings shall comply with ISO 17895 or ISO 11890
+Testing must be by an accredited laboratory.
+
+8
+
+HW1.3 Air Quality and Comfort
+To promote sustainable designs, systems and features that can provide satisfactory thermal comfort, while
+enhancing outdoor air provision for greater well-being of occupants.
+
+HW1.3a Thermal Comfort
+Thermal comfort preferences are highly individual, and can be affected by metabolism, body type and clothing.
+These factors make it hard to find a temperature that will satisfy all occupants in the same space at the same
+time. Providing a range of thermally comfortable spaces means that the building systems allow for a variability
+of temperatures, and greater ability to adjust to individual preferences in different zones, allowing occupants
+to adjust the temperature in their immediate surroundings in order to achieve better thermal comfort.
+
+(i) Air-Conditioned Non-Residential Buildings
+The building can adjust temperature and thermal conditions so that parts of the building can have an occupant
+centric thermal variation and comfort within it
+
+Assessment Criteria
+HW1.3a Thermal Comfort
+(i) Air-Conditioned Non-residential Buildings: zonal
+temperature and air speed controls
+
+New Buildings
+
+Existing Buildings
+
+1 Point
+
+1 Point
+
+Points shall be awarded based upon the design and operational strategies that detail how thermal comfort can
+be tailored to suit occupants in different spaces, at different times, and be adaptable to user preferences.
+Strategies include
+•
+
+•
+
+The use of hybrid cooling systems with elevated temperatures with provision of ceiling fans and/or
+individual desk fans. Where comfort can be controlled by the temperature of conditioned air and the
+air speed variation
+Spatial and zonal temperature monitoring with occupant feedback, controls to allow for adjustable air
+speeds and temperatures in discrete zones in open areas or by room.
+
+Requirements:
+• Control zones should not exceed 100m2
+• Controls should provide the logic to modify the operation of the VAV box, FCU, Passive Displacement
+System coil temperature, Ceiling fan speed or other system employed, which will adjust thermal
+comfort in that zone.
+• The strategies should cover at least 90% of regularly occupied functional spaces.
+
+Documentation Requirements
+At Design stage (New Buildings) / Pre-retrofit stage (Existing Buildings):
+•
+•
+•
+
+Thermal comfort analysis including relevant simulations of alternative cooling technology employed
+Write up and schematics of control strategy and control logic and its impact on comfort
+Mark up of control zones and thermal variation limits
+
+At Verification stage (New Buildings & Existing Buildings):
+•
+•
+
+As built drawings, photos and schematics of thermal control systems installed
+Testing reports of alternative cooling system
+9
+
+•
+
+Photos of ceiling fans/ individual fans provided for each occupant
+
+(ii) Non-Air-Conditioned Functional Spaces
+Naturally ventilated regularly occupied functional areas should be effectively designed to be thermally
+comfortable and healthy for the building occupants.
+
+Assessment Criteria
+HW1.3a Thermal Comfort
+
+New Buildings
+
+(ii) Non-Air-Conditioned functional
+spaces.
+a) Thermal Comfort Simulation
+b) Effective Cross Ventilation
+c) Prescriptive Performance
+
+Existing Buildings
+
+For Non-Residential Buildings For Non-Residential Buildings
+1 Point
+
+1 Point
+
+For Residential Buildings
+
+For Residential Buildings
+
+3 Points
+
+N/A
+
+Points shall be scored through meeting either one of the performance routes (a), (b) or (c).
+For draft sensitive sports spaces, or industrial buildings with occupancy densities less than 50m2 per person,
+projects can meet the following requirements in leu of a) and b):
+•
+•
+
+Air Change rate  10
+Air Change Effectiveness  1.2
+
+a)
+
+Thermal comfort simulation
+
+The thermal comfort assessment shall be carried out using Predicted Mean Vote (PMV) equation to identify
+the most effective building design and layout for the development.
+Thermal Comfort
+-0.5≤PMV≤0.5
+b) Effective cross ventilation:
+70% of habitable areas to meet the Area weighted average wind velocity of 0.6m/s using Computational Fluid
+Dynamics (CFD) modelling. Refer to the GM Guideline on Computational Fluid Dynamics (CFD) Simulation
+
+c)
+
+Prescriptive performance
+
+Parameter
+
+Description
+
+Openings towards
+0.1 point for every 10% of room openings facing
+prevailing wind directions
+the prevailing winds.
+
+Points
+For Non-Residential Buildings
+0.5 Point
+
+For Residential Buildings
+1Point
+
+10
+
+Parameter
+
+Description
+
+Non-Residential Buildings A. Single sided ventilation:
+Depth of Room vs
+the limiting depth(W) for effective ventilation is
+Openings
+twice the floor-to-ceiling height (H) [W≤2H]
+B. Cross Ventilation:
+
+Points
+
+0.5 point where ≥50% of
+applicable spaces meet
+
+the limiting depth(W) for effective ventilation is
+five times the floor-to-ceiling height (H) [W≤5H]
+C. Atria/ event space:
+Atria to have an effective opening >10% floor
+area:
+
+1 point where ≥70% of
+applicable spaces meet.
+
+Atria can be 1.5x the depth of room (A and B), or
+up to 2x depth where the use of fixed air
+movement technologies are employed (e.g. HVLS
+fans).
+Residential Dwelling Unit Plan level analysis based on the number of living
+Cross ventilation
+rooms, bedrooms, home office spaces that are
+designed with true cross ventilation.
+
+0.5 points for ≥50%
+1 point for ≥60%
+2 points for ≥70%
+3 points for ≥75%
+
+Documentation Requirements
+At Design stage (New Buildings) / Pre-retrofit stage (Existing Buildings):
+•
+•
+•
+•
+
+Dimensioned plan, sections, window schedule and details
+For a) and b) the simulation report as outlined in the GM 2021 Guideline on Computational Fluid Dynamics
+(CFD) Simulation
+For c) calculations with detailed drawings showing compliance with the parameters outlined.
+Summary score sheet
+
+At Verification stage (New Buildings & Existing Buildings):
+•
+•
+•
+
+As built drawings and photographs
+Any design changes to be highlighted on the plan drawing and the areas recalculated/ re-simulated
+Site Measurements for existing buildings, demonstrating PMV or effective cross ventilation based on
+minimally 3 months aggregated data collected during typical operational hours of the building
+
+Guidance Notes
+General:
+•
+
+Effective opening areas, and distances shall be compliant with BCA approved documents, or shall
+demonstrate an acceptable performance-based approach which has been approved by the commissioner
+of building control.
+
+•
+
+Prevailing winds can be taken as N, NNE, NE, SE, SSE, S, SSW with prominent winds from the northeast and
+the south reflecting the dominance of the monsoons, with winds from the Northerly to north-easterly
+during December to March, and Southerly to south-easterly during June to September. The inter monsoon
+months (April, May, October and November) are transition periods and show lighter and more variable
+winds.
+11
+
+•
+
+For a) Thermal comfort simulation and b) Effective cross ventilation, the details on how to conduct the
+simulation, the validated software and PMV equations are found in the GM: 2021 Guideline on
+Computational Fluid Dynamics (CFD) Simulation.
+
+a) Thermal Comfort Modelling:
+•
+
+Area weighted average velocity of 0.2m/s shall be achieved in order to use the fixed Dry Bulb
+Temperature (DBT) within the PMV formula within the BCA, else the DBT would be derived from
+simulations.
+
+b) Effective Cross Ventilation:
+•
+
+The area weighted average of 0.6m/s for 70% of the units must be met in order for points to be
+scored, note that this performance, for residential buildings differs from the performance
+requirements in the EE section.
+
+c) Prescriptive Performance:
+A. Single Sided Ventilation
+•
+
+This applies to naturally ventilated regularly occupied functional spaces with window openings on one
+side.
+
+•
+
+Limiting depth for effective single sided ventilation is no more than 8m. This can be extended to 12m
+with use of air movement technologies such as ceiling fans.
+
+B. Cross Ventilation
+•
+
+This applies to naturally ventilated regularly occupied functional spaces with window openings on
+opposing sides of the space.
+
+•
+
+Limiting depth for effective cross ventilation is 15m. This can be extended to 24m with use of air
+movement technologies such as ceiling fans.
+
+•
+
+One of the sides for cross ventilation can consider openings to a naturally ventilated atrium.
+
+C. Atria/ Event Space
+
+•
+
+For atria or event spaces which are single-sided, they may apply a factor of 1.5 to the W-H ratio for
+regularly occupied functional spaces. This means they can meet W ≤ 3H instead to score. Where air
+movement technologies are employed, such as HVLS fans, this can be increased to W ≤ 4H
+
+•
+
+For atria or event spaces which have cross ventilation, they may apply a factor of 1.5 to the W-H ratio
+for regularly occupied functional spaces. This means they can meet W ≤ 7.5H instead to score. Where
+air movement technologies are employed, such as HVLS fans, this can be increased to W ≤ 10H
+
+Residential Buildings.
+•
+•
+•
+•
+
+Plan level analysis based on the number of living rooms, bedrooms, home office spaces that are
+designed with true cross ventilation.
+The main entrance door (where the developer provides a lockable gate /grille), all windows and
+internal doors are assumed to be open.
+Provision of dedicated power point(s) to enable the installation of ceiling fans in the living room
+Refer to GM 2021 Energy Efficiency technical guide – Ventilation performance for further guidance
+notes and worked examples.
+
+References
+GM 2021 Guideline on Computational Fluid Dynamics (CFD) Simulation
+CIBSE AM10, Natural Ventilation in non-domestic buildings
+See http://www.weather.gov.sg/climate-climate-of-singapore/ for the overview of Singapore’s climate data including wind
+speed and directional data.
+
+12
+
+HW1.3b Outdoor Air Provision
+(i) Enhanced Outdoor Air Provision
+Outdoor air provision (ventilation) in buildings is critical in diluting various indoor air pollutants such as those
+generated by human (odour etc.), human activities (CO, CO2, PM2.5 etc.) and building materials/ furnishings
+(VOCs etc.).
+
+Assessment Criteria
+HW1.3b Outdoor Air Provision
+
+New Buildings
+
+Existing Buildings
+
+1 Point
+
+1 Point
+
+2 Points
+
+2 Points
+
+(i) Outdoor air provision greater than ventilation rates in
+SS553, with demand control and monitoring systems.
+a)
+
+Outdoor air supply at 1.5 times minimum
+ventilation rate required in SS553
+
+b) Outdoor air supply at 2 times minimum
+ventilation rate required in SS553
+
+Points shall be awarded for the adoption of an outdoor air supply strategy which is greater than the minimum
+ventilation rate required within SS553 Table 1 (air-conditioned spaces) or Table 5 (mechanically ventilated
+spaces. (applicable to non-residential buildings only)
+•
+•
+•
+
+•
+•
+
+•
+
+Points can be scored based on % of functional spaces and the enhanced ventilation rate.
+Outdoor air supply rate shall be measured by direct outdoor airflow measurement devices located at
+each AHU or each floor
+Occupancy based ventilation rates can be used to demonstrate performance, control logic should be
+based on real-time occupancy density and link to the outdoor air supply. Reference should be made
+to ASHRAE 62.1 ventilation rate based on occupancy density.
+CO2 monitoring should be within the occupancy area (breathing zone), not at the return air side of
+AHUs.
+CO2 levels should not exceed
+o For (a) 800ppm or
+o For b) 600ppm.
+Connected sensors for outdoor airflow, occupant density and indoor CO2 levels should be linked to
+the BMS or an independent system that provides direct control and data management functions.
+
+Documentation Requirements
+At Design stage (New Buildings) / Pre-retrofit stage (Existing Buildings):
+Measurement, monitoring and control of outdoor airflow rate
+•
+•
+•
+•
+•
+
+Increased outdoor air supply rate calculation by zones based on SS 553 Table 1 or Table 5
+Extracts of specifications showing the detailed performance requirements of the ventilation system,
+control system and real time monitoring system.
+Design and construction details reflecting the outdoor supply rates to individual zones
+Method statement for operations of the system including the strategy to monitor, control and maintain
+outdoor air intake volume to be 1.5 times or 2 times greater than SS553 rates.
+Drawings of the positioning of sensors at outdoor air duct in accordance with the manufacturer’s
+guidelines and link to a building management system (or equivalent) for monitoring and controlling the
+outdoor air volume
+13
+
+•
+•
+•
+
+Plan layout indicating the provision of the sensors at least one location per AHU or per floor
+Plan layout indicating the provision of access panel for regular maintenance of airflow sensors
+In cases where outdoor airflow monitoring and control system is linked to occupant density monitoring
+and control system, a detailed method statement with supporting documents and specifications should
+be provided to demonstrate how enhanced ventilation rates to each person in a space can be achieved.
+
+CO2 Sensors
+•
+
+•
+•
+•
+
+•
+
+Method statement on the monitoring and regulation of indoor CO2 levels, including alerts programmed
+into a BMS or a central monitoring and control system to notify the CO2 levels exceeding the targeted
+set point
+Plan layouts and schematics showing the locations of CO2 sensors, providing representative readings to
+control the outdoor airflow.
+At least two CO2 sensors per AHU or at least one CO2 sensor per 250m2 whichever provides greatest
+granularity. Sensors should be installed at the height of breathing zone (0.75m to 1.2m from the floor).
+CO2 sensor specifications to meet the following requirements;
+o Sensor technology: Non-dispersive Infrared
+o Measurement range: 300 to 3000 ppm or wider
+o Accuracy: not more than ±50 ppm or ±5% within measurement range
+o Resolution: 5 ppm or less
+o Yearly calibration
+Data monitoring at a central location (e.g. BMS) with daily, weekly, monthly data viewing and logging
+capability at logging interval of least 30 minutes.
+
+At Verification stage (New Buildings & Existing Buildings):
+Measurement, monitoring and control of outdoor airflow rate
+•
+•
+•
+
+•
+
+Delivery orders, technical specifications, as-built drawings, outdoor airflow computations by zones
+and onsite photographs of the airflow measurement devices
+Details of BMS or equivalent monitoring and control system with screenshots and control logics to
+showing real-time nature of the system.
+Past daily, weekly, monthly logged data of the outdoor airflow at each AHU or each floor
+demonstrating the compliance to the respective requirement. Data logging interval to be at least 30
+minutes.
+In cases where outdoor airflow monitoring and control system is linked to occupant density monitoring
+and control system, a detailed method statement with supporting documents and specifications should
+be submitted
+
+CO2 Sensors
+•
+•
+•
+
+Delivery orders, technical specifications, calibration certificate, plan drawings showing the locations
+and onsite photographs of the CO2 sensors
+Monitoring and control system screenshots and control logic details
+extract of at least 1 month of logged data demonstrating the compliance to the respective
+requirement. Data logging interval to be at least 30 minutes.
+
+Guidance Notes
+An operational method statement should be provided to bridge the gap between design intent and operational
+reality. This should include details on programming alerts for when the outdoor air volume drops below the
+minimum set points and varies by more than 15% above the airflow set point.
+
+14
+
+Accuracy of outdoor airflow measurement should have the capability to measure and control the outdoor air
+intake volume with an accuracy of +/–10%.
+Worked Example
+Outdoor airflow rate computation:
+AHU
+schedule
+
+Area
+type
+
+Area
+served
+(m2)
+
+SS553
+table 1
+(l/s/m2)
+
+Min. OA
+amount
+(l/s)
+
+Targeted OA
+amount (l/s)
+
+Remarks
+
+2 times
+
+AHU 1-1
+
+Lobby
+
+300
+
+0.3
+
+90
+
+90
+
+Common area
+
+AHU 1-2
+
+Office
+
+500
+
+0.6
+
+300
+
+600
+
+Functional area
+
+AHU 2-1
+
+Office
+
+400
+
+0.6
+
+240
+
+480
+
+Functional area
+
+AHU 2-2
+
+Office
+
+400
+
+0.6
+
+240
+
+480
+
+Functional area
+
+AHU 3-1
+
+Office
+
+400
+
+0.6
+
+240
+
+480
+
+Functional area
+
+AHU 3-2
+
+Office
+
+400
+
+0.6
+
+240
+
+480
+
+Functional area
+
+AHU 4-1
+
+Office
+
+400
+
+0.6
+
+240
+
+480
+
+Functional area
+
+AHU 4-2
+
+Office
+
+400
+
+0.6
+
+240
+
+480
+
+Functional area
+
+The project above would score 2.5 points as all functional areas are designed with 2x the outdoor air ventilation
+rate.
+Example of proration of points:
+•
+
+25% of the functional area, with outdoor air supplied at 2 times the ventilation rate required in SS553.
+The remaining spaces are a typical demand control strategy pegged to SS553. The projects would
+score 0.5 points.
+
+•
+
+A mixture of strategies employed in a project where 50% of regularly occupied functional spaces are
+based on 1.5 times enhanced ventilation, while the other 50% is based on 2 times the ventilation rate.
+The total score would be 1.5 points.
+
+15
+
+(ii) Periodic (Post) Occupancy Evaluation
+Periodic Occupancy Evaluation, or a Post Occupancy Evaluation (POE) provides insights on the occupants
+experience within the building and a platform in which to identify performance shortfalls and introduce
+corrective actions to address issues.
+
+Assessment Criteria
+HW1.3b Outdoor Air Provision
+(ii) Periodic (Post) Occupancy Evaluation
+
+New Buildings
+
+Existing Buildings
+
+0.5 Point
+
+0.5 Point
+
+Points will be awarded if a Periodic (Post) Occupancy Evaluation (POE) survey is conducted at least once every
+3 years and corrective actions are taken to address occupant concerns that arise from the analysis of the
+evaluation. (applicable to non-residential buildings only)
+The POE sample size should be at least 10% of the occupant population with the following exceptions:
+•
+•
+
+Projects with occupancies < 100 pax, minimum of 10 occupants surveyed
+Projects with occupancies >1,000, minimally 100 occupants surveyed.
+
+Documentation Requirements
+At Design stage (New Buildings) / Pre-retrofit stage (Existing Buildings):
+•
+
+Extracts of the tender specifications showing the requirements to conduct a POE within one year after
+occupancy and to undertake corrective actions.
+
+At Verification stage (New Buildings & Existing Buildings):
+•
+•
+•
+•
+
+A written confirmation on the building occupancy (total number), demonstrating that the response rate of
+the POE meets the sample size requirement
+Samples of completed survey forms and emails submitted by the respondents
+POE survey results showing the summary of the survey analysis and the list of corrective actions taken
+Evaluation of the POE results and the list of the corrective actions based on the respondents’ comments
+
+Guidance Notes
+The spreadsheet for the standardised BCA POE survey questionnaire and results template is available for use
+and meets the requirements of the criteria.
+•
+•
+
+Survey Template: https://www1.bca.gov.sg/docs/default-source/docs-corpbuildsg/sustainability/poe_survey_template.xlsx
+Survey Analysis: https://www1.bca.gov.sg/docs/default-source/docs-corpbuildsg/sustainability/poe_results_template.xlsx
+
+For Projects wishing to develop or adapt their own POE system these can follow the guidance below, however
+the questions and language should be tailored to suit the building occupants to yield meaningful data on which
+to act. Within the survey, there should be room for occupant’s comments and observations.
+(i) General Information:
+• Basic data of the individual
+• Location within the building
+• Nature of work
+
+16
+
+•
+
+Time spent within the building (average week)
+
+(ii) Lighting Quality:
+• Lighting system with adequate intensity (brightness) and even distribution
+• Appropriate lighting for each different activity area
+• Appropriate lighting controls and zoning
+• Access and quality of natural light
+• Discomfort glare / daylight control
+(iii) Acoustic Quality:
+• Appropriate sound levels for each different activity area
+• Acoustic/ speech privacy
+• Background noise
+• Noise transmission between rooms / spaces
+(iv) Indoor Air Quality:
+• Temperature (thermal comfort)
+• Humidity
+• Smell
+• Air movement
+• Freshness of the air (perceived air quality)
+• Ability to control indoor conditions
+(v) Environment:
+• Cleanliness of the work spaces
+• Cleanliness of the common areas (toilets, pantry's, lobbies, terraces etc.)
+• General building maintenance
+• Waste sorting and recycling strategies or programmes
+• Corporate environmental policies and programmes
+(vi) Health:
+• Respiratory irritations (blocked, runny, itchy nose)
+• Sore throat
+• Chronic cough
+• Irritated eyes
+• Chronic fatigue
+• Linking these symptoms to the building
+
+17
+
+(iii) IAQ Surveillance Audit
+Assessment Criteria
+HW1.3b Outdoor Air Provision
+(iii) Indoor Air Quality Surveillance Audit
+a) Once every 3 years
+b) Annually
+
+New Buildings
+
+Existing Buildings
+
+0.5 Point
+
+0.5 Point
+
+1 Point
+
+1 Point
+
+IAQ audits are to be performed by an IAQ laboratory accredited by Singapore Accreditation Council (SAC) with
+respect to the recommended IAQ parameters and acceptable limits stated in Table 1 of SS554 or NEA’s
+Guidelines for Good Indoor Air Quality in Office Premises. (applicable to non-residential buildings only)
+•
+•
+
+For Projects that conduct the IAQ audit annually – 1 Point
+Projects which conduct the audit every 3 years – 0.5 Point
+
+Documentation Requirements
+At Design stage (New Buildings) / Pre-retrofit stage (Existing Buildings):
+•
+
+Commitment as part of the scope of works from the project team to conduct IAQ surveillance audit within
+one year after occupancy by an accredited laboratory.
+
+At Verification stage (New Buildings & Existing Buildings):
+•
+
+IAQ surveillance audit report by an accredited laboratory. For regularly occupied functional spaces outside
+of the above-mentioned standards’/ guidelines’ remit, the performance standards for the respective IAQ
+parameters shall be determined based on prevailing industry best practice standards
+
+Guidance Notes
+A spreadsheet of the standardised IAQ report template is available at https://www1.bca.gov.sg/docs/defaultsource/docs-corp-buildsg/sustainability/iaq-report-template.xlsx?sfvrsn=d683e678_6
+
+18
+
+HW1.3c Clean Air
+Building occupants and users’ exposure to air pollutants can be reduced by arresting air pollutants through
+high-efficiency media filters, by disinfecting air or by setting designated smoking points.
+
+Assessment Criteria
+HW1.3c Clean Air
+
+New Buildings
+
+Existing Buildings
+
+(i) UVGI System for Air Disinfection
+
+0.5 Point
+
+0.5 Point
+
+(ii) Air Filtration
+
+1 Point
+
+1 Point
+
+(iii) Designated Smoking Points
+
+For Non-Residential Buildings For Non-Residential Buildings
+0.5 Point
+
+0.5 Point
+
+For Residential Buildings
+
+For Residential Buildings
+
+1 Point
+
+1 Point
+
+(i) UVGI System for Air Disinfection
+Assessment Criteria
+Points shall be awarded for projects using Ultraviolet Germicidal Irradiation (UVGI) System for air disinfection
+at AHUs, FCUs, in-duct or upper rooms. The UVGI system should cover at least 90% of regularly occupied
+functional spaces. (applicable to non-residential buildings only)
+
+Documentation Requirements
+At Design stage (New Buildings) / Pre-retrofit stage (Existing Buildings):
+•
+•
+•
+•
+•
+
+Extracts of the tender specifications and schematics showing the provision of UVGI system for air
+disinfection.
+UVC germicidal wavelength (260nm)
+Plan drawings showing locations of the UVGI system
+Technical specifications and safety features of the UVGI system
+Manufacturer’s guideline on the intensity, location, reflector design and number of lights
+
+At Verification stage (New Buildings & Existing Buildings):
+As-built drawings showing locations and pictures of the UVGI system
+•
+•
+•
+
+Actual specifications and safety features of the UVGI system
+Plan drawings showing the coverage of at least 90% of regularly occupied functional spaces
+Manufacturer’s guideline on the intensity, location, reflector design and number of lights
+
+19
+
+(ii) Air Filtration
+Assessment Criteria
+The filtration provision should cover at least 90% of regularly occupied functional spaces. (applicable to nonresidential buildings only)
+a)
+
+For Air conditioned and Mechanically Ventilated Functional Spaces:
+
+1 point will be awarded for projects using ePM1 ≥75% (ISO 16890) or alternatively at least MERV 14A
+(ASHRAE 52.2 Appendix J) media filters permanently for airside systems, including AHUs, PAHUs and FCUs.
+For Existing Buildings where high-efficiency filters cannot be fitted due to existing building constraints,
+portable air cleaners can be used, this would be eligible for 0.5points.
+A mixture of strategies is allowed for existing buildings with constraints (e.g. ePM1 ≥75% media filter to cover
+50% of regularly occupied functional spaces and the other 50% of regularly occupied functional spaces are
+provided with potable air cleaners). Points shall be pro-rated, in this instance, ((50 x 1point) + (50 x 0.5point)
+/100) = 0.75 Points
+b) For Naturally Ventilated Functional Spaces:
+Use of portable air cleaners during periods of poor air quality (e.g. Haze events) or public health events (such
+as a communicable disease outbreak).
+The clean air delivery rate (CADR) for smoke or equivalent of portable air cleaners with HEPA filters should be
+used to determine the size and number of portable air cleaners needed in a space.
+
+Documentation Requirements
+At Design stage (New Buildings) / Pre-retrofit stage (Existing Buildings):
+•
+•
+•
+
+Extracts of tender specification for the permanent provision of ePM1 ≥75% (ISO 16890) or at least MERV
+14A (ASHRAE 52.2 Appendix J) media filter for air distribution systems
+Technical specifications and air filtration classification testing report for the filters to be used for each air
+distribution system
+Plan drawings showing the coverage of at least 90% of regularly occupied functional spaces
+
+At Verification stage (New Buildings & Existing Buildings):
+•
+•
+•
+•
+
+Pictures showing filter locations and installations
+Technical specifications and filtration classification testing report for the actual filters and/or portable air
+cleaners used on site
+Adequate provision of portable air cleaners supported by computations
+Plan drawings showing the coverage of at least 90% of regularly occupied functional spaces
+
+Guidance Notes
+For Portable Air Cleaners:
+If the unit of CADR is in m3/h, the total CADR of the air cleaner(s) should be at least five times the room volume
+in m3. If the unit of CADR is in ft3/min, the total CADR of the air cleaner(s) should be at least three times the
+room volume in m3.
+
+Worked Example
+20
+
+To determine the size and number of portable air cleaners needed in a space;
+Space conditions
+• Space area = 100m2
+• Space height = 2.8m
+• Space volume = 100m2 X 2.8m = 280m3
+Computation example
+• CADR (CMH, m3/hr) > 5 x Volume (m3) = 5 x 280 = 1,400, therefore CADR > 1,400
+• Assume the CADR of the air purifier with HEPA filter is 500 CMH/unit
+• 1,400 / 500 = 2.8, therefore the number of units required = 3 units
+
+(iii) Designated Smoking Points
+Assessment Criteria
+Provision of designated smoking points for smokers to use, which are located as to allow non-smokers to
+utilise and gain full enjoyment of the outdoor spaces in a healthy manner. A site that has a full zero smoking
+policy will score here.
+
+Documentation Requirements
+At Design stage (New Buildings) / Pre-retrofit stage (Existing Buildings):
+•
+
+Design drawings and specifications that show the location, design and dimensions of the designated
+smoking area in accordance with Guidelines on Designated Smoking Area set-up by the National
+Environment Agency.
+
+At Verification stage (New Buildings & Existing Buildings):
+•
+
+As-built drawings and photos that show the location, design and dimensions of the designated smoking area
+
+Guidance Notes
+NEA laws Under the Smoking (Prohibition in Certain Places) Act detail places where smoking is prohibited.
+Additional house rules or by-laws put in place by owners/managers of premises against smoking in their
+premises are permitted and allow for HW1.3c (iv) to be realised.
+Refer to https://www.nea.gov.sg/docs/default-source/our-services/smoking-prohibition/9-dsaguidelines_cleared.pdf for guidance on location of designated smoking points and areas
+
+21
+
+HW2 Psychological
+A maximum of 5 points can be scored across HW 2 Psychological section.
+
+HW2.1 Access to Nature
+Well-being refers to the state of being comfortable, healthy or happy. Providing nurturing, healing and inclusive
+spaces can enhance the building occupant and user’s environment, and overall wellbeing. This includes
+integrating within buildings places of respite, nature access, architecture that invoke a connection to nature as
+well as accessible and inclusive spaces.
+
+Assessment Criteria
+HW2.1 Access to Nature
+(i)
+
+Provision of accessible planted sky terraces,
+courtyards, and roof top gardens.
+
+(ii)
+
+Fixed indoor planting distributed at key common
+areas. >10% of common area (by floor Area) to
+have fixed indoor planting, and/or ponds,
+supporting systems such as grow lights, irrigation
+systems need to be shown.
+
+(iii)
+
+Placement of natural elements and use of mixed
+textures in key common areas such as atria,
+entrance lobbies, shared seating areas, and key
+circulation routes.
+
+(iv)
+
+In the absence of indoor or accessible planting,
+to orientate and design common areas for direct
+visual access to greenery.
+
+New Buildings
+
+Existing Buildings
+
+1 Point
+
+1 Point
+
+0.5 Point
+
+1 Point
+
+0.5 Point
+
+0.5 Point
+
+0.5 Point
+
+0.5 Point
+
+Points shall be scored based on the above criteria. Note that supporting infrastructure should be included,
+including landscape maintenance plan (both for internal and external planting), interior fitout guides and
+evidence of use of natural materials, with a range of textures to provide a haptic and visual journey through
+the building.
+
+Documentation Requirements
+At Design stage (New Buildings) / Pre-retrofit stage (Existing Buildings):
+•
+•
+•
+•
+•
+
+Design statement on the approach, strategies implementation of the incorporation of, and access to
+nature within the development.
+Landscape plans of the relevant accessible sky gardens, sky terraces, internal courtyards and rooftop
+gardens that indicate the outdoor furniture, the outdoor refreshment area
+Plan layouts and perspectives of the interior planting design at the applicable areas with calculations
+that demonstrate the plant coverage as a percentage of the relevant floor areas
+Layout identifying common area, the design and haptic qualities of the space, the natural elements
+being introduced and their locations.
+Site plan and images of orientation, window placement and the associated framed views out to nature
+that the occupants would be orientated to.
+22
+
+At Verification stage (New Buildings & Existing Buildings):
+•
+
+As-built drawings and photographs highlighting the provision of the committed features
+
+References
+World Health Organisation, Urban Green Spaces and Health: A review of evidence.
+https://www.nparks.gov.sg/skyrisegreenery
+
+HW2.2 Circadian Rhythm
+Humans and animals have internal clocks that synchronise physiological functions (the circadian rhythm). In
+buildings this natural rhythm can be disturbed. The Circadian Rhythm has a major role in sleep, cognitive
+performance, and the immune system.
+
+Assessment Criteria
+HW2.2 Circadian Rhythm
+
+New Buildings
+
+Existing Buildings
+
+(i)
+
+Views to Outside
+
+1 Point
+
+1 Point
+
+(ii)
+
+Quality of Artificial Lighting
+
+0.5 Point
+
+0.5 Point
+
+(iii)
+
+Circadian Lighting System
+
+2 Points
+
+2 Points
+
+(i) Views to Outside
+Daytime exposure to light, especially blue light, helps synchronise the circadian clock, enabling us to feel alert
+during the day and sleepy at night. Many people work in poorly daylit spaces, having views to the outside
+allow for the body to respond to the passage of time, maintaining their circadian rhythm.
+
+Assessment Criteria
+Points shall be awarded for the following:
+•
+•
+
+75% of the floor area of all regularly occupied spaces is within 8m of windows, with unobstructed views.
+95% of the floor area of all regularly occupied spaces is within 12m of windows, with unobstructed
+views
+
+Documentation Requirements
+At Design stage (New Buildings) / Pre-retrofit stage (Existing Buildings):
+•
+•
+
+Floor plans with areas of compliance marked up.
+Window schedules and elevations
+
+At Verification stage (New Buildings & Existing Buildings):
+•
+
+As-built drawings and photographs
+
+Guidance Notes
+Unobstructed views has 2 meanings in this criteria:
+1.
+
+Views - The windows should be reasonable in terms of size and position to offer views and daylight
+penetration. Window(s) looking onto another unit, service yard, or directly onto the façade of another
+23
+
+building without sufficient distance gap to allow sufficient view to sky or daylight penetration would by
+themselves, not be in compliance. Project teams are expected to show reasonableness in their
+evaluation.
+2.
+
+Unobstructed within the interior means that there is a direct view to the window(s), and an allowance
+for daylight penetration, which means that where cubicles are used in an office environment, or there
+are subdivisions of spaces into discrete rooms, generally opaque partitions should be no higher than
+1.4m for compliance. However layouts with a range of partition heights can be accepted where the
+design shows view to outside are not negatively impacted.
+
+Daylit atria can be considered, in leu of a window to outside.
+Where the floor area is unable to demonstrate compliance, detailed analysis can be undertaken to show that
+75% or 95% of desks or regularly occupied seats meet the distance requirements.
+Performance based analysis are welcome, and daylighting simulations would gain recognition, for example using
+daylight autonomy showing good levels of daylight across the floor plate with a consideration for glare.
+
+(ii) Quality of Artificial Lighting
+Where daylight alone is not possible to provide adequate lighting conditions, a minimum quality for artificial
+lighting should be employed to provide comfort, uniformity, colour rendering and at a level to perform tasks.
+
+Assessment Criteria
+a)
+
+Colour Rendering,
+
+All electric lights (except decorative fixtures, emergency lights and other special-purpose lighting) meet the
+minimum colour rendering index in accordance with Clause 5 of SS 531 – 1 : 2016 (2013) – Code of Practice for
+Lighting of Workplaces
+b) Responsive Light Control
+All lighting (except decorative fixtures) are programmed using occupancy sensors to automatically dim to 20%
+or less (or switch off) when the zone is unoccupied, and all lighting in areas where there is access to daylight
+have the capacity to and are programmed to dim continuously in response to daylight.
+
+Documentation Requirements
+At Design stage (New Buildings) / Pre-retrofit stage (Existing Buildings):
+•
+•
+
+Specifications and data sheets of light selections including relevant simulations and calculations
+Sensor details, control strategy and electrical drawings indicating the zoning of lights and control groups.
+
+At Verification stage (New Buildings & Existing Buildings):
+•
+
+As-built drawings, delivery orders, data sheets and photographs.
+
+Guidance Notes
+For projects to be able to score, basic lighting quality standards are to be met, these include:
+lifespan rating is in accordance with - IES TM-21 method, based on LM80 test report
+Lighting designed with minimal flicker and stroboscopic effects: Submission of specifications showing use of
+LED lights or high frequency ballasts with frequency > 20 kHz and LED drivers with ≤30% flicker
+
+24
+
+Worked Example
+The proposed development provides the following lighting quality for its occupants at various spaces:
+Reference Ra
+
+Type of interior, task or
+activity
+
+Design Ra
+
+Office Space Type 1
+
+80
+
+80
+
+Atrium
+
+60
+
+60
+
+Corridor type 1
+
+40
+
+40
+
+Toilet
+
+80
+
+80
+
+Mechanical & Electrical
+Rooms
+
+60
+
+60
+
+Carpark
+
+40
+
+40
+
+(as specified in SS531: 2006)
+
+The proposed lighting design meets the reference values as stated in SS 531: 2006 (2013) and the LED lightings
+installed are based on lifespan rating of L70 for ≥50,000 life hours and lighting designed with minimal flicker
+and stroboscopic effects (LED drivers with ≤30% flicker).
+Responsive Light Control
+The following requirements are met in all major workspace areas:
+•
+•
+
+All lighting except decorative fixtures is programmed using occupancy sensors to automatically dim to
+20% or less (or switch off) when the zone is unoccupied.
+All lighting except decorative fixtures has the capacity and is programmed to dim continuously in
+response to daylight.
+
+(iii) Circadian Lighting System
+Dynamic ‘circadian’ lighting uses dimmable, colour-tuning LEDs to give brighter, bluer light in the morning
+middle of the day, and dimmer light – with less blue – later in the day.
+
+Assessment Criteria
+HW2.2 Circadian Rhythm
+
+New Buildings
+
+Existing Buildings
+
+(iii) Circadian Lighting System
+
+For Non-Residential Buildings
+
+For Non-Residential Buildings
+
+a)1 Point OR
+
+a)1 Point OR
+
+b) 2 Points
+
+b) 2 Points
+
+For Residential Buildings
+
+For Residential Buildings
+
+b) 2 Points – all relevant common
+area lighting.
+
+b) 2 Points – all relevant common
+area lighting.
+
+a)
+
+Task Lighting
+
+b) All Lighting
+
+Projects can either:
+1.
+
+Engage a lighting specialist to look at the various opportunities for a bespoke circadian lighting system
+that balances brightness and dimming with graduated colour shift during the day. Typically the system
+
+25
+
+2.
+
+would reference either Equivalent Melanopic Lux (EML) and/or Melanopic Equivalent Daylight
+Illuminance (MEDI).
+A project can install a dynamic lighting system with colour shift settings that graduate between colour
+temperatures during the day. At least 3 colour shifts should be considered during the day. A
+recommended programme is below for a building with normal daytime occupancy. Note that the
+colour changes should be gradual and recommended to be over a 1hour period.
+
+Time
+
+Recommended Colour Temperature Range
+
+7am to 10am
+
+3500-4000K
+
+10am to 2pm
+
+5000K-6500K
+
+2pm to 5pm
+
+3500K-4000K
+
+5pm onwards
+
+2700 -3000K
+
+Points would be based on the extent of coverage, whether this is for
+a) Task Lighting – 1 point OR
+b) All lighting – 2 Points
+For residential projects, colour shift lighting would be applicable for the management office, outsourced
+workers rest areas, common lobbies and corridors, function rooms. Landscape and outdoor lighting should aim
+for low colour temperatures (2700K) where used at night to prevent disturbance to residents sleep. Gyms,
+fitness and sports areas, as well as carparks would not be included due to separate functional requirements.
+For car parks it is recommended to use a neutral colour temperature suited for visibility, security, and human
+comfort.
+
+Documentation Requirements
+At Design stage (New Buildings) / Pre-retrofit stage (Existing Buildings):
+•
+•
+•
+
+Lighting specialist design report and recommendations highlighting the circadian rhythm design
+strategies and standards used
+Extent of coverage (task lighting or general lighting)
+Lighting system specification, colour temperatures and control logic for time and length of transition
+
+At Verification stage (New Buildings & Existing Buildings):
+•
+
+Lighting data sheets, control systems and lighting management plan.
+
+References
+https://www.designingbuildings.co.uk/wiki/Circadian_rhythms
+BRE Trust (2019) Lighting for Circadian Rhythms
+CIBSE Journal May 2019 – Evaluating Dynamic Lighting
+CIE standard S 026/E:2018
+DIN SPEC 67600.
+DIN SPEC 5031-100.
+SSL-erate (2014) Lighting for Health and Wellbeing in Education, Work Places, Nursing Homes, Domestic
+Applications and Smart Cities
+
+26
+
+HW2.3a Sound Zoning Design Approach
+Implement passive and/or active acoustic control measures to minimise exterior sourced noises by creating
+positive soundscapes, to improve the aural comfort of occupants .
+
+Assessment Criteria
+HW2.3a Sound Zoning Approach
+•
+
+Orienting and locating noise-sensitive buildings and
+spaces away from exterior sourced noises. using less
+noise-sensitive spaces (e.g. MSCP, pedestrian/cycling
+pathways) as buffers from exterior sourced noises,
+
+•
+
+Natural or engineered barrier (balconies,
+toilets/kitchen, dense landscaping
+
+New Buildings
+
+Existing Buildings
+
+0.5 Point
+
+0.5 Point
+
+0.5 Point will be awarded where the project team can demonstrate a sensitive contextual design to the project
+in relation to the prevailing soundscape. Consideration to the location and massing of blocks, landscape
+interventions, spatial arrangement and positioning of rooms and spaces, and physical acoustical barriers
+should be shown and articulated in the plans.
+
+Documentation Requirements
+At Design stage (New Buildings) / Pre-retrofit stage (Existing Buildings):
+•
+
+Sound Zoning or Soundscape plan that details the design approach and optimisation to minimise
+exterior sourced noises to sensitive spaces.
+
+At Verification stage (New Buildings & Existing Buildings):
+•
+
+Implementation and analysis of the design features and techniques employed.
+
+References
+Sound in Landscape Architecture. A Soundscape Approach to Noise
+https://soundscapedesign.info/design-tool/
+https://www.arup.com/perspectives/what-should-a-city-sound-like
+
+27
+
+HW2.3b Interior Acoustic Comfort
+An improved acoustical performance for normally occupied spaces can enhance the aural comfort of its
+occupants, facilitating communication, reducing unwanted sound and aiding in speech privacy.
+
+Assessment Criteria
+HW2.3b Interior Acoustic Comfort
+(i) Impact Sound Insulation (residential
+buildings)
+
+New Buildings
+
+For Non-Residential Buildings For Non-Residential Buildings
+(ii) 0.5 point
+
+(ii) 0.5 point
+
+(iii) 0.5 point
+
+(iii) 0.5 point
+
+(iv) 1 point
+
+(iv) 1 point
+
+For Residential Buildings
+
+For Residential Buildings
+
+(i) 1.5 point
+
+N/A
+
+(ii) Noise from External Noise Sources
+(iii) Airborne Sound Transmission
+Reduction (non-residential buildings)
+
+(iv) Reverberation Time (non-residential
+
+Existing Buildings
+
+buildings)
+
+(ii) 0.5 point
+
+(i) Impact Sound Insulation:
+Compliance with the following Isolation class (IIC) or BB90, or HTM08-01 standards.
+Impact Sound Transmission Reduction Requirements
+Area
+
+Performance (IIC)
+
+Floors between residential spaces such as bedrooms, living rooms and
+lounges.
+
+≥50
+
+Floors separating enclosed and fully vertically adjacent wet areas (e.g., bathrooms) are not subject to the impact sound
+insulation requirements
+
+(ii) Noise from External Noise Sources:
+Façade noise ingress is the noise level in a space when unoccupied but ready for occupancy and applies to
+internal noise levels for closed façade condition only (i.e. all normally operable windows and doors to outside
+are closed) and without noise contribution from building services. The façade noise ingress criteria should be
+met across the whole floor area.
+Internal noise levels to comply with SS553 Amendment 1 where applicable, otherwise per AS2107:2016, BB93
+or HTM08-01. Some areas extracted from AS2107:2016 for ease below:
+Recommended design sound level LAeq dB(A)
+Area
+
+Office
+
+Description
+
+Recommended maximum sound level
+
+Open Plan Office
+
+45
+
+Board and Conference
+
+40
+
+28
+
+Institutional,
+Community and civic
+spaces
+
+Corridors and lobbies
+
+50
+
+Reception Area
+
+45
+
+Teaching Spaces
+
+45
+
+Lecture Theatre
+
+35 – 45
+
+Libraries
+
+45 – 50
+
+Music Practice Rooms
+
+45
+
+Assembly Halls (up to 250 seats)
+
+40
+
+Staff Common Room
+
+45
+
+Airport Terminals
+
+55
+
+Art Galleries
+
+45
+
+Cinemas
+
+35
+
+Court Rooms
+
+35
+
+Museums
+
+45
+
+Post Office and General Banking Areas 50
+
+Hotel
+
+Residential buildings
+
+Cafeteria and Food Courts
+
+55
+
+Restaurants
+
+50
+
+Meeting Room
+
+35 – 40
+
+Banquet Room / Hall
+
+35 – 40
+
+Living Areas
+
+45
+
+Sleeping Areas
+
+40
+
+Kitchen / Laundry Areas
+
+50
+
+AS/ NZS 2107 (2016) ‘Acoustics – Recommended design sound levels and reverberation times for building interiors’
+Standards Australia
+
+29
+
+(iii) Airborne Sound Transmission Reduction:
+Sound transmission class (STC): A rating of how well a partition attenuates airborne sound. The higher the STC
+is, the higher the sound reduction. Points shall be awarded where compliance with the airborne sound
+insulation criteria outlined below otherwise per BB93 or HTM08-01 are demonstrated.
+Sound Transmission Reduction Requirements
+Area
+
+Performance (STC)
+
+General Office Spaces
+
+≥45
+
+Any spaces where confidential or critical speech is required
+examples include, Meeting Rooms, Conference Rooms, Classrooms
+
+≥50-60
+
+Between Mechanical/ Equipment spaces and occupied spaces
+
+≥55
+
+The above reduction requirements apply to partitions between rooms.
+For partitions with doors or significant glazing between rooms and corridors/general office areas the above criteria do not
+apply, however doors and glazing systems shall be specified as minimum STC 35 and the designer is to consider overall
+room-to-room sound level difference and flanking paths.
+
+(iv) Reverberation Time:
+Reverberation time (RT): The length of time required for sound to diminish 60 decibels from its initial level in
+an enclosed space. Points shall be awarded with compliance with Reverberation Time criteria provided in
+AS2107:2016, some areas extracted for ease below:
+Reverberation Requirements
+Area
+
+Office
+
+Institutional,
+Community and civic
+spaces
+
+Hotel
+
+Atria, commercial
+lobbies
+
+Description
+
+Reverberation Time
+
+Open Plan Office
+
+0.4 – minimised for noise control
+
+Conference
+
+0.6-0.8
+
+Meeting Room (small)
+
+<0.6
+
+Video/Audio Conference rooms
+
+0.2-0.4
+
+Classrooms
+
+0.3-0.7
+
+Conference Rooms
+
+0.6-0.7
+
+Libraries
+
+<0.6
+
+Music Practice Rooms
+
+0.7-0.9
+
+Assembly Halls (up to 250 seats)
+
+0.6-0.8
+
+Sports Halls
+
+0.7-2
+
+Meeting Room
+
+0.6-0.8
+
+Banquet Room/Hall
+
+<1.2 should be minimised for noise control
+
+Retail, office, institutional, or hotel
+atria or main lobby spaces
+
+(reduce as far as practicable for noise
+control)
+30
+
+AS/ NZS 2107 (2016) ‘Acoustics – Recommended design sound levels and reverberation times for building interiors’
+Standards Australia
+BS 8233 (2014) ‘Guidance on sound insulation and noise reduction for buildings’; British Standards Institution
+
+Documentation Requirements
+At Design stage (New Buildings) / Pre-retrofit stage (Existing Buildings):
+Either an Acoustic Design report conducted by an accredited acoustician or
+(i) IIC performance be captured within the tender documentation with acoustic report and testing
+commitment
+(ii) Detailed design and specification of internal noise conditions based on external noise conditions
+measured.
+(iii) Detailed specifications and testing details of STC performance of partitions between spaces.
+(iv) Calculations or acoustic simulations of reverberation times of key functional areas and the design
+strategies to maintain the reverberation times.
+At Verification stage (New Buildings & Existing Buildings):
+Either and acoustic verification report complete with testing data and evaluation that demonstrate full
+performance with the standards outlined above or
+(i) A representative selection of rooms, of at least 5% of the total. With on-site measurements
+undertaken in accordance with the relevant standards confirming compliance A site correction to the
+IIC may be allowed with suitable justification (typically 5dB i.e. NISR no less than IIC – 5dB) or as
+otherwise indicated within BB93 or HTM08-01 as applicable.
+(ii) Measured internal noise levels for a representative selection of rooms, of at least 5% of the total.
+(iii) On-site noise measurements undertaken in accordance with the relevant standards confirming
+compliance with the airborne sound insulation criteria. a representative sample of partitions shall be
+tested i.e. at least 10%
+A site correction to the STC performance outlined in Table HW2.3.2 may be allowed with suitable
+justification (typically 5dB ie FSTC no less than STC – 5dB) or as otherwise indicated within BB93 for
+education buildings or HTM08-01 for healthcare buildings.
+(iv) Measured reverberation time in accordance with ISO 3382-2 or equivalent, for a representative
+selection of rooms, at least 5% of the total.
+
+Guidance Notes
+Acoustic Design report: can be used for demonstration of compliance of HW2.3b. It should follow the following
+format:
+
+31
+
+Acoustic Design and Verification report
+Design Report:
+Executive Summary – Summary of the key design recommendations for the project
+Acoustic Considerations:
+(1) Impact of the project on the immediate noise environment, especially noise sensitive
+accommodation, including both the construction and operational stages of the building.
+(2) External noise sources and propagation affecting the development
+(3) Internal noise sources, acoustical design and criteria used within the building
+(4) Internal layout planning, finishes selection and acoustical performance of the building
+(5) Site massing, landscaping and facades design to mitigate the adverse impacts of external noise
+Facade Noise Ingress Control Criteria:
+(1) Noise survey methodology and standards
+(2) Results
+(3) Recommendations for façade treatment & spatial arrangement of interior spaces
+Internal Acoustic Design Criteria:
+(1) Sound transmission reduction targets, calculated using recognised design guidelines, field or
+laboratory test results by certified/ accredited agency
+(2) Reverberation time targets demonstrated by detailed design calculations or acoustic modelling
+(3) Sound reinforcement systems and/or public address system (where applicable)
+Internal Acoustic Design Proposals
+(1) Proposals for sound absorptive finishes and supporting calculations for typical areas
+(2) Proposals for sound insulation with supporting calculations or field or laboratory test results by
+certified/accredited agency for typical areas.
+Acoustic Verification:
+Environmental Noise & Survey (As-Built):
+(1) Methodology and testing standards
+(2) External impact of development on the surroundings
+Façade Noise Ingress Control (As-Built)
+Façade ingress noise measurement for internal areas
+Internal Acoustics (As-Built):
+(1) Sound Insulation measurements
+(2) Reverberation times measurements
+(3) Commissioning and handover of noise masking or sound reinforcement systems (where applicable)
+Useful references:
+AS/ NZS 2107 (2016) ‘Acoustics – Recommended design sound levels and reverberation times for building interiors’
+Standards Australia
+BS 8233 (2014) ‘Guidance on sound insulation and noise reduction for buildings’; British Standards Institution
+ISO 16283-1 (2014) ‘Acoustics - Field measurement of sound insulation in buildings and of building elements -- Part 1:
+Airborne sound insulation’; International Standards Organisation
+ISO 3382 Acoustics - Measurement of room acoustic parameters
+
+32
+
+Impact Isolation Class (IIC): A laboratory rating defined by ASTM E989 of how well a floor construction
+attenuates noise from impact. The higher the IIC, the higher the impact sound reduction.
+Calculation of reverberation time
+The reverberation time can be calculated by hand where:
+A = (α1S1 + α2S2 + α3S3 +….+ αnSn)
+RT = 0.163 x V/A
+A - Total equivalent sound absorption area of a room (in Sabin or m 2)
+α1, i - the sound absorption coefficient for different materials 1→i as specified/used in a space/room.
+S1, i - the total surface area of different materials, 1→i corresponding to the respective absorption coefficient
+(m2).
+RT – Reverberation Time in seconds.
+V – Room Volume (m3)
+
+33
+
+HW3 Sociological
+A maximum of 5 points can be scored across HW 3 Sociological section.
+
+HW3.1 Inclusive
+To raise greater public awareness towards user-friendly buildings, where developments and stakeholders
+adopt a user-centric philosophy in their design, operations and maintenance
+
+Assessment Criteria
+HW3.1 Inclusive
+
+New Buildings
+
+Existing Buildings
+For Non-Residential Buildings
+
+BCA Universal Design: UD
+Universal Design index (UDi)
+
+•
+•
+
+Mark
+
+or
+
+1 Point
+
+1 Point (UD Mark Gold or UDi
+C rating)
+
+2 Points
+
+2 Points (UD Mark GoldPLUS
+or UDi A or B rating)
+
+UD Mark Gold or UDi C rating
+UD Mark GoldPLUS or UDi A or B
+rating
+
+For Residential Buildings
+N/A
+
+Points shall be awarded where the UDi ratings or UD mark certification levels are met.
+
+Documentation Requirements
+At Design stage (New Buildings) / Pre-retrofit stage (Existing Buildings):
+Tender documentation and written commitment from the developer / building owner that the project shall
+achieve the relevant UDi rating at the building plan submission stage
+At Verification stage (New Buildings & Existing Buildings):
+The UDi rating at TOP/CSC or UD Mark award
+
+34
+
+HW3.2a Restorative and Community Spaces
+To provide a range of spaces catering for a broad spectrum of human activities that are suitably adaptable for
+collaborating, resting and relaxing, or community bonding. The provision of such spaces especially in a working
+environment help reduce stress, provide places of focus, connection and refuge for occupants
+
+Assessment Criteria
+HW3.2a Restorative and Community Spaces
+(i) Designated indoor and/or outdoor
+space for restorative practices
+(minimum 16m2 per space, and large
+enough for meditation/yoga or just
+quiet respite) which are accessible for
+all building occupants
+
+New Buildings
+
+Existing Buildings
+
+For Non-Residential Buildings For Non-Residential Buildings
+1 Point (i)
+
+1 Point (i)
+
+1 Point (ii)
+
+1 Point (ii)
+
+For Residential Buildings
+
+For Residential Buildings
+
+2 Points (ii)
+
+2 Points (ii)
+
+(ii) Provision of community spaces and
+facilities, within the development,
+including physical exercise facilities,
+playgrounds, communal gardens /
+allotments/ sensory spaces
+1 point can be awarded for the provision of designated indoor and/ or outdoor spaces for restorative purpose
+in non-residential building. These spaces shall be accessible to all building occupants. Projects would need to
+determine reasonable provision based on building type, occupancy and accessibility to the spaces. Spaces
+should be decentralised across a number of floors and areas within the building. Considerations should be
+made to interior finishes and noise separation.
+1 point can be awarded for non-residential buildings, 2 points for residential developments with the provision
+of a range of active exterior spaces and shared facilities where community groups can come together. These
+can include physical exercise facilities, playgrounds for a range of ages, communal gardens or allotments,
+sensory spaces and sheltered seating.
+
+Documentation Requirements
+At Design stage (New Buildings) / Pre-retrofit stage (Existing Buildings):
+•
+•
+•
+
+Spaces shall be identified on the plan, with the design intent clearly articulated.
+For indoor restorative spaces details should include the separation from the working environment,
+the interior design considerations and the soft furnishings
+The range of outdoor spaces should be articulated, identifying the primary user as well ensuring space
+for care givers where applicable (playgrounds, water play areas and fitness areas). Planting strategy,
+soundscape design considerations should be considered as a part of the sensory experience where
+sensory spaces are included.
+
+At Verification stage (New Buildings & Existing Buildings):
+
+•
+
+Submission of as built drawings and photographs of the spaces
+
+35
+
+HW3.2b Outsourced Workers
+To allow outsourced workers having access to proper and reasonable rest areas for their well-being.
+
+Assessment Criteria
+HW3.2b Outsourced Workers
+(i) Locations that afford privacy and provides a
+pleasant environment and
+
+New Buildings
+
+Existing Buildings
+
+1 Point
+
+1 Point
+
+(ii) Provision of amenities such as tables, chairs, water
+coolers, lockers.
+1 point can be awarded for the provision of proper and reasonable rest areas for outsourced workers (e.g.
+security officers, cleaners) to rest, recuperate and eat. These areas should afford privacy and provide a
+pleasant, well designed and constructed environment with adequate amenities such as tables, comfortable
+chairs, free to use water coolers and secure lockers for personal use. Full reference should be made to the
+“Tripartite Advisory on Provision of Rest Areas for Outsourced Workers’ (Dec 2019).
+
+Documentation Requirements
+At Design stage (New Buildings) / Pre-retrofit stage (Existing Buildings):
+•
+
+Rest area location marked on plan, the size of the space must be sufficient to cater for the expected
+numbers of outsourced workers and come with the relevant furniture and amenities provided .
+
+At Verification stage (New Buildings & Existing Buildings):
+
+•
+
+Submission of as built drawings and photographs of the spaces
+
+HW3.3a Physical Activity and Mental Wellness Programmes
+Physical health and mental wellbeing are inextricably related. Physical activities can bring health benefits
+including elevated mood and reduced stress, anxiety, opportunities for bonding, socialisation and help prevent
+mental health problems.
+
+Assessment Criteria
+HW3.3a Physical and Mental Wellness
+Programmes
+
+New Buildings
+
+Existing Buildings
+
+Structured, regular fitness and mental wellness For Non-Residential Buildings For Non-Residential Buildings
+programmes for all staff, or occupants through
+N/A
+1 Point
+engagement of external facilities and resources
+For Residential Buildings
+For Residential Buildings
+e.g. subsidised gym memberships, health
+assessments, personal training, fitness classes,
+N/A
+N/A
+mass workouts, talks and workshops,
+counselling.
+1 point can be awarded for a range of programmes to be implemented for the building, which would involve
+its tenants, occupants and/or visitors depending on the project type and use. A Minimum of 6 events would
+need to be organised each year. Subsidised memberships to external facilities, such as gym memberships can
+be included.
+
+36
+
+Documentation Requirements
+At Verification stage (Existing Buildings):
+
+•
+
+Submission of materials showing the range of activities organised, the policies and subsidies offered
+as well as uptake rate.
+
+HW3.3b Healthy Eating and Drinking
+Create a healthy food environment through provision of facilities, programmes and policies.
+
+Assessment Criteria
+HW3.3b Healthy Eating and Drinking
+(i)
+
+Accessible drinking water points
+at convenient locations
+
+(ii)
+
+On site eateries with HPB’s
+healthier dining programme
+
+(iii)
+
+Corporate policies on healthy
+eating including catering
+procurement policies
+
+New Buildings
+
+Existing Buildings
+
+For Non-Residential Buildings For Non-Residential Buildings
+(i) 0.5 point
+
+(i) 0.5 point
+
+(ii) 0.5 point
+
+(ii) 0.5 point
+
+(iii) 0.5 point
+
+(iii) 0.5 point
+
+For Residential Buildings
+
+For Residential Buildings
+
+(i) 1 point
+
+(i) 1 point
+
+Convenient locations include (but not limited to)
+•
+•
+
+Residential – near playgrounds, recreational areas, sports courts and fitness areas.
+Non-residential – internally within common areas near WC’s, changing rooms, and circulation nodes.
+Externally in accessible landscape areas, playgrounds and recreational spaces
+
+Documentation Requirements
+At Design stage (New Buildings) / Pre-retrofit stage (Existing Buildings):
+•
+•
+•
+
+Plans identifying the accessible water point locations on the plan and the areas in which these serve.
+Leasing requirements for eateries to be part of HPB’s healthier eating programme and to provide
+healthier choices.
+Draft corporate policies on catering for events and functions based on healthier choices for food and
+beverages
+
+At Verification stage (New Buildings & Existing Buildings):
+
+•
+•
+•
+
+Submission of as built drawings and photographs of the water points
+List of on-site eateries and details showing that these eateries are participating in HPB’s Healthier
+Dining Programme
+Submission of endorsed corporate policy on healthy eating including procurement policies
+
+37
+
+Health and Wellbeing - Innovation
+Assessment Criteria
+Health and Wellbeing - Innovation
+
+New Buildings
+
+Existing Buildings
+
+2 Points
+
+2 points
+
+Projects can demonstrate substantial performance to a specific
+Health and Wellbeing indicator or outcome, where innovation
+points can be awarded on a case-by-case basis. Points shall be
+awarded based on the strength of evidence of benefits and
+potential impact.
+
+Documentation Requirements
+At Design stage (New Buildings) / Pre-retrofit stage (Existing Buildings):
+The project team is to submit a concise summary that articulates:
+•
+•
+•
+
+The nature of the environmental benefit of their intervention/innovation
+Justify the impact of the intervention through detailed calculations and comparisons with industry
+norms
+Substantiate the calculations and comparisons with evidence and data.
+
+At Verification stage (New Buildings & Existing Buildings):
+The operations team is to submit:
+•
+•
+•
+
+Details of the implemented intervention/innovation
+Measurements and recordings of key metrics/indicators to show improvements of environmental
+performance arising from implemented intervention/innovation
+Lessons learnt if the intervention does not perform as expected
+
+Guidance Notes
+Projects can innovate to go above and beyond to attain exceptional Health and Wellbeing outcomes as
+intended in one or more criterion or demonstrate unique solutions to enhance other aspects of health and
+wellbeing not specified in the criteria. Innovations will be considered on a case by case basis.
+Some examples include:
+•
+•
+
+Wind driven rain simulations
+Daylight and glare simulations for internal spaces.
+
+38
+
+WELL Certification
+WELL certified buildings are recognised leaders in holistic health and wellbeing practices.
+The WELL version 2 standard consists of 10 concepts:
+1. Air
+2. Water
+3. Nourishment
+4. Light
+5. Movement
+6. Thermal Comfort
+7. Sound
+8. Materials
+9. Mind
+10. Community
+Each concept consists of features with distinct health intents. Features are either preconditions or
+optimisations. For more information visit https://www.wellcertified.com
+
+Assessment Criteria
+WELL Certification
+
+WELL Core Certification
+
+WELL Rating
+
+GM HW Points
+
+WELL Rating
+
+GM HW Points
+
+WELL Bronze
+
+6
+
+WELL Core Bronze
+
+4
+
+WELL Silver
+
+8
+
+WELL Core Silver
+
+6
+
+WELL Gold
+
+12
+
+WELL Core Gold
+
+8
+
+WELL Platinum
+
+15
+
+WELL Core Platinum
+
+10
+
+•
+•
+•
+
+Projects that have attained WELL certifications would be accredited the respective Green Mark points
+in the Health and Wellbeing section.
+Projects that have attained WELL Gold or WELL Platinum (core assessment) will also be awarded the
+Health and Wellbeing badge recognizing their exemplary performance.
+For projects that have attained lower WELL ratings, additional points can be attempted within the
+Health and Wellbeing section to achieve the Health and Wellbeing badge, that are not duplicated in the
+WELL Certification criteria.
+
+Documentation Requirements
+A copy of the certificate of the WELL Certificate
+
+39
+
+Acknowledgements:
+Criteria Development
+Ar. Benjamin Towell GMAAP
+
+Building and Construction Authority
+
+Ms. Denise Tan
+
+Ministry of Health Office for Healthcare Transformation
+
+Ms. Stephanie Tan
+
+Ministry of Health Office for Healthcare Transformation
+
+Ms. Elly Chiu
+
+Centre for Liveable Cities
+
+Ms. Deborah Chan
+
+Centre for Liveable Cities
+
+Dr. Lee Jang Young GMAAP
+
+Building and Construction Authority
+
+Technical Guide
+Dr. Lee Jang Young GMAAP
+
+Building and Construction Authority
+
+Mr. Lewis Chua GMAAP
+
+Building and Construction Authority
+
+Mr. Saw Cai Kwan GMAAP
+
+Building and Construction Authority
+
+Er. Ang Boon Wee GMAAP
+
+Building and Construction Authority
+
+Ar. Benjamin Towell GMAAP
+
+Building and Construction Authority
+
+Technical Contributors
+Dr. Xu Jingfeng
+
+Arup
+
+Mr. Jason Sim
+
+Arup
+
+40
+
+

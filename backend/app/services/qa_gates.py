@@ -227,7 +227,7 @@ def run_all_qa_gates(report: "Report", findings: list) -> list[QAGateResult]:
         evaluator = GATE_EVALUATORS[gate_id]
         if gate_id in ("QA-G1", "QA-G5"):
             results.append(evaluator(report, findings))
-        elif gate_id == "QA-G2":
+        elif gate_id in ("QA-G2", "QA-G6"):
             results.append(evaluator(findings))
         else:
             results.append(evaluator(report))

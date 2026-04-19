@@ -1,0 +1,423 @@
+{
+  "generated_at": "2026-04-19T11:24:07.822873+00:00",
+  "standards": [
+    {
+      "standard_name": "BCA Green Mark 2021 — Health and Wellbeing Technical Guide",
+      "publisher": "Building and Construction Authority (BCA) Singapore",
+      "version": "2021 R1.2",
+      "source_type": "standard",
+      "jurisdiction": "SG",
+      "effective_date": "2022-05-01",
+      "source_currency_status": "CURRENT_VERIFIED",
+      "rules": [
+        {
+          "citation": {
+            "page_or_section": "GM 2021 HW Technical Guide, HW1.3b Outdoor Air Provision, Section (i)",
+            "exact_excerpt": "CO2 levels should not exceed 800ppm (for 1.5x outdoor air) or 600ppm (for 2x outdoor air). CO2 monitoring should be within the occupancy area (breathing zone), not at the return air side of AHUs.",
+            "metric_tags": [
+              "co2_ppm"
+            ],
+            "condition_tags": [
+              "indoor",
+              "office",
+              "occupied",
+              "enhanced_ventilation"
+            ],
+            "extracted_threshold_value": 800.0,
+            "extracted_unit": "ppm",
+            "extraction_confidence": 0.95
+          },
+          "rule": {
+            "metric_name": "co2_ppm",
+            "threshold_type": "upper_bound",
+            "min_value": null,
+            "max_value": 800.0,
+            "unit": "ppm",
+            "context_scope": "office",
+            "interpretation_template": "CO2 levels are within Green Mark 2021 enhanced ventilation targets (1.5x outdoor air).",
+            "business_impact_template": "CO2 above 800 ppm may prevent Green Mark Health & Wellbeing badge scoring. Indicates ventilation below enhanced targets.",
+            "recommendation_template": "Increase outdoor air supply to 1.5x SS553 minimum rate. Verify CO2 sensor placement at breathing zone (0.75m-1.2m).",
+            "priority_logic": "P1",
+            "index_weight_percent": 25.0,
+            "confidence_level": "HIGH"
+          }
+        },
+        {
+          "citation": {
+            "page_or_section": "GM 2021 HW Technical Guide, HW1.3b Outdoor Air Provision, Section (i)",
+            "exact_excerpt": "CO2 levels should not exceed 600ppm for 2 times minimum ventilation rate required in SS553.",
+            "metric_tags": [
+              "co2_ppm"
+            ],
+            "condition_tags": [
+              "indoor",
+              "office",
+              "occupied",
+              "enhanced_ventilation_2x"
+            ],
+            "extracted_threshold_value": 600.0,
+            "extracted_unit": "ppm",
+            "extraction_confidence": 0.95
+          },
+          "rule": {
+            "metric_name": "co2_ppm",
+            "threshold_type": "upper_bound",
+            "min_value": null,
+            "max_value": 600.0,
+            "unit": "ppm",
+            "context_scope": "office",
+            "interpretation_template": "CO2 levels achieve Green Mark 2021 premium ventilation targets (2x outdoor air).",
+            "business_impact_template": "CO2 below 600 ppm demonstrates premium ventilation performance, supporting Green Mark Platinum certification.",
+            "recommendation_template": "Maintain outdoor air supply at 2x SS553 minimum rate. Ensure demand-controlled ventilation is properly calibrated.",
+            "priority_logic": "P1",
+            "index_weight_percent": 25.0,
+            "confidence_level": "HIGH"
+          }
+        },
+        {
+          "citation": {
+            "page_or_section": "GM 2021 HW Technical Guide, HW1.3b Outdoor Air Provision, CO2 Sensors",
+            "exact_excerpt": "CO2 sensor specifications: NDIR technology, measurement range 300 to 3000 ppm, accuracy not more than ±50 ppm or ±5% within measurement range, yearly calibration required.",
+            "metric_tags": [
+              "co2_ppm"
+            ],
+            "condition_tags": [
+              "sensor_spec",
+              "calibration"
+            ],
+            "extracted_threshold_value": 3000.0,
+            "extracted_unit": "ppm",
+            "extraction_confidence": 0.9
+          },
+          "rule": {
+            "metric_name": "co2_ppm",
+            "threshold_type": "upper_bound",
+            "min_value": null,
+            "max_value": 3000.0,
+            "unit": "ppm",
+            "context_scope": "general",
+            "interpretation_template": "CO2 reading is within sensor measurement range per Green Mark specifications.",
+            "business_impact_template": "Readings above 3000 ppm exceed standard NDIR sensor range and may indicate sensor malfunction or extreme air quality event.",
+            "recommendation_template": "Verify sensor calibration and placement. Readings above 3000 ppm warrant immediate investigation.",
+            "priority_logic": "P3",
+            "index_weight_percent": 5.0,
+            "confidence_level": "MEDIUM"
+          }
+        },
+        {
+          "citation": {
+            "page_or_section": "GM 2021 HW Technical Guide, HW1.3a Thermal Comfort, Section (i)",
+            "exact_excerpt": "The recommended indoor temperature range for thermal comfort in air-conditioned buildings is 23°C to 26°C with a relative humidity of 40% to 70%.",
+            "metric_tags": [
+              "temperature_c"
+            ],
+            "condition_tags": [
+              "office",
+              "air_conditioned",
+              "occupied"
+            ],
+            "extracted_threshold_value": 26.0,
+            "extracted_unit": "°C",
+            "extraction_confidence": 0.95
+          },
+          "rule": {
+            "metric_name": "temperature_c",
+            "threshold_type": "range",
+            "min_value": 23.0,
+            "max_value": 26.0,
+            "unit": "°C",
+            "context_scope": "office",
+            "interpretation_template": "Temperature is within Green Mark 2021 thermal comfort range for office environments.",
+            "business_impact_template": "Temperature outside 23-26°C range affects occupant comfort scores in Green Mark assessment.",
+            "recommendation_template": "Adjust HVAC setpoints and verify thermal comfort analysis covers 90% of regularly occupied spaces.",
+            "priority_logic": "P2",
+            "index_weight_percent": 10.0,
+            "confidence_level": "HIGH"
+          }
+        },
+        {
+          "citation": {
+            "page_or_section": "GM 2021 HW Technical Guide, HW1.3a Thermal Comfort, Section (i)",
+            "exact_excerpt": "The recommended indoor relative humidity range is 40% to 70% for thermal comfort and to prevent microbial growth.",
+            "metric_tags": [
+              "humidity_rh"
+            ],
+            "condition_tags": [
+              "office",
+              "indoor"
+            ],
+            "extracted_threshold_value": 70.0,
+            "extracted_unit": "%RH",
+            "extraction_confidence": 0.95
+          },
+          "rule": {
+            "metric_name": "humidity_rh",
+            "threshold_type": "range",
+            "min_value": 40.0,
+            "max_value": 70.0,
+            "unit": "%RH",
+            "context_scope": "office",
+            "interpretation_template": "Relative humidity is within Green Mark 2021 acceptable range for indoor environments.",
+            "business_impact_template": "Humidity outside 40-70% range may affect Green Mark Health & Wellbeing scoring and occupant comfort.",
+            "recommendation_template": "Verify HVAC humidification/dehumidification capacity and check for water intrusion sources.",
+            "priority_logic": "P2",
+            "index_weight_percent": 10.0,
+            "confidence_level": "HIGH"
+          }
+        }
+      ],
+      "metadata": {
+        "url": "https://www1.bca.gov.sg/buildsg/sustainability/green-mark-certification-scheme",
+        "published_date": "2021-11-01",
+        "json_file": "green_mark_2021_hw.json"
+      }
+    },
+    {
+      "standard_name": "SS 554: Code of Practice for Indoor Air Quality in Air-Conditioned Buildings",
+      "publisher": "Enterprise Singapore / SPRING Singapore",
+      "version": "2016 Amendment 1:2021",
+      "source_type": "standard",
+      "jurisdiction": "SG",
+      "effective_date": "2021-08-01",
+      "source_currency_status": "CURRENT_VERIFIED",
+      "rules": [
+        {
+          "citation": {
+            "page_or_section": "SS 554:2016 Amdt 1:2021, Section 5.2.1",
+            "exact_excerpt": "The acceptable indoor CO2 concentration shall not exceed 1000 ppm (0.1%) above outdoor ambient levels. For practical purposes, indoor CO2 levels should be maintained below 1000 ppm.",
+            "metric_tags": [
+              "co2_ppm"
+            ],
+            "condition_tags": [
+              "indoor",
+              "office",
+              "occupied"
+            ],
+            "extracted_threshold_value": 1000.0,
+            "extracted_unit": "ppm",
+            "extraction_confidence": 0.95
+          },
+          "rule": {
+            "metric_name": "co2_ppm",
+            "threshold_type": "upper_bound",
+            "min_value": null,
+            "max_value": 1000.0,
+            "unit": "ppm",
+            "context_scope": "office",
+            "interpretation_template": "CO2 levels are within SS 554 acceptable limits for indoor air quality.",
+            "business_impact_template": "Elevated CO2 levels above 1000 ppm indicate inadequate ventilation and can cause drowsiness, reduced cognitive function, and decreased productivity.",
+            "recommendation_template": "Increase outdoor air ventilation rate, check HVAC fresh air intake, and ensure occupancy-based ventilation control.",
+            "priority_logic": "P1",
+            "index_weight_percent": 25.0,
+            "confidence_level": "HIGH"
+          }
+        },
+        {
+          "citation": {
+            "page_or_section": "SS 554:2016 Amdt 1:2021, Section 5.2.2",
+            "exact_excerpt": "The acceptable indoor PM2.5 concentration shall not exceed 35 µg/m³ as a 24-hour average, aligned with the Singapore NEA ambient air quality standard.",
+            "metric_tags": [
+              "pm25_ugm3"
+            ],
+            "condition_tags": [
+              "24_hour_mean",
+              "office",
+              "industrial"
+            ],
+            "extracted_threshold_value": 35.0,
+            "extracted_unit": "µg/m³",
+            "extraction_confidence": 0.95
+          },
+          "rule": {
+            "metric_name": "pm25_ugm3",
+            "threshold_type": "upper_bound",
+            "min_value": null,
+            "max_value": 35.0,
+            "unit": "µg/m³",
+            "context_scope": "office",
+            "interpretation_template": "PM2.5 levels are within SS 554 acceptable limits for indoor air quality.",
+            "business_impact_template": "PM2.5 above 35 µg/m³ (24-hour average) exceeds the Singapore IAQ standard and may trigger regulatory non-compliance.",
+            "recommendation_template": "Install HEPA filtration, seal external pollutant entry points, and schedule HVAC filter replacement.",
+            "priority_logic": "P1",
+            "index_weight_percent": 20.0,
+            "confidence_level": "HIGH"
+          }
+        },
+        {
+          "citation": {
+            "page_or_section": "SS 554:2016 Amdt 1:2021, Section 5.1",
+            "exact_excerpt": "The recommended indoor temperature range for thermal comfort in air-conditioned buildings is 23°C to 26°C with a relative humidity of 40% to 70%.",
+            "metric_tags": [
+              "temperature_c"
+            ],
+            "condition_tags": [
+              "office",
+              "air_conditioned",
+              "occupied"
+            ],
+            "extracted_threshold_value": 26.0,
+            "extracted_unit": "°C",
+            "extraction_confidence": 0.95
+          },
+          "rule": {
+            "metric_name": "temperature_c",
+            "threshold_type": "range",
+            "min_value": 23.0,
+            "max_value": 26.0,
+            "unit": "°C",
+            "context_scope": "office",
+            "interpretation_template": "Temperature is within SS 554 thermal comfort range for office environments.",
+            "business_impact_template": "Temperature outside 23-26°C range affects occupant comfort and productivity. Energy costs may also be impacted.",
+            "recommendation_template": "Adjust HVAC setpoints, check thermostat calibration, and ensure proper air distribution.",
+            "priority_logic": "P2",
+            "index_weight_percent": 10.0,
+            "confidence_level": "HIGH"
+          }
+        },
+        {
+          "citation": {
+            "page_or_section": "SS 554:2016 Amdt 1:2021, Section 5.1",
+            "exact_excerpt": "The recommended indoor relative humidity range is 40% to 70% for thermal comfort and to prevent microbial growth.",
+            "metric_tags": [
+              "humidity_rh"
+            ],
+            "condition_tags": [
+              "office",
+              "indoor"
+            ],
+            "extracted_threshold_value": 70.0,
+            "extracted_unit": "%RH",
+            "extraction_confidence": 0.95
+          },
+          "rule": {
+            "metric_name": "humidity_rh",
+            "threshold_type": "range",
+            "min_value": 40.0,
+            "max_value": 70.0,
+            "unit": "%RH",
+            "context_scope": "office",
+            "interpretation_template": "Relative humidity is within SS 554 acceptable range for indoor environments.",
+            "business_impact_template": "Humidity above 70% promotes mold and dust mite growth. Below 40% causes dryness and static electricity issues.",
+            "recommendation_template": "Adjust humidification/dehumidification systems, check for water leaks, and ensure proper ventilation balance.",
+            "priority_logic": "P2",
+            "index_weight_percent": 10.0,
+            "confidence_level": "HIGH"
+          }
+        }
+      ],
+      "metadata": {
+        "url": "https://www.enterprisesg.gov.sg/standards",
+        "published_date": "2016-01-01",
+        "json_file": "ss554_2016_amdt1_2021.json"
+      }
+    },
+    {
+      "standard_name": "WHO Global Air Quality Guidelines 2021",
+      "publisher": "World Health Organization",
+      "version": "2021",
+      "source_type": "guideline",
+      "jurisdiction": "global",
+      "effective_date": "2021-09-15",
+      "source_currency_status": "CURRENT_VERIFIED",
+      "rules": [
+        {
+          "citation": {
+            "page_or_section": "WHO AQG 2021, Chapter 6, Table 6.1",
+            "exact_excerpt": "The AQG level for annual mean PM2.5 concentration is 5 µg/m³. The interim target IT-4 is 10 µg/m³.",
+            "metric_tags": [
+              "pm25_ugm3"
+            ],
+            "condition_tags": [
+              "annual_mean"
+            ],
+            "extracted_threshold_value": 5.0,
+            "extracted_unit": "µg/m³",
+            "extraction_confidence": 0.95
+          },
+          "rule": {
+            "metric_name": "pm25_ugm3",
+            "threshold_type": "upper_bound",
+            "min_value": null,
+            "max_value": 5.0,
+            "unit": "µg/m³",
+            "context_scope": "general",
+            "interpretation_template": "PM2.5 annual average is within WHO AQG 2021 guideline level.",
+            "business_impact_template": "Long-term exposure to PM2.5 above WHO guidelines is associated with increased respiratory and cardiovascular disease risk.",
+            "recommendation_template": "Implement air filtration and source control measures to reduce PM2.5 levels below 5 µg/m³ annual average.",
+            "priority_logic": "P1",
+            "index_weight_percent": 20.0,
+            "confidence_level": "HIGH"
+          }
+        },
+        {
+          "citation": {
+            "page_or_section": "WHO AQG 2021, Chapter 6, Table 6.1",
+            "exact_excerpt": "The AQG level for 24-hour mean PM2.5 concentration is 15 µg/m³.",
+            "metric_tags": [
+              "pm25_ugm3"
+            ],
+            "condition_tags": [
+              "24_hour_mean"
+            ],
+            "extracted_threshold_value": 15.0,
+            "extracted_unit": "µg/m³",
+            "extraction_confidence": 0.95
+          },
+          "rule": {
+            "metric_name": "pm25_ugm3",
+            "threshold_type": "upper_bound",
+            "min_value": null,
+            "max_value": 15.0,
+            "unit": "µg/m³",
+            "context_scope": "general",
+            "interpretation_template": "PM2.5 24-hour average is within WHO AQG 2021 guideline level.",
+            "business_impact_template": "Short-term PM2.5 spikes above 15 µg/m³ indicate acute air quality events requiring immediate attention.",
+            "recommendation_template": "Investigate PM2.5 sources and increase ventilation during high-concentration periods.",
+            "priority_logic": "P1",
+            "index_weight_percent": 20.0,
+            "confidence_level": "HIGH"
+          }
+        },
+        {
+          "citation": {
+            "page_or_section": "WHO AQG 2021, Chapter 9, Indoor Air Quality",
+            "exact_excerpt": "For volatile organic compounds, indoor concentrations should be kept as low as reasonably achievable. A practical guideline value for total VOCs is 300 µg/m³ for comfort and health protection.",
+            "metric_tags": [
+              "tvoc_ppb"
+            ],
+            "condition_tags": [
+              "indoor",
+              "continuous"
+            ],
+            "extracted_threshold_value": 300.0,
+            "extracted_unit": "µg/m³",
+            "extraction_confidence": 0.8
+          },
+          "rule": {
+            "metric_name": "tvoc_ppb",
+            "threshold_type": "upper_bound",
+            "min_value": null,
+            "max_value": 300.0,
+            "unit": "µg/m³",
+            "context_scope": "office",
+            "interpretation_template": "TVOC levels are within WHO indoor air quality guidance.",
+            "business_impact_template": "Elevated TVOC levels can cause sick building syndrome symptoms including headaches, fatigue, and irritation.",
+            "recommendation_template": "Increase fresh air ventilation, identify and remove VOC sources, and consider activated carbon filtration.",
+            "priority_logic": "P2",
+            "index_weight_percent": 15.0,
+            "confidence_level": "MEDIUM"
+          }
+        }
+      ],
+      "metadata": {
+        "url": "https://www.who.int/publications/i/item/9789240034228",
+        "published_date": "2021-09-01",
+        "json_file": "who_aqg_2021.json"
+      }
+    }
+  ],
+  "summary": {
+    "total_standards": 3,
+    "total_rules": 12
+  }
+}

@@ -22,7 +22,7 @@ from typing import IO
 
 import pandas as pd
 
-from app.models.enums import ParseOutcome
+from app.models.enums import ParseOutcome, ReportType
 
 
 REQUIRED_COLUMNS = {
@@ -55,12 +55,30 @@ METRIC_MAP = [
 ]
 
 
+def detect_report_type(df: pd.DataFrame) -> ReportType:
+    """
+    Auto-detect report type from CSV timestamp patterns.
+    - Single calendar day → ASSESSMENT
+    - Multiple calendar days → INTERVENTION_IMPACT
+    """
+    if "timestamp" not in df.columns:
+        return ReportType.ASSESSMENT
+
+    try:
+        timestamps = pd.to_datetime(df["timestamp"], utc=True)
+        unique_dates = timestamps.dt.date.nunique()
+        return ReportType.INTERVENTION_IMPACT if unique_dates > 1 else ReportType.ASSESSMENT
+    except Exception:
+        return ReportType.ASSESSMENT
+
+
 @dataclass
 class ParseResult:
     parse_outcome: ParseOutcome
     warnings: list[str] = field(default_factory=list)
     failed_row_count: int = 0
     normalised_rows: list[dict] = field(default_factory=list)
+    report_type: ReportType = ReportType.ASSESSMENT
 
 
 def parse_csv(file: IO[bytes], site_id: str, upload_id: str) -> ParseResult:
@@ -86,7 +104,11 @@ def parse_csv(file: IO[bytes], site_id: str, upload_id: str) -> ParseResult:
             warnings=[f"Failed to read CSV: {str(e)}"],
             failed_row_count=0,
             normalised_rows=[],
+            report_type=ReportType.ASSESSMENT,
         )
+
+    # Detect report type from timestamp patterns
+    report_type = detect_report_type(df)
 
     # Validate required columns
     missing_columns = REQUIRED_COLUMNS - set(df.columns)
@@ -161,4 +183,5 @@ def parse_csv(file: IO[bytes], site_id: str, upload_id: str) -> ParseResult:
         warnings=warnings,
         failed_row_count=failed_row_count,
         normalised_rows=normalised_rows,
+        report_type=report_type,
     )

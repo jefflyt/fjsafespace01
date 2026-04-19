@@ -1,38 +1,40 @@
 import Link from "next/link"
 import { ShieldCheck } from "lucide-react"
+import { NotificationBell } from "@/components/NotificationBell"
 
 export function Navbar() {
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto flex h-16 items-center px-6">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md">
+      <div className="mx-auto flex h-14 max-w-7xl items-center px-6">
         <div className="mr-8 flex items-center">
-          <Link href="/" className="mr-6 flex items-center space-x-2">
-            <div className="p-1.5 rounded-lg bg-primary/10">
-              <ShieldCheck className="h-6 w-6 text-primary" />
+          <Link href="/ops" className="mr-6 flex items-center space-x-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+              <ShieldCheck className="h-5 w-5 text-primary" />
             </div>
-            <span className="hidden font-bold sm:inline-block text-xl tracking-tight">
+            <span className="hidden font-heading text-lg font-bold tracking-tight sm:inline-block">
               FJDashboard
             </span>
           </Link>
-          <nav className="flex items-center space-x-8 text-sm font-semibold uppercase tracking-wider">
+          <nav className="flex items-center space-x-1 text-sm">
             <Link
-              href="/analyst"
-              className="transition-colors hover:text-primary text-foreground/80"
+              href="/ops"
+              className="rounded-md px-3 py-1.5 font-medium text-foreground/70 transition-colors hover:bg-muted hover:text-foreground"
             >
               Operations
             </Link>
             <Link
               href="/executive"
-              className="transition-colors hover:text-primary text-foreground/40"
+              className="rounded-md px-3 py-1.5 font-medium text-foreground/40 transition-colors hover:bg-muted hover:text-foreground"
             >
               Executive
             </Link>
           </nav>
         </div>
-        <div className="flex flex-1 items-center justify-end space-x-4">
-          <div className="text-xs font-bold uppercase tracking-widest border border-primary/20 rounded-full px-4 py-1.5 bg-primary/5 text-primary flex items-center shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-primary animate-pulse mr-2"></span>
-            Ops Mode
+        <div className="flex flex-1 items-center justify-end space-x-3">
+          <NotificationBell />
+          <div className="flex items-center rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
+            <span className="mr-1.5 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
+            Ops
           </div>
         </div>
       </div>

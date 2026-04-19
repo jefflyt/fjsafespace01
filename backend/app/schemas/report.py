@@ -37,7 +37,7 @@ class ReportResponse(BaseModel):
     qa_checks: str = "{}"
     data_quality_statement: Optional[str] = None
     certification_outcome: Optional[CertificationOutcome] = None
-    pdf_url: Optional[str] = None
+    report_snapshot: Optional[str] = None
     generated_at: datetime
 
 

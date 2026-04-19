@@ -7,7 +7,7 @@ FastAPI backend for the FJ SafeSpace Wellness Platform dashboard.
 ```bash
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env    # fill in DATABASE_URL, APPROVER_EMAIL, etc.
+cp ../.env.example ../.env    # at project root, fill in DATABASE_URL, APPROVER_EMAIL, etc.
 ```
 
 ## Run (dev)

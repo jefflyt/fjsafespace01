@@ -1,0 +1,116 @@
+{
+  "_comment": "SS 554:2016 Amendment 1:2021 — Code of Practice for Indoor Air Quality in Air-Conditioned Buildings. Singapore's mandatory IAQ standard for certified buildings.",
+  "source": {
+    "title": "SS 554: Code of Practice for Indoor Air Quality in Air-Conditioned Buildings",
+    "publisher": "Enterprise Singapore / SPRING Singapore",
+    "source_type": "standard",
+    "jurisdiction": "SG",
+    "url": "https://www.enterprisesg.gov.sg/standards",
+    "version_label": "2016 Amendment 1:2021",
+    "published_date": "2016-01-01",
+    "effective_date": "2021-08-01",
+    "source_currency_status": "CURRENT_VERIFIED"
+  },
+  "rules": [
+    {
+      "citation": {
+        "page_or_section": "SS 554:2016 Amdt 1:2021, Section 5.2.1",
+        "exact_excerpt": "The acceptable indoor CO2 concentration shall not exceed 1000 ppm (0.1%) above outdoor ambient levels. For practical purposes, indoor CO2 levels should be maintained below 1000 ppm.",
+        "metric_tags": ["co2_ppm"],
+        "condition_tags": ["indoor", "office", "occupied"],
+        "extracted_threshold_value": 1000.0,
+        "extracted_unit": "ppm",
+        "extraction_confidence": 0.95
+      },
+      "rule": {
+        "metric_name": "co2_ppm",
+        "threshold_type": "upper_bound",
+        "min_value": null,
+        "max_value": 1000.0,
+        "unit": "ppm",
+        "context_scope": "office",
+        "interpretation_template": "CO2 levels are within SS 554 acceptable limits for indoor air quality.",
+        "business_impact_template": "Elevated CO2 levels above 1000 ppm indicate inadequate ventilation and can cause drowsiness, reduced cognitive function, and decreased productivity.",
+        "recommendation_template": "Increase outdoor air ventilation rate, check HVAC fresh air intake, and ensure occupancy-based ventilation control.",
+        "priority_logic": "P1",
+        "index_weight_percent": 25.0,
+        "confidence_level": "HIGH"
+      }
+    },
+    {
+      "citation": {
+        "page_or_section": "SS 554:2016 Amdt 1:2021, Section 5.2.2",
+        "exact_excerpt": "The acceptable indoor PM2.5 concentration shall not exceed 35 µg/m³ as a 24-hour average, aligned with the Singapore NEA ambient air quality standard.",
+        "metric_tags": ["pm25_ugm3"],
+        "condition_tags": ["24_hour_mean", "office", "industrial"],
+        "extracted_threshold_value": 35.0,
+        "extracted_unit": "µg/m³",
+        "extraction_confidence": 0.95
+      },
+      "rule": {
+        "metric_name": "pm25_ugm3",
+        "threshold_type": "upper_bound",
+        "min_value": null,
+        "max_value": 35.0,
+        "unit": "µg/m³",
+        "context_scope": "office",
+        "interpretation_template": "PM2.5 levels are within SS 554 acceptable limits for indoor air quality.",
+        "business_impact_template": "PM2.5 above 35 µg/m³ (24-hour average) exceeds the Singapore IAQ standard and may trigger regulatory non-compliance.",
+        "recommendation_template": "Install HEPA filtration, seal external pollutant entry points, and schedule HVAC filter replacement.",
+        "priority_logic": "P1",
+        "index_weight_percent": 20.0,
+        "confidence_level": "HIGH"
+      }
+    },
+    {
+      "citation": {
+        "page_or_section": "SS 554:2016 Amdt 1:2021, Section 5.1",
+        "exact_excerpt": "The recommended indoor temperature range for thermal comfort in air-conditioned buildings is 23°C to 26°C with a relative humidity of 40% to 70%.",
+        "metric_tags": ["temperature_c"],
+        "condition_tags": ["office", "air_conditioned", "occupied"],
+        "extracted_threshold_value": 26.0,
+        "extracted_unit": "°C",
+        "extraction_confidence": 0.95
+      },
+      "rule": {
+        "metric_name": "temperature_c",
+        "threshold_type": "range",
+        "min_value": 23.0,
+        "max_value": 26.0,
+        "unit": "°C",
+        "context_scope": "office",
+        "interpretation_template": "Temperature is within SS 554 thermal comfort range for office environments.",
+        "business_impact_template": "Temperature outside 23-26°C range affects occupant comfort and productivity. Energy costs may also be impacted.",
+        "recommendation_template": "Adjust HVAC setpoints, check thermostat calibration, and ensure proper air distribution.",
+        "priority_logic": "P2",
+        "index_weight_percent": 10.0,
+        "confidence_level": "HIGH"
+      }
+    },
+    {
+      "citation": {
+        "page_or_section": "SS 554:2016 Amdt 1:2021, Section 5.1",
+        "exact_excerpt": "The recommended indoor relative humidity range is 40% to 70% for thermal comfort and to prevent microbial growth.",
+        "metric_tags": ["humidity_rh"],
+        "condition_tags": ["office", "indoor"],
+        "extracted_threshold_value": 70.0,
+        "extracted_unit": "%RH",
+        "extraction_confidence": 0.95
+      },
+      "rule": {
+        "metric_name": "humidity_rh",
+        "threshold_type": "range",
+        "min_value": 40.0,
+        "max_value": 70.0,
+        "unit": "%RH",
+        "context_scope": "office",
+        "interpretation_template": "Relative humidity is within SS 554 acceptable range for indoor environments.",
+        "business_impact_template": "Humidity above 70% promotes mold and dust mite growth. Below 40% causes dryness and static electricity issues.",
+        "recommendation_template": "Adjust humidification/dehumidification systems, check for water leaks, and ensure proper ventilation balance.",
+        "priority_logic": "P2",
+        "index_weight_percent": 10.0,
+        "confidence_level": "HIGH"
+      }
+    }
+  ]
+}

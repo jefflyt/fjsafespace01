@@ -68,7 +68,7 @@ export function QAChecklist({ reportId, qaChecks, onUpdate }: QAChecklistProps) 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center justify-between">
+        <CardTitle className="font-heading flex items-center justify-between text-lg">
           <span>QA Checklist</span>
           <Badge variant={allChecked ? "default" : "secondary"}>
             {passedCount}/{QA_GATES.length} checked

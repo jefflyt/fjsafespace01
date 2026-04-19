@@ -1,0 +1,91 @@
+{
+  "_comment": "WHO Global Air Quality Guidelines 2021 — Global health-based thresholds for key air pollutants. Stricter than SS 554; useful as aspirational benchmarks.",
+  "source": {
+    "title": "WHO Global Air Quality Guidelines 2021",
+    "publisher": "World Health Organization",
+    "source_type": "guideline",
+    "jurisdiction": "global",
+    "url": "https://www.who.int/publications/i/item/9789240034228",
+    "version_label": "2021",
+    "published_date": "2021-09-01",
+    "effective_date": "2021-09-15",
+    "source_currency_status": "CURRENT_VERIFIED"
+  },
+  "rules": [
+    {
+      "citation": {
+        "page_or_section": "WHO AQG 2021, Chapter 6, Table 6.1",
+        "exact_excerpt": "The AQG level for annual mean PM2.5 concentration is 5 µg/m³. The interim target IT-4 is 10 µg/m³.",
+        "metric_tags": ["pm25_ugm3"],
+        "condition_tags": ["annual_mean"],
+        "extracted_threshold_value": 5.0,
+        "extracted_unit": "µg/m³",
+        "extraction_confidence": 0.95
+      },
+      "rule": {
+        "metric_name": "pm25_ugm3",
+        "threshold_type": "upper_bound",
+        "min_value": null,
+        "max_value": 5.0,
+        "unit": "µg/m³",
+        "context_scope": "general",
+        "interpretation_template": "PM2.5 annual average is within WHO AQG 2021 guideline level.",
+        "business_impact_template": "Long-term exposure to PM2.5 above WHO guidelines is associated with increased respiratory and cardiovascular disease risk.",
+        "recommendation_template": "Implement air filtration and source control measures to reduce PM2.5 levels below 5 µg/m³ annual average.",
+        "priority_logic": "P1",
+        "index_weight_percent": 20.0,
+        "confidence_level": "HIGH"
+      }
+    },
+    {
+      "citation": {
+        "page_or_section": "WHO AQG 2021, Chapter 6, Table 6.1",
+        "exact_excerpt": "The AQG level for 24-hour mean PM2.5 concentration is 15 µg/m³.",
+        "metric_tags": ["pm25_ugm3"],
+        "condition_tags": ["24_hour_mean"],
+        "extracted_threshold_value": 15.0,
+        "extracted_unit": "µg/m³",
+        "extraction_confidence": 0.95
+      },
+      "rule": {
+        "metric_name": "pm25_ugm3",
+        "threshold_type": "upper_bound",
+        "min_value": null,
+        "max_value": 15.0,
+        "unit": "µg/m³",
+        "context_scope": "general",
+        "interpretation_template": "PM2.5 24-hour average is within WHO AQG 2021 guideline level.",
+        "business_impact_template": "Short-term PM2.5 spikes above 15 µg/m³ indicate acute air quality events requiring immediate attention.",
+        "recommendation_template": "Investigate PM2.5 sources and increase ventilation during high-concentration periods.",
+        "priority_logic": "P1",
+        "index_weight_percent": 20.0,
+        "confidence_level": "HIGH"
+      }
+    },
+    {
+      "citation": {
+        "page_or_section": "WHO AQG 2021, Chapter 9, Indoor Air Quality",
+        "exact_excerpt": "For volatile organic compounds, indoor concentrations should be kept as low as reasonably achievable. A practical guideline value for total VOCs is 300 µg/m³ for comfort and health protection.",
+        "metric_tags": ["tvoc_ppb"],
+        "condition_tags": ["indoor", "continuous"],
+        "extracted_threshold_value": 300.0,
+        "extracted_unit": "µg/m³",
+        "extraction_confidence": 0.80
+      },
+      "rule": {
+        "metric_name": "tvoc_ppb",
+        "threshold_type": "upper_bound",
+        "min_value": null,
+        "max_value": 300.0,
+        "unit": "µg/m³",
+        "context_scope": "office",
+        "interpretation_template": "TVOC levels are within WHO indoor air quality guidance.",
+        "business_impact_template": "Elevated TVOC levels can cause sick building syndrome symptoms including headaches, fatigue, and irritation.",
+        "recommendation_template": "Increase fresh air ventilation, identify and remove VOC sources, and consider activated carbon filtration.",
+        "priority_logic": "P2",
+        "index_weight_percent": 15.0,
+        "confidence_level": "MEDIUM"
+      }
+    }
+  ]
+}

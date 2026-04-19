@@ -1,0 +1,13 @@
+{"type":"server-started","port":59308,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:59308","screen_dir":"/Users/jefflee/Documents/AIProjects/fjsafespace01/.superpowers/brainstorm/55357-1776607548/content","state_dir":"/Users/jefflee/Documents/AIProjects/fjsafespace01/.superpowers/brainstorm/55357-1776607548/state"}
+{"type":"screen-added","file":"/Users/jefflee/Documents/AIProjects/fjsafespace01/.superpowers/brainstorm/55357-1776607548/content/current-vs-proposed.html"}
+{"source":"user-event","type":"click","text":"1\n      \n        Upload Flow\n        One CSV at a time → generate multiple reports from same scan","choice":"upload-flow","id":null,"timestamp":1776607624086}
+{"source":"user-event","type":"click","text":"1\n      \n        Upload Flow\n        One CSV at a time → generate multiple reports from same scan","choice":"upload-flow","id":null,"timestamp":1776607625108}
+{"source":"user-event","type":"click","text":"1\n      \n        Upload Flow\n        One CSV at a time → generate multiple reports from same scan","choice":"upload-flow","id":null,"timestamp":1776607625886}
+{"source":"user-event","type":"click","text":"2\n      \n        Customer Portal Deferred\n        All customer views + Clerk auth pushed to Phase 3","choice":"customer-defer","id":null,"timestamp":1776607626494}
+{"source":"user-event","type":"click","text":"3\n      \n        2 Views Only\n        Ops (details + reports) + Executive (results + suggestions)","choice":"view-reduction","id":null,"timestamp":1776607627004}
+{"source":"user-event","type":"click","text":"3\n      \n        2 Views Only\n        Ops (details + reports) + Executive (results + suggestions)","choice":"view-reduction","id":null,"timestamp":1776607629278}
+{"source":"user-event","type":"click","text":"2\n      \n        Customer Portal Deferred\n        All customer views + Clerk auth pushed to Phase 3","choice":"customer-defer","id":null,"timestamp":1776607629641}
+{"source":"user-event","type":"click","text":"1\n      \n        Upload Flow\n        One CSV at a time → generate multiple reports from same scan","choice":"upload-flow","id":null,"timestamp":1776607630158}
+{"type":"screen-added","file":"/Users/jefflee/Documents/AIProjects/fjsafespace01/.superpowers/brainstorm/55357-1776607548/content/report-type-detection.html"}
+{"type":"screen-added","file":"/Users/jefflee/Documents/AIProjects/fjsafespace01/.superpowers/brainstorm/55357-1776607548/content/waiting.html"}
+{"type":"server-stopped","reason":"idle timeout"}

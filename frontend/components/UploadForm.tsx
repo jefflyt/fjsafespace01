@@ -17,6 +17,7 @@ export interface UploadResult {
   warnings: string | null;
   uploaded_at: string;
   failed_row_count: number;
+  report_type: "ASSESSMENT" | "INTERVENTION_IMPACT";
 }
 
 interface UploadFormProps {
@@ -116,11 +117,17 @@ export function UploadForm({ onUploadComplete }: UploadFormProps) {
           onDragLeave={handleDrag}
           onDragOver={handleDrag}
           onDrop={handleDrop}
-          className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+          className={`relative overflow-hidden rounded-lg border-2 border-dashed p-8 text-center transition-colors ${
             dragActive
               ? "border-primary bg-primary/5"
               : "border-muted-foreground/25 hover:border-primary/50"
           }`}
+          style={{
+            backgroundImage: dragActive
+              ? undefined
+              : "radial-gradient(circle, hsl(var(--muted)) 1px, transparent 1px)",
+            backgroundSize: "20px 20px",
+          }}
         >
           {file ? (
             <div className="flex items-center justify-center gap-3">

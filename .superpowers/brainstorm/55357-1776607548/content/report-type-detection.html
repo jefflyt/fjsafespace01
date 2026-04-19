@@ -1,0 +1,37 @@
+<h2>Report Type Auto-Detection Logic</h2>
+<p class="subtitle">Based on CSV date patterns</p>
+
+<div class="split">
+  <div class="mockup">
+    <div class="mockup-header">Assessment Report (Single Date)</div>
+    <div class="mockup-body" style="padding: 16px; font-size: 13px;">
+      <div class="label">CSV: All timestamps on same day</div>
+      <div class="placeholder" style="background: #f0fdf4; padding: 12px; margin: 8px 0; border-radius: 6px;">
+        <strong>Example:</strong> NPE sample — all rows 2026-04-01
+      </div>
+      <div class="label">Result</div>
+      <p style="margin: 4px 0;">Auto-classify as <span class="mock-button" style="background: #8700E3; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">Assessment Report</span></p>
+      <p style="font-size: 12px; color: #666; margin-top: 8px;">Frames as current IAQ state at point in time</p>
+    </div>
+  </div>
+
+  <div class="mockup">
+    <div class="mockup-header">Intervention Impact Report (Multiple Dates)</div>
+    <div class="mockup-body" style="padding: 16px; font-size: 13px;">
+      <div class="label">CSV: Timestamps span multiple days</div>
+      <div class="placeholder" style="background: #fefce8; padding: 12px; margin: 8px 0; border-radius: 6px;">
+        <strong>Example:</strong> Before (2026-04-01) + After (2026-04-15)
+      </div>
+      <div class="label">Result</div>
+      <p style="margin: 4px 0;">Auto-classify as <span class="mock-button" style="background: #E8F5F2; color: #333; padding: 2px 8px; border-radius: 4px; font-size: 12px;">Intervention Impact Report</span></p>
+      <p style="font-size: 12px; color: #666; margin-top: 8px;">Frames as post-change IAQ check after remediation</p>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 20px;">
+  <h3>Phase 3 Enhancement</h3>
+  <div class="placeholder" style="padding: 12px; margin: 8px 0; border-radius: 6px;">
+    Manual report type selector before scan starts — overrides auto-detection
+  </div>
+</div>

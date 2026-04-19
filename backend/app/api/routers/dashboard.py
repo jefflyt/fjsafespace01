@@ -16,8 +16,10 @@ Reference: TDD §4.2
 """
 
 from fastapi import APIRouter, HTTPException, Query, status
+from sqlmodel import col, select
 
 from app.api.dependencies import SessionDep, TenantIdDep
+from app.models.workflow_b import Finding, Site
 from app.schemas.dashboard import ExecutiveDashboardResponse
 from app.services import aggregation as agg_svc
 
@@ -34,7 +36,29 @@ async def get_sites(session: SessionDep, tenant_id: TenantIdDep):
     Fields: siteId, siteName, certificationOutcome, wellnessIndexScore,
             top3Risks[], top3Actions[], nextVerificationDate, lastScanDate
     """
-    raise HTTPException(status_code=status.HTTP_501_NOT_IMPLEMENTED, detail="Not yet implemented")
+    sites = session.exec(select(Site)).all()
+
+    rows = []
+    for site in sites:
+        score, outcome = agg_svc.calculate_site_wellness_index(session, site.id)
+
+        # Get last scan date from most recent finding
+        latest_finding = session.exec(
+            select(Finding)
+            .where(col(Finding.site_id) == site.id)
+            .order_by(col(Finding.created_at).desc())
+            .limit(1)
+        ).first()
+
+        rows.append({
+            "site_id": site.id,
+            "site_name": site.name,
+            "certification_outcome": outcome.value,
+            "wellness_index_score": score,
+            "last_scan_date": latest_finding.created_at.isoformat() if latest_finding else None,
+        })
+
+    return rows
 
 
 @router.get("/dashboard/sites/{site_id}/zones", status_code=status.HTTP_200_OK)
@@ -45,7 +69,41 @@ async def get_site_zones(site_id: str, session: SessionDep, tenant_id: TenantIdD
     Fields: zoneName, metrics[{ metricName, currentValue, unit,
             thresholdBand, sourceCurrencyStatus, benchmarkLane, sparklineData[] }]
     """
-    raise HTTPException(status_code=status.HTTP_501_NOT_IMPLEMENTED, detail="Not yet implemented")
+    site = session.get(Site, site_id)
+    if not site:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Site {site_id} not found.",
+        )
+
+    findings = session.exec(
+        select(Finding).where(col(Finding.site_id) == site_id)
+    ).all()
+
+    if not findings:
+        return {"site_id": site_id, "site_name": site.name, "zones": []}
+
+    # Group findings by zone_name
+    zones: dict[str, list] = {}
+    for f in findings:
+        if f.zone_name not in zones:
+            zones[f.zone_name] = []
+        zones[f.zone_name].append({
+            "metric_name": f.metric_name.value,
+            "threshold_band": f.threshold_band.value,
+            "source_currency_status": f.source_currency_status.value,
+            "benchmark_lane": f.benchmark_lane.value,
+            "interpretation_text": f.interpretation_text,
+        })
+
+    return {
+        "site_id": site.id,
+        "site_name": site.name,
+        "zones": [
+            {"zone_name": name, "metrics": metrics}
+            for name, metrics in zones.items()
+        ],
+    }
 
 
 @router.get("/dashboard/comparison", status_code=status.HTTP_200_OK)
@@ -56,7 +114,8 @@ async def get_cross_site_comparison(session: SessionDep, tenant_id: TenantIdDep)
 
     Fields: siteId, siteName, wellnessIndexScore, certificationOutcome, lastScanDate
     """
-    raise HTTPException(status_code=status.HTTP_501_NOT_IMPLEMENTED, detail="Not yet implemented")
+    leaderboard = agg_svc.get_leaderboard(session)
+    return leaderboard
 
 
 @router.get("/dashboard/summary", status_code=status.HTTP_200_OK)
@@ -66,7 +125,19 @@ async def get_daily_summary(session: SessionDep, tenant_id: TenantIdDep):
 
     Fields: top3Risks[], top3Actions[], nextVerificationDate, dataAsOf
     """
-    raise HTTPException(status_code=status.HTTP_501_NOT_IMPLEMENTED, detail="Not yet implemented")
+    top_risks = agg_svc.get_top_3_risks(session)
+    top_actions = agg_svc.get_top_3_actions(session)
+
+    # Get most recent finding timestamp for dataAsOf
+    latest_finding = session.exec(
+        select(Finding).order_by(col(Finding.created_at).desc()).limit(1)
+    ).first()
+
+    return {
+        "top3_risks": top_risks,
+        "top3_actions": top_actions,
+        "data_as_of": latest_finding.created_at.isoformat() if latest_finding else None,
+    }
 
 
 # ── PR 6.2: Executive Dashboard ──────────────────────────────────────────────

@@ -58,6 +58,7 @@ class Upload(SQLModel, table=True):
     uploaded_at: datetime = Field(default_factory=datetime.utcnow)
     parse_status: ParseStatus = Field(default=ParseStatus.PENDING)
     parse_outcome: Optional[ParseOutcome] = None
+    report_type: Optional[ReportType] = None
     rule_version_used: Optional[str] = None
     # JSON-serialised string[]
     warnings: Optional[str] = None
@@ -168,8 +169,9 @@ class Report(SQLModel, table=True):
     data_quality_statement: Optional[str] = None
     # Certification outcome (never null after evaluation)
     certification_outcome: Optional[CertificationOutcome] = None
-    # PDF stored in Supabase Storage; URL saved here
-    pdf_url: Optional[str] = None
+    # Immutable JSON snapshot of the full report context at approval time.
+    # Used for on-demand PDF generation and dashboard rendering.
+    report_snapshot: Optional[str] = None
     generated_at: datetime = Field(default_factory=datetime.utcnow)
 
     __table_args__ = (

@@ -1,0 +1,1148 @@
+OFFICIAL VERSION: September 2021
+
+GREEN MARK 2021
+
+EE
+
+In Hw
+
+Cn Mt Re
+CERTIFICATION STANDARD
+.
+
+Green Mark Department
+Environmental Sustainability Group
+Building and Construction Authority
+52 Jurong Gateway Road
+#12-01, Singapore 608550
+(Above JEM)
+
+© 2021 by Building and Construction Authority
+All rights reserved. The Green Mark 2021 (GM: 2021) Certification Standard may be used by individuals for reference
+purposes only. Any user of the Green Mark Certification Standard shall retain all copyright and other proprietary notices
+contained in it. Save as provided above, and sales, modification, reproduction, display or distribution of the Green Mark
+Certification Standard or any copies thereof is not allowed without BCA’s prior written consent, which may be obtained by
+requesting to https://www.bca.gov.sg/feedbackform/
+
+Published 7th September 2021
+
+Disclaimer
+The information within Green Mark, including any examples, images and illustrations are for reference only, intended to
+educate and assist built environment stakeholders. This does not replace the need for professional advice, due diligence and
+legal compliances. None of the parties involved in Green Mark 2021 assume any liability for the accuracy, completeness or
+reliance on the information contained within.
+
+Revision Log
+Revision
+
+Description
+
+Effective Date
+
+P1
+
+For Pilot
+
+22/04/2021
+
+R1
+
+1st Version
+
+1/11/2021
+
+R1.1
+
+1st Version with minor updates
+
+1/11/2021
+
+Page 2 of 32
+
+Contents
+DEFINITIONS AND ABBREVIATIONS ........................................................................................................ 4
+WHAT IS GREEN MARK: 2021 ................................................................................................................. 6
+KEY ADVANCEMENTS IN GREEN MARK: 2021 ........................................................................................ 7
+#1 Aggressive Energy Efficiency (Operational Carbon) Standard ................................................... 7
+#2 Further Alignment with United Nations Sustainable Development Goals ................................ 7
+#3 Introduction of GM: 2021 In-Operation..................................................................................... 7
+#4 SLE Residential ........................................................................................................................... 7
+#5 Other Key Changes ..................................................................................................................... 8
+WHY GREEN MARK: 2021........................................................................................................................ 9
+TARGETED OUTCOME OF GREEN MARK: 2021 ....................................................................................... 9
+GUIDELINES FOR APPLICATION AND SUBMISSION ............................................................................... 11
+GREEN MARK: 2021 APPLICATION PROCESS ........................................................................................ 13
+GREEN MARK 2021 ASSESSMENT FRAMEWORK .................................................................................. 14
+GREEN MARK 2021 RATINGS ................................................................................................................ 15
+GREEN MARK: 2021 CERTIFICATION CRITERIA ..................................................................................... 18
+Energy Efficiency (Operational Carbon) ............................................................................................ 18
+Sustainability Sections ...................................................................................................................... 21
+Health and Well-being (Hw) .......................................................................................................... 21
+Whole Life Carbon (Cn) ................................................................................................................. 21
+Resilience (Re) ............................................................................................................................... 21
+Maintainability (Mt) ...................................................................................................................... 22
+Intelligence (In) ............................................................................................................................. 22
+BCA GREEN MARK LOGO and ENQUIRIES ............................................................................................. 23
+ACKNOWLEDGEMENTS ......................................................................................................................... 26
+ANNEX 1: KEY REGULATORY ENVIRONMENTAL STANDARDS ............................................................... 28
+
+Page 3 of 32
+
+DEFINITIONS AND ABBREVIATIONS
+Colour Rendering Index (CRI)
+A measurement from 1 to 100 that indicates how accurately an artificial light source, as compared with an
+incandescent light, displays hues. The higher the index, the more accurately the light is rendering colours (from
+U.S Energy Star).
+District Cooling System (DCS)
+The supply of chilled water for cooling purpose from a central source to multiple buildings through a network of
+pipes. Individual users purchase chilled water from the district cooling system operator and do not need to install
+their own chiller plant other than air distribution system. This is different from buildings’ in-house airconditioning system, in part or in full, being maintained and operated by a third party.
+Energy Efficiency (EE)
+Energy refers to the capacity for doing work. Energy Efficiency means using less energy to perform the same
+work, which is eliminating energy waste.
+Energy Use Intensity (EUI)
+EUI is measured by the total electricity used within a building in a year, expressed as kilowatt hour (kWh), per
+gross floor area (m²). As electricity is the main source of energy used in Singapore's buildings, other energy
+sources are typically excluded in the computation of energy use intensity.
+Gross Floor Area (GFA)
+The total area of the covered floor space in a building based on the definition under the Urban Redevelopment
+Authority (URA).
+Super Low Energy (SLE)
+Best-in-class energy performing building that achieves at least 60% energy savings based on code of 2005, or
+40% energy savings based on prevailing code.
+Zero Energy (ZE)
+A super low energy (SLE) building with all energy consumption, including plug load, supplied from renewable
+energy sources.
+Positive Energy (PE)
+A super low energy (SLE) building with 115% of all energy consumption, including plug load, supplied from
+renewable energy sources.
+Operational Carbon
+The amount of carbon emissions associated with energy used to operate the building or in the operation of
+infrastructure (World Green Building Council).
+Renewable Energy Certificate (REC)
+A market-based instrument representing the proof that a unit of electricity was generated from a renewable
+energy resource. Once the power provider has fed the energy into the grid, the REC received can then be sold
+on the open market as an energy commodity. To be recognised REC’s shall be compliant SS 673: 2021 Singapore
+Standard Code of practice for renewable energy certificates.
+
+Page 4 of 32
+
+Mt Framework (Maintainability Framework)
+The design appraisal tool used for demonstrating the design for maintainability (DfM) performance within
+Green Mark 2021 Maintainability section.
+
+Page 5 of 32
+
+WHAT IS GREEN MARK: 2021
+The Green Mark 2021 (GM: 2021) has evolved from our previous Green Mark framework to become:
+•
+
+•
+
+•
+
+simple – many pre-requisites have been removed, and the criteria have been restructured to two broad
+categories: (1) Energy Efficiency (the only prerequisite) and (2) Sustainability sections covering
+Intelligence, Health and Well-being, Whole life Carbon, Maintainability and Resilience.
+sustainable – the GM: 2021 criteria have been aligned to meet the United Nations Sustainable
+Development Goals (UN SDGs), pushing the energy efficiency envelope to mainstream Super Low
+Energy buildings, and recognising the future requirements from various sustainable finance
+taxonomies.
+smart – GM: 2021 keeps digitalisation efforts in mind to facilitate easy, seamless and secure
+certification processes.
+
+In addition, GM: 2021 aims to be:
+•
+•
+•
+
+owner-friendly – meeting building developers’ and owners’ needs for sustainable operations and
+environmental social and governance (ESG) reporting and demonstrating their leadership
+cost-effective – pushing the boundaries of sustainability with a value driven approach, including
+environmental value, social value and economic value based on a Life-Cycle Cost (LCC) approach
+user-friendly – a robust yet flexible framework, that brings all buildings into the same ecosystem of GM:
+2021.
+
+Page 6 of 32
+
+KEY ADVANCEMENTS IN GREEN MARK: 2021
+#1 Aggressive Energy Efficiency (Operational Carbon) Standard
+The energy efficiency standard in GM: 2021 has been calibrated and aggressively raised in tandem with the
+revised standards in the regulatory minimum in environmental sustainability for both new and existing
+buildings.1
+Parallel energy efficiency pathways have been developed to meet the aggressive energy efficiency standards set
+in GM: 2021. They are:
+Pathway 1: Energy Consumption based, using the Energy Use Intensity (EUI)
+Pathway 2: Deemed-to-comply prescriptive performance, using fixed metrics
+Pathway 3: Performance-based energy modelling
+An artificial-intelligence (AI) enabled energy calculator is also being developed to facilitate data-driven
+contextualised simulation as well as demonstration of compliance. More information about the AI energy
+calculator could be found here at BCA’s SLEB Smart Hub. https://www.sleb.sg/AICalculator.
+All pathways are open for new and existing buildings to use. Each building type has a guide to which of the three
+pathways can be used for that typology of building (see table 1). To ensure robust efficiency standards are met,
+a stipulated Total System Efficiency (TSE) of air-conditioning system is required to be demonstrated. TSE
+measures the overall air-conditioning system efficiency covering the water- and air-side systems (or CU and air
+side) and provides greater flexibility for designers to optimise their building cooling system’s performance.
+
+#2 Further Alignment with United Nations Sustainable Development Goals
+GM: 2021 takes a holistic view of socio-environmental issues. It aligns with the United Nation (UN) Sustainable
+Development Goals (SDGs) and further translates and contextualises them for implementation within the built
+environment within Singapore and the urban tropics. Beyond the SDGs, it also takes reference to various
+developing sustainable finance taxonomies, including the European Union (EU) taxonomy and requirements
+within the Taskforce for Climate Related Financial Disclosures (TCFD).
+Green Mark as a leading green building rating tool, is benchmarked to international tools, the World Green
+Building Council’s Health and Wellbeing Framework and wider evidence-based global imperatives.
+
+#3 Introduction of GM: 2021 In-Operation
+GM: 2021 In-Operation is designed to encourage buildings certified with Green Mark to continuously improve
+and maintain their environmental practices in operation. It is a streamlined certification process for certified
+projects not undergoing a retrofit, to maintain a valid Green Mark Certification with the submission of key
+performance indicators to ensure continued performance of the Green Mark project in energy efficiency, indoor
+environmental quality (IEQ) and smart operations, etc. Projects can maintain the previous Green Mark award
+rating or upgrade the ratings based on the energy efficiency performance. For detailed requirement, please refer
+to this table.
+The detail requirement is available here. BCA assessors will conduct random site check for GM: 2021 In
+Operation projects.
+
+#4 SLE Residential
+Expansion of SLE to cater for new and existing residential projects, emphasising a passive design for the dwelling
+units and common areas, high efficiency energy systems with smart management controls, and the requirement
+
+1
+
+The revised regulatory requirements require new building developments and those undergoing major retrofitting and/or major energy
+use change to attain 50% and 40% energy savings compared to 2005 levels, respectively, which is comparable to the energy performance
+standards of Green Mark Platinum buildings of previous versions (GM2015, GM2016 and GM2017).
+
+Page 7 of 32
+
+for adoption of onsite renewable energy to offset a proportion of the key facilities such as the swimming pools,
+gymnasiums and function rooms.
+
+#5 Other Key Changes
+Enhancement on energy modelling and computer fluid dynamics frameworks
+The energy modelling and computational fluid dynamics (CFD) simulation have been enhanced to provide a more
+complete understanding of building performance through simulations to support the operation of energy
+efficient buildings, whilst recognising the advancement in simulation software and its use in practice.
+•
+•
+
+CFD has been enhanced to improve clarity of conditions for both residential and non-residential
+developments and the approach to wind-driven rain simulations.
+Standardised schedules in energy modelling have been incorporated to enable consistent comparison
+of annual energy savings of the designed building against reference building for energy savings. Projects
+using the EUI pathway should adopt the standardised schedules if operational schedules of the building
+are unavailable at the design stage.
+
+Page 8 of 32
+
+WHY GREEN MARK: 2021
+Green Mark provides a robust and leading method to assess and verify buildings for their environmental
+performance, assisting project teams and building owners to deliver and demonstrate high performing and
+sustainable buildings. Green Mark is built upon best practices, climate science, analysis of large building
+performance data sets and global thought leadership. GM: 2021 aims to further stretch outcomes of buildings
+to substantially reduce the environmental impacts – focusing on whole life carbon, health and wellbeing,
+resilience, intelligence and maintainability. GM provides a nationally and globally recognised green building
+performance rating.
+
+TARGETED OUTCOME OF GREEN MARK: 2021
+GM: 2021 aims to drive energy efficiency and carbon reduction in mitigating the effects of climate change, as
+well as other sustainable aspects that deliver on addressing the key sustainability drivers.
+Key Sustainability Drivers
+Globally, consensus is for Green Buildings to be defined through several key issues including:
+•
+
+climate action (decarbonisation of the built environment)
+
+•
+
+health and well-being (resilience, social equity, pollution mitigation, health, diversity)
+
+•
+
+resources and circularity (regeneration of resources and natural systems)
+
+Through Green Mark’s co-creation we have identified the key aspects within these issues, which are relevant to
+our marketplace, and translate them into the delivery of the UN SDGs, in alignment with longer-term sustainable
+finance considerations. These have been contextualised into our criteria to define the sustainability sections.
+These sections, in addition to energy, are Intelligence (smart buildings), Health and Wellbeing (the mental,
+physical and sociological aspects of buildings and their operation), Whole Life Carbon (which looks at the
+embodied carbon, construction, fit out and supports corporate plans to transition to zero carbon),
+Maintainability (the design for safe and effective maintenance) and Resilience (nature-based solutions and
+leadership).
+Green Mark Sections maped to UN SDGs
+
+The United Nations Sustainable Development Goals are the blueprint to achieve a better and more sustainable future
+for all. They address challenges of the global community, including those related to poverty, inequality, climate,
+environmental degradation, prosperity, and peace and justice. The Goals are integrated and indivisible, balancing the
+three dimensions of sustainability.
+https://www.un.org/sustainabledevelopment/sustainable-development-goals/
+Page 9 of 32
+
+Programmes related GM: 2021 certification:
+GreenGov.SG
+Formerly known as the Public Sector Taking the Lead in Environmental Sustainability (PSTLES) initiative, the
+GreenGov.SG initiative forms a component and enabler of the Singapore Green Plan 2030. Under GreenGov.SG,
+the public sector will strive to attain ambitious sustainability targets in carbon abatement and resource
+efficiency. As well as being a positive influence and enabler of green efforts. The new and more ambitious targets
+include:
+•
+•
+•
+•
+
+Peaking the public sector’s carbon emissions around 2025
+Improve Energy Utilisation Index (EUI) by 10% by 2030, from average of 2018-2020 levels
+Improve Water Efficiency Index (WEI) by 10% by 2030, from average of 2018-2020 levels
+Improve Waste Disposal Index (WDI) by 30% by 2030, from 2022 levels
+
+The BCA Green Mark scheme (Platinum SLE standards) is part of the GreenGov.SG requirement for all new and
+existing buildings under retrofit, and a key enabler in meeting the whole of government sustainability targets.
+
+Mandatory Higher Green Mark Standard for GLS sites
+Projects developed on land sold under the Government Land Sales (GLS) programme and are subject to the
+Building Control (Environmental Sustainability) Regulations 2008 to attain higher Green Mark standard, are
+required to
+•
+•
+
+Submit an application to BCA for the project to be assessed and certified under the BCA Green Mark
+Scheme.
+Upon completion of building works, inform BCA early to initiate the Green Mark verification audit so as
+to facilitate the temporary occupation permit (TOP) and certificate of statutory completion (CSC)
+process.
+
+Note that the evidence of Green Mark application is required to be submitted along with the application for
+Building Plan approval. Upon project completion, the relevant clearances showing that the project has been
+verified and met the prescribed Green Mark Certification rating will also be required before TOP and/or CSC can
+be considered.
+
+Page 10 of 32
+
+GUIDELINES FOR APPLICATION AND SUBMISSION
+Eligibility
+GM: 2021 is for newly designed and existing buildings either undergoing retrofitting (including major change to
+the cooling system) or that have not been previously certified. Most of the building types are eligible for
+assessment, including office towers, retail buildings and hotels. However, GM: 2021 does not apply to office
+interiors, retail interiors or other interior fit out projects.
+Except for GM: 2021 In-operation certification, it is a mandatory requirement for building projects to meet the
+Building Control (Environmental Sustainability) Regulations 2008 or Building Control (Environmental
+Sustainability) Regulations 2013 before Green Mark certification could be conferred.
+
+Submission for Certification
+The BCA GM: 2021 certification process is as follows:
+
+APPLICATION
+
+ASSESSMENT
+
+VERIFICATION
+
+• Prior to the submission of
+GM application, applicant
+is to ensure eligibility
+requirement stated above
+could be fulfilled.
+• Submission of application
+with relevant supporting
+documents
+for
+certification.
+
+• Assessment
+to
+be
+conducted
+once
+the
+design
+and/or
+documentary evidence are
+ready.
+
+• Site verification may be
+conducted upon project
+completion.
+
+• Upon
+acceptance
+of
+application
+and
+fee
+payable, a BCA Green
+Mark Assessor will be
+assigned for the duration
+of the project.
+
+• Assessment
+process
+includes design and/or
+documentary reviews to
+verify if the building
+project meets (i) the
+intents of the criteria and
+certification level; and (ii)
+the
+pre-requisite
+requirements.
+
+• Site verification process
+includes review of delivery
+records,
+updated
+documents on green
+features, building energy
+performance data and
+photographic evidence.
+Site
+inspection
+and
+measurement will be
+conducted.
+
+Detailed information on the certification process is available on the BCA website:
+https://www1.bca.gov.sg/buildsg/sustainability/green-mark-certification-scheme/green-mark-assessmentcriteria-and-online-application
+GM assessment will be carried out by BCA’s appointed assessors. To be awarded with Green Mark certification,
+all documents submitted for the BCA GM assessment should be duly verified and signed by responsible person(s)
+stipulated in Table 1 and appropriate practitioners where applicable. The necessary documents are required to
+provide the evidence for the performance requirements being met. The project team only needs to provide the
+relevant information; the full project’s documentation is not required for submission for Green Mark
+certification. The detailed documents required can be found in various technical guides of GM: 2021.
+
+Page 11 of 32
+
+Table 1 Responsible Person (s) for Application Submission
+Description
+
+Responsible Persons for Application Submission
+
+GM online submission
+
+For GM: 2021 Full Certification
+SGBC accredited GMAP or GMAAP*, Registered Architect or
+Professional Engineer
+For GM: 2021 In-Operation:
+Either Registered
+GMAP/GMAAP*
+
+Energy
+
+Auditors
+
+or
+
+SGBC’s
+
+accredited
+
+* Includes GM AP(FM) and GM AAP(FM)
+
+Energy Modelling
+
+Assessment Stage
+PE (Mech), PE(Electrical) and accredited GMAAP for coendorsement on Energy Modelling (EM) form
+Verification Stage
+SGBC’s accredited Green Mark AAP for endorsement on EM form
+Revised Energy Modelling Guide available here
+
+Computational Fluid Dynamics (CFD)
+
+SGBC’s accredited Green Mark AAP for endorsement on CFD report
+Revised CFD Guide available here
+
+Energy audit or OSE report
+
+PE (Mech) Or Registered Energy Auditor
+
+Page 12 of 32
+
+GREEN MARK: 2021 APPLICATION PROCESS
+
+*Projects subject to Environmental Sustainability Regulations, including projects with major change of cooling system or major retrofit would be subject to
+GM: 2021 certification. Projects which are not subject to ES regulations, AND have been previously held a Green Mark certificate can use GM 2021 InOperation
+
+Page 13 of 32
+
+GREEN MARK 2021 ASSESSMENT FRAMEWORK
+The GM: 2021 certification framework covers:
+(1) New developments, at the design and completion (as built) stage
+(2) Existing buildings in operation, with no previous Green Mark certification
+(3) Existing buildings with major retrofit 2
+
+GM: 2021 In Operations would apply for:
+•
+•
+
+Existing buildings in operation that have previously held Green Mark certification, and with no major
+energy use change.
+Projects seeking Green Mark Re-certification
+
+GM: 2021 In-Operation is a simplified version of GM: 2021 for projects that have previously been assessed and
+fully certified under Green Mark that have demonstrated their holistic environmental performance. GM: 2021
+In Operation tracks the key performance indicators, based on actual operational data to ensure the building is
+performing in its operation to the same GM 2021 standard.
+
+2 Major retrofit refers to ‘major energy use change’ as defined under Part IIIB of the Building Control Act 2012 and Building
+
+Control (Environmental Sustainability Measures for Existing Buildings) Regulations. These include the installation or
+replacement of air conditioning systems. For definition of major energy use change or major retrofit, please refer to the
+latest Environmental Sustainability regulatory requirement in BCA’s website https://go.gov.sg/regulations
+
+Page 14 of 32
+
+GREEN MARK 2021 RATINGS
+GM: 2021 is positioned to recognise performance that is above mandatory, regulated standards, that include
+robust levels of energy efficiency, indoor air quality, greenery provision, active mobility considerations, materials
+and waste management and water efficiency. Annex 1 provides a brief overview of some of the key mandatory
+standards.
+
+[1] Mandatory requirements are based on development control and building plan provisions for new buildings, for existing buildings under
+retrofit, the requirements would vary depending on the type and extent of the works being undertaken.
+
+Green Mark Certification
+Project teams can choose either to follow the Green Mark Gold PLUS or Platinum certification, or Green Mark
+SLE certification.
+GM Series
+
+GM SLE Series
+
+-
+
+SLE, ZE, PE
+
+GoldPLUS
+
+GoldPLUS SLE
+
+Platinum
+
+Platinum SLE
+
+For Green Mark In-Operation there is a Green Mark Gold level of certification, to encourage projects certified
+under our legacy Green Mark certification tools to continue to demonstrate their high levels of environmental
+performance.
+
+Page 15 of 32
+
+The GM: 2021 Badges
+Where projects achieve at least 10 GM points in a sustainability section, the BCA GM: 2021 Certificate would
+have a special mention of the achievement via a ‘badge’ being awarded. The project team may use a combination
+of, or individually the associated logo or graphic along with the BCA Green Mark Logo and level of award in their
+marketing collaterals and materials related to the certified building, show casing their exemplary performance
+in an area of sustainability.
+
+Page 16 of 32
+
+Notes:
+1. Off-site REC procurement is only applicable for projects meeting energy saving ≥60%. REC’s must be generated in Singapore through renewables deployed within Singapore.
+2. GM: 2021 includes other sustainable requirement regulated by other agencies including BCA’s Building Control (Environmental Sustainability) Regulations 2008 and Building Control
+(Environmental Sustainability Measures for Existing Buildings) Regulation 2013. Meeting these regulated requirements would have deemed meeting at least 50 GM points. Refer to Annex 1.
+3. Building projects that are subject to the Government Land sales, it is a mandatory requirement to also meet the Building Control (Environmental Sustainability) Regulations 2008 before
+Green Mark certification could be conferred.
+4. Gold rating is only applicable to projects applying for GM: 2021 In Operation
+
+Page 17 of 32
+
+GREEN MARK: 2021 CERTIFICATION CRITERIA
+Energy Efficiency (Operational Carbon)3
+Energy efficiency (Operational Carbon) is required in the following:
+1. New non-residential development
+2. New residential development
+3. Existing non-residential development
+There are three pathways leading to greater energy efficiency, with each pathway describing the requirements
+to achieve an energy efficiency of 50%, 55% and 60% (SLE standard)4.
+
+Energy Efficiency Pathways
+Energy Efficiency is the only prerequisite in GM: 2021, aimed at ensuring projects reduce their operational
+carbon and associated operating costs from the reduction in energy consumption.
+The three pathways are designed to facilitate different types of buildings in fulfilling their respective energy
+efficiency requirements:
+The Green Mark Energy Pathways are:
+•
+•
+
+•
+
+Data driven and flexible – aligned to real project performance with validated data. Flexible routes for
+projects to demonstrate their performance.
+Outcome based – full recognition of passive design strategies and renewable energy systems
+contribution to energy savings.
+Supportive of innovation, encourage the use of new technologies, approaches and solutions to energy
+performance.
+
+Pathway 1 – EUI
+Total Building annual energy consumption over the gross floor area of the building (kWh/m2/yr). Based on:
+•
+•
+•
+
+Energy modelling (Design)
+Energy Calculation and measured data (Retrofit)
+Measurement – In operation
+
+Pathway 2 – Fixed Metrics
+A prescriptive pathway where projects must demonstrate high levels of performance in each of the key building
+energy systems.
+•
+•
+
+Key performance metrics (ingredients) that make an energy efficient project. All aspects must be met
+individually.
+Any shortfall in performance can be made up with the use of onsite renewables, subject to the
+building typology multiplication factor.
+
+3
+
+Based on 2005 levels, this translates to 30%, 35% and 40% EE improvement over current codes at the time of writing (Q1
+2021)
+4
+
+Operational Carbon is a term to describe the amount of carbon emissions associated with energy used to operate the
+building or in the operation of infrastructure (World Green Building Council)
+Page 18 of 32
+
+Pathway 3 – Energy Savings
+•
+
+Demonstrated energy savings following the Green Mark Energy Modelling guideline which looks at
+holistic energy performance against a reference model. Refer to Energy Modelling Guideline for
+details on how to complete the energy modelling simulation
+
+All projects are required to comply with one of the energy efficiency pathways to demonstrate their energy
+efficiency levels.
+Refer to the Energy Efficiency Section Document for details on the requirement for each pathway.
+Refer to BCA’s SLEB Smart Hub (www.sleb.sg) for details on innovative EE solutions and services.
+Off-site renewable energy, including those from purchased Renewable Energy Credits (REC), are applicable for
+projects going for Zero Energy Buildings (ZE). The REC’s must be generated in Singapore through renewable
+energy generated within Singapore, in accordance with SS 673: 2021 Singapore Standard Code of practice for
+renewable energy certificates. The length of time of REC commitment is minimally three years with commitment
+of re-certification.
+Table 2 shows the applicability for the three pathways.
+
+Page 19 of 32
+
+Table 2 – Energy Efficiency (EE) Pathway Applicability
+PATHWAY 2
+Fixed Metrics
+
+PATHWAY 3
+Energy Savings
+
+•
+•
+•
+
+•
+•
+•
+
+•
+•
+•
+
+•
+•
+•
+•
+•
+
+•
+•
+•
+•
+•
+
+•
+•
+•
+•
+•
+
+•
+•
+•
+•
+
+•
+•
+•
+•
+
+•
+•
+•
+•
+
+by GFA mix
+•
+•
+•
+•
+•
+
+•
+•
+•
+•
+•
+
+High Tech Industrial Buildings
+Light Industrial Buildings
+Warehouses, Workshops and Others
+
+•
+•
+•
+
+•
+•
+•
+
+Residential
+Non-Landed Residential (HDB, EC, condominiums,
+private apartments)
+Cluster Housing
+Landed Housing
+
+•
+•
+•
+
+Building Type
+
+PATHWAY 1
+EUI
+Commercial
+
+Office Buildings
+Hotels
+Retail Buildings
+Educational
+IHL (University, Polytechnics and ITE)
+Private Schools and Colleges
+Junior Colleges (MOE)
+Secondary Schools (MOE)
+Primary Schools (MOE)
+Healthcare
+Hospitals (Private and General)
+Community Hospitals
+Polyclinics
+Nursing Homes/ Youth Homes
+
+Other Non-Residential
+Mixed Developments
+Community Centres
+Civic Buildings
+Cultural Institutions
+Sports and Recreation Centres
+Religious/ Places of Worship
+
+•
+•
+•
+•
+Industrial
+
+ALL OTHER BUILDING TYPES
+
+Bespoke
+
+EC – Executive Condominium
+GFA – Gross Floor Area
+HDB – Housing and Development Board
+IHL – Institute of Higher Learning
+ITE – Institute of Technical Education
+MOE – Ministry of Education
+
+•
+
+%
+
+EE
+Page 20 of 32
+
+Sustainability Sections
+There are five environmental sustainability sections under GM: 2021 Framework. These sections are developed
+with various industry stakeholders and fulfil the relevant UN Global Goals for SDGs. There are 15 points available
+in each section – a project scoring 10 points and above from each section qualifies to get a badge which
+represents their exceptional performance in that area.
+
+Health and Well-being (Hw)
+
+Hw
+
+The Health and Well-being section will score buildings on how they are
+designed, retrofitted, constructed, and operated to facilitate the mental,
+physical, and social well-being of their occupants. This section has been
+developed jointly with the Ministry of Health Office for Healthcare
+Transformation (MOHT) and Centre for Liveable Cities (CLC).
+
+Whole Life Carbon (Cn)
+
+Cn
+
+The Whole Life Carbon section will score buildings on their Whole Life
+Carbon performance based on international calculation methodologies,
+upfront (embodied) carbon (i.e., carbon footprint of the construction
+materials), use of sustainable construction methods, and the sustainable
+fitting-out of buildings. The section will also evaluate the plans, and
+delivery of those plans to transition the building towards zero carbon
+emissions.
+
+Resilience (Re)
+
+Re
+
+The Resilience section will evaluate buildings on their resilience and
+adaptation to climate change as well as the use of nature-based or
+natural climate solutions with actions to protect, sustainably manage,
+and restore natural or modified ecosystems.
+
+Page 21 of 32
+
+Maintainability (Mt)
+
+Mt
+
+The Maintainability section will score buildings on their Design for
+Maintainability (DfM), which refers to designing buildings for their safe
+and effective maintenance to optimise lifecycle performance of the
+asset. This section uses the Maintainability Framework (the DfM
+evaluation tool) and translates this into Green Mark points.
+
+In
+
+The Intelligence section will score buildings on the adoption of relevant
+smart technologies and systems, and data management environments
+within the building design, construction, retrofit and operation of the
+building, that enable fully integrated, automated, intelligent, and
+responsive buildings.
+
+Intelligence (In)
+
+EE
+
+In Hw
+
+Cn Mt Re
+
+Page 22 of 32
+
+BCA GREEN MARK LOGO and ENQUIRIES
+The Green Mark Logo
+
+For enquires on the use of the Green Mark logo, go to: https://www1.bca.gov.sg/docs/default-source/docscorp-buildsg/sustainability/guidelines-for-usage-of-bca-green-mark-logo.pdf
+
+The GM: 2021 BADGES
+Where projects achieve a badge for exceptional performance in a sustainability section or sections, the project
+team may use a combination of, or individually the associated logo or graphic along with the BCA Green Mark
+Logo and level of award in their marketing collaterals and materials related to the certified building.
+Section & Description of Use
+
+Logo
+
+Health and Wellbeing
+
+Whole Life Carbon
+
+Page 23 of 32
+
+Icon
+
+Resilience
+
+Maintainability
+
+Intelligence
+
+Page 24 of 32
+
+For Energy Performance Use along with the range of energy savings such as 50% or 55%, SLE, ZE or PE
+Logo
+
+Icon
+
+A branding guide shall be developed to assist in the use of the BCA Green Mark Logo and Green Mark badges.
+
+Frequently Asked Questions (FAQ)
+The FAQ section on the BCA website provide clear submission guidelines and additional technical assistance to
+project teams.
+https://www1-bca-gov-sg-admin.cwp.sg/docs/default-source/docs-corpbuildsg/sustainability/20211027_gm2021-faqs.pdf
+
+Green Mark Training Courses
+The BCA Academy also provides training courses to provide the necessary knowledge required in Green Mark
+assessment.
+SGBC-certify Green Mark professionals such as GMAPs and GMAAPs to support Green Mark assessment. To be
+a certified GMAP/GMAAP, please refer to SGBC website https://gmap.sgbc.online/public/about
+For information on Green Mark courses, visit the BCA Academy: https://www.bcaa.edu.sg/
+
+Feedback on GM: 2021
+Please email benjamin_towell@bca.gov.sg or tracy_liu@bca.gov.sg for any enquiries, comments or feedback
+on Green Mark 2021.
+
+Page 25 of 32
+
+ACKNOWLEDGEMENTS
+The development of Green Mark 2021 (GM: 2021) is a result of an extensive industry collaboration across the
+built environment value chain. The Building and Construction Authority of Singapore would like to extend our
+sincerest gratitude to all internal and external stakeholders for their invaluable support and contribution
+towards the development of GM: 2021 that will enable us to develop a sustainable environment for our current
+and future generations to come. In particular, we would like to thank the co-leads and members of the following
+taskforces of the Singapore Green Building Masterplan review committee.
+
+Taskforce 1 Pushing Boundaries Towards Net Zero Energy members
+Ar. Owen Wee GMAAP (Surbana Jurong & SGBC)
+
+Co-lead
+
+Dr. Edward Ang (BCA)
+
+Co-lead
+
+Dr. Gao Chun Ping (BCA)
+
+Co-lead
+
+Er. Tay Cher Seng (Natflow)
+Mr. Tan Sze Tiong (HDB)
+Mr. Shuchi Jhalani (HDB)
+Ar. John Mclaughlin GMAP (MKPL)
+Dr. Stephen Tay (NUS)
+Er. Ng Beow Suan GMAAP (Squire Mech)
+Mr. Joseph Koh (JTC)
+Mr. Daniel Lau (JTC)
+Mr. Yubin Moo (MOE)
+Ms. Farizan d'Avezac de Moran GMAAP (GreenA)
+Ms. Irene Yong GMAAP (Beca)
+Er. Loh Chee Shyong (UOB)
+Mr. Wong Ee Ven GMAP (Keppel Land)
+Ms. Gillian Oh (NEA)
+Mr. Beh Lean Hooi GMAP (CapitaLand)
+Ms. Lee Zhenyi GMAAP (C&W Services)
+Mr. Jidesh Kambil GMAP (SGBC)
+
+Page 26 of 32
+
+Taskforce 3 Reinventing Green Mark members
+Mr. Tan Phay Ping GMAAP (BSD & SGBC)
+
+Co-lead
+
+Mr. Jeffery Neng (BCA)
+
+Co-lead
+
+Er. Yong Siew Onn GMAAP (DP)
+Er. Tony Tay Chye Teck (WSP)
+Mr. Praveen Hassan Chandrashekar GMAP (Surbana Jurong)
+Ms. Irene Yong GMAAP (Beca)
+Ms. Eileen Lee GMAP (Woh Hup)
+Mr. Kenny Lee (NUS)
+Mr. Nilesh Y. Jadhav (Qisquare)
+Mr. Venky. S GMAP (Lendlease)
+Mr. Koh Tee Yan (JTC)
+Ms. Rao Yimin GMAAP (JTC)
+Mr. Alfred Ng GMAAP (CDL)
+Mr. Derek Foo (Far East)
+Ar. Ng Sin Yong GMAP (ADDP Architect)
+Mr. Simon Lim (HPB)
+Mr. Adrian Ting (CapitaLand)
+
+Green Mark 2021
+Mr. Jeffery Neng (BCA)
+
+Editor
+
+Ar. Benjamin Towell GMAAP (BCA)
+
+Lead Author
+
+Ms. Tracy Liu GMAAP (BCA)
+
+Co-Lead
+
+Secretariat and support
+Mr. Thomas Pang GMAAP (BCA)
+Mr. Leow Yock Keng GMAAP (BCA)
+Ms. Chris Tay GMAAP (BCA)
+Ms. Maisie Koh (BCA)
+Mr. Md Halim Anpi GMAAP (BCA)
+Dr. Jin Guang Yu GMAP (BCA)
+Mr. Zhang Xiangjing GMAP (BCA)
+Er. Ang Boon Wee (BCA)
+Ms. Goh Jia Lin (BCA)
+Mr. Tan Yu Xuan (BCA)
+
+Page 27 of 32
+
+ANNEX 1: KEY REGULATORY ENVIRONMENTAL STANDARDS
+Minimum Green Requirements Governing Buildings
+Regulatory green standards from other agencies form the base for a holistic green building
+All Green Mark buildings shall comply with the minimum regulatory requirements stipulated by government
+agencies. These requirements form the base for a holistic green building and ensure that all sustainability
+angles are achieved. These include energy and water conservation, climate resilience, greenery provision and
+tree conservation, waste management and mobility.
+
+BCA Environmental
+Sustainability Regulation
+40-50% energy efficiency
+improvement over 2005
+code
+
+URA LUSH (Landscaping for
+Urban Spaces and High-Rise)
+Provide greenery and
+communal spaces
+
+PUB Water Efficiency
+Management Practices
+Ensuring climate resilience,
+water monitoring and
+management
+
+NEA Waste Management
+Reduce waste and
+promote recycling
+
+NParks Greenery Provision
+and Tree Conservation
+Conserve trees, safeguard
+green spaces in premise/
+roadside and implement
+lush landscaping
+
+LTA Active Mobility
+Bicyle parking provision
+requirement and End-of-Trip
+facilities.
+
+B
+
+Page 28 of 32
+
+BCA Environmental Sustainability Measures for New and Existing Buildings
+
+Under the BCA Environmental Sustainability Measures, a building shall be designed and constructed with
+energy performance that meets minimum energy performance improvement of 50% and 40% for new and
+existing buildings respectively, over the 2005 baseline. This will be done via a performance-based approach
+including energy modelling and energy audit methodology or a prescriptive approach through meeting
+energy performance standards of key building systems.
+Key building systems include:
+1) air-conditioning system
+2) lighting system
+3) mechanical ventilation system
+4) vertical transportation system
+5) envelope and roof
+6) air tightness and leakage
+In addition, a building shall be designed with three other environmental sustainability features in relation to
+energy and other carbon emission reduction measures. The environmental sustainability features for new
+developments are classified in the following three sections:
+1) Sustainable design strategies – optimise the use of passive design strategies in response to local
+climate and site conditions to improve indoor environmental quality while minimising energy use
+2) Sustainable construction – promotes the adoption of sustainable practices, material procurement
+and design which inculcate responsible use and conservation of resources during construction and
+building operation.
+3) Sustainable technologies – encourages the provision of green building technologies that are oriented
+towards establishing low energy building consumption and smart control systems that could adapt
+to the users’ needs and enhance building energy performance.
+The environmental sustainability features for existing buildings with major change in energy use are classified
+in the following three sections:
+1) Sustainable features – encourages incorporation of cost-effective green features and passive
+strategies when a building is upgraded so as to minimise the overall building energy consumption
+and to improve on indoor thermal comfort.
+2) Sustainable operation and management – facilitate smart monitoring and integration of
+sustainability management practices to maximise operational efficiency and carbon reduction
+opportunities.
+3) Sustainable technologies - encourage the provision of green building technologies that are oriented
+towards establishing low energy building consumption and smart control systems that could adapt
+to the users’ needs and enhance building energy performance.
+
+Page 29 of 32
+
+URA – LUSH (Landscaping for Urban Spaces and High-Rise)
+LUSH is a comprehensive urban and skyrise greening programme comprising both landscape replacement
+area (LRA) requirements and incentives to provide greenery and communal spaces.
+The LRA requirements are calibrated by location, Gross Plot Ratio (GPR) and development type. A
+development may include Sky Terraces, Communal Planter Boxes and Covered Communal Ground Gardens
+amongst other features, towards meeting the LRA requirement.
+
+Page 30 of 32
+
+NParks – Greenery Provision and Tree Conservation for Developments
+To achieve the vision of a City in Nature, National Parks Board (NParks) works closely with developers,
+building owners, Qualified Persons (QPs), professionals and other public agencies. The handbook ‘Greenery
+Provision and Tree Conservation For Developments’ seeks to provide a guide on the statutory and technical
+requirement for conserving trees, safeguarding green spaces within premises and roadside and implementing
+lush landscaping as part of development projects.
+
+LTA – Bicycle Parking Provision Requirement and End-of-Trip Facilities
+LTA and URA aim to promote cycling as a mode of transport, to enhance liveability and support the ‘car-lite’
+vision for Singapore. It is important for developments to provide sufficient and well-maintained bicycle
+parking spaces in order to facilitate more people to take up cycling as a commuting mode.
+LTA introduced a new bicycle parking provision standard for all new development and buildings undergoing
+redevelopment or reconstruction. This mandatory requirement took effect from 8 May 2018 for any new
+application for new development, redevelopment and reconstruction works to URA. Mandatory bicycle
+parking requirements will be based on development type.
+
+NEA – Waste Management
+Mandatory Reporting of Waste Data
+The environmental Public Health Act (EPHA) was amended on 1 April 2014 to enable the mandatory reporting
+of waste data and submission of waste reduction plans by any owner, occupier or lessee of a workplace, upon
+their receipt of a written notice. Currently the commercial premises that are served a notice include hotels
+with more than 200 rooms and shopping malls with more than 4,600 square metres of Net Lettable Area.
+From 2020, factories with more than 20,000 square metres of Gross Floor Area (GFA), warehouses with more
+than 50,000 square metres of GFA, and convention/ exhibition centres with more than 8,000 square metres
+of GFA, will also be included.
+Provision of Recycling Bins and Recycling Collection Services
+Under the National Recycling Programme launched in April 2001, the public waste collectors (PWCs) licensed
+by NEA are required to provide recycling bins and recycling collection services to all HDB estates, private
+landed properties and condominiums/ private apartments opted into the public waste collection scheme.
+
+Mandatory Segregation of Food Waste
+From 2024 onwards, the Ministry of the Environment and Water Resources (MEWR) and the National
+Environment Agency (NEA) will make it mandatory for the owners and operators of commercial and industrial
+premises, where large amount of food waste are generated, to segregate their food waste for treatment.
+Dual Waste Chute and Pneumatic Waste Conveyance System
+All new non-landed private residential development with more than four storeys will have two waste chutes
+– one for recyclables and the other for general waste (rubbish) that will be incinerated. In addition,
+development with at least 500 housing units must have a pneumatic waste conveyance system, which will
+transport waste from rubbish chutes to a central collection area via a network of pipes.
+Extended producer responsibility (EPR) system for e-waste management
+NEA has introduced a regulated e-waste management that will ensure the proper collection and handling of
+e-waste and the extraction of valuable resources from e-waste. The regulated e-waste management system
+will be based on the Extended Producer Responsibility (EPR) approach, where producers bear the
+Page 31 of 32
+
+responsibility for the collection and treatment of their products when they reach end-of-life. This EPR system
+will be implemented through the Resource Sustainability Act (RSA), administered by the NEA.
+Mandatory packaging reporting
+Under the mandatory packaging reporting (MPR) framework, producers of packaged products such as brand
+owners, manufacturers and importers, as well as retailers such as supermarkets, will be required to submit
+packaging data and 3R (reduce, re-use, recycle) plans to the NEA. Companies will have to provide information
+on the packaging placed on the Singapore market, broken down according to type of packaging material (e.g.,
+plastic, paper, metal, glass), packaging form (e.g., carrier bags, bottles) and the corresponding weights.
+
+PUB – Water Efficiency
+Water Efficiency Management Practices
+Under the Water Efficiency Management Practices, it is mandatory for large water users with net water
+consumption of at least 60,000 cubic metres in the previous year to:
+1) install private water meters at key water usage areas within their premises
+2) appoint at least one water efficiency manager (WEM)
+3) submit their water efficiency management plan (WEMP)
+Mandatory WELS
+With effect from 1 Apr 2019, all taps and mixers (basin, sink, bib and shower), dual-flush low-capacity flushing
+cisterns and urinal flush valves/ waterless urinals allowed for sale and supply in Singapore shall be of
+minimum 2-ticks or more rating under the MWELS. 1-tick water fittings are no longer allowed for sale and
+supply in Singapore from 1 Apr 2019 onwards.
+
+Minimum Platform Level
+The Minimum Platform Level (MPL) of a development site is the minimum ground level of the proposed
+development which is necessary for flood protection. Developments that do not comply with the MPL
+requirements will be subject to higher flood risks. Raising ground levels is the most effective way to protect
+new developments from flood risks as there be no risk of mechanical failure. The MPL of a development site
+can be found in the Code of Practice (COP) on Surface Water Drainage.
+
+Page 32 of 32
+
+

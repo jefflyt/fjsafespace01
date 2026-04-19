@@ -45,6 +45,12 @@ def render_pdf(template_name: str, context: dict | None = None) -> bytes:
     return pdf_bytes
 
 
+def render_html(template_name: str, context: dict | None = None) -> str:
+    """Render a Jinja2 template into a full HTML string for immutable storage."""
+    template = jinja_env.get_template(template_name)
+    return template.render(context or {})
+
+
 def _finding_to_dict(finding) -> dict:
     """Convert a Finding SQLModel instance to a renderable dict."""
     return {
@@ -61,6 +67,77 @@ def _finding_to_dict(finding) -> dict:
         "confidence_level": finding.confidence_level.value if hasattr(finding.confidence_level, "value") else finding.confidence_level,
         "source_currency_status": finding.source_currency_status.value if hasattr(finding.source_currency_status, "value") else finding.source_currency_status,
         "benchmark_lane": finding.benchmark_lane.value if hasattr(finding.benchmark_lane, "value") else finding.benchmark_lane,
+    }
+
+
+def build_report_snapshot(
+    report,
+    findings: list,
+    site_name: str = "Unknown Site",
+) -> dict:
+    """
+    Build an immutable snapshot of the full report at approval time.
+
+    Stores both:
+    - ``html``: fully rendered HTML string — used for on-demand PDF generation,
+      guaranteeing the PDF always matches what was approved regardless of
+      future template or CSS changes.
+    - ``context``: structured JSON — used for dashboard rendering and export API.
+    """
+    report_type = report.report_type
+    if isinstance(report_type, ReportType):
+        report_type = report_type.value
+
+    critical_count = sum(
+        1 for f in findings
+        if f.threshold_band == ThresholdBand.CRITICAL
+    )
+
+    band_order = {
+        ThresholdBand.CRITICAL: 0,
+        ThresholdBand.WATCH: 1,
+        ThresholdBand.GOOD: 2,
+    }
+    sorted_findings = sorted(
+        findings,
+        key=lambda f: band_order.get(f.threshold_band, 99),
+    )
+
+    template_map = {
+        ReportType.ASSESSMENT.value: "assessment_report.html",
+        ReportType.INTERVENTION_IMPACT.value: "intervention_impact_report.html",
+    }
+    template_name = template_map.get(report_type, "assessment_report.html")
+
+    snapshot_findings = [_finding_to_dict(f) for f in sorted_findings]
+
+    context = {
+        "site_name": site_name,
+        "report_id": report.id,
+        "report_type": report_type,
+        "rule_version_used": report.rule_version_used,
+        "generated_date": report.generated_at.strftime("%B %d, %Y") if isinstance(report.generated_at, datetime) else str(report.generated_at),
+        "certification_outcome": report.certification_outcome.value if hasattr(report.certification_outcome, "value") else report.certification_outcome,
+        "data_quality_statement": report.data_quality_statement or "",
+        "reviewer_name": report.reviewer_name,
+        "reviewer_approved_at": report.reviewer_approved_at.strftime("%B %d, %Y") if report.reviewer_approved_at and isinstance(report.reviewer_approved_at, datetime) else None,
+        "findings": snapshot_findings,
+        "top_findings": snapshot_findings[:3],
+        "critical_count": critical_count,
+        "qa_checks": json.loads(report.qa_checks) if report.qa_checks else {},
+        "style_url": str(_TEMPLATE_DIR / "style.css"),
+    }
+
+    # Render the full HTML string at approval time for immutability
+    rendered_html = render_html(template_name, context)
+
+    return {
+        "report_id": report.id,
+        "report_type": report_type,
+        "site_name": site_name,
+        "template": template_name,
+        "context": context,
+        "html": rendered_html,
     }
 
 

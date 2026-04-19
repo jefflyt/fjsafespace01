@@ -2,14 +2,23 @@
 backend/app/core/config.py
 
 Application settings loaded from environment variables via pydantic-settings.
-All variables are documented in backend/.env.example.
+Loads from .env at the project root.
 """
+
+from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+# Project root is 3 levels up from this file: backend/app/core/config.py -> project root
+ENV_PATH = Path(__file__).parent.parent.parent.parent / ".env"
+
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(
+        env_file=str(ENV_PATH),
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
 
     # ── Database ──────────────────────────────────────────────────────────────
     # App DB role: full read/write on Workflow B tables;
