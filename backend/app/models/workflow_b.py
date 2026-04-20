@@ -79,6 +79,7 @@ class Reading(SQLModel, table=True):
     upload_id: str = Field(foreign_key="upload.id")
     site_id: str = Field(foreign_key="site.id")
     device_id: str
+    zone_name: str
     reading_timestamp: datetime
     metric_name: MetricName
     metric_value: float
@@ -110,6 +111,7 @@ class Finding(SQLModel, table=True):
     site_id: str = Field(foreign_key="site.id")
     zone_name: str
     metric_name: MetricName
+    metric_value: float
     threshold_band: ThresholdBand
     interpretation_text: str
     workforce_impact_text: str

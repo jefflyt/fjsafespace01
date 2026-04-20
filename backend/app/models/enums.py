@@ -23,11 +23,21 @@ class ParseOutcome(str, enum.Enum):
 
 
 class MetricName(str, enum.Enum):
+    """All 16 uHoo sensor metrics from the CSV export."""
     co2_ppm = "co2_ppm"
+    co_ppb = "co_ppb"
     pm25_ugm3 = "pm25_ugm3"
-    tvoc_ppb = "tvoc_ppb"
-    temperature_c = "temperature_c"
     humidity_rh = "humidity_rh"
+    temperature_c = "temperature_c"
+    tvoc_ppb = "tvoc_ppb"
+    o3_ppb = "o3_ppb"
+    no_ppb = "no_ppb"
+    no2_ppb = "no2_ppb"
+    voc_ppb = "voc_ppb"
+    pressure_hpa = "pressure_hpa"
+    noise_dba = "noise_dba"
+    pm10_ugm3 = "pm10_ugm3"
+    aqi_index = "aqi_index"
 
 
 class ThresholdBand(str, enum.Enum):

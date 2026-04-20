@@ -19,7 +19,7 @@ from fastapi import APIRouter, HTTPException, Query, status
 from sqlmodel import col, select
 
 from app.api.dependencies import SessionDep, TenantIdDep
-from app.models.workflow_b import Finding, Site
+from app.models.workflow_b import Finding, Reading, Site
 from app.schemas.dashboard import ExecutiveDashboardResponse
 from app.services import aggregation as agg_svc
 
@@ -174,3 +174,38 @@ async def get_executive_dashboard(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to aggregate executive dashboard data: {exc}",
         )
+
+
+# ── Readings Time-Series ─────────────────────────────────────────────────────
+
+
+@router.get("/uploads/{upload_id}/readings", status_code=status.HTTP_200_OK)
+async def get_readings(upload_id: str, session: SessionDep):
+    """
+    Return all readings for an upload, grouped by metric.
+    Each metric entry contains: zone_name, timestamp, metric_value, is_outlier.
+    Sorted by timestamp ascending for time-series charts.
+    """
+    readings = session.exec(
+        select(Reading)
+        .where(col(Reading.upload_id) == upload_id)
+        .order_by(col(Reading.reading_timestamp))
+    ).all()
+
+    # Group by metric_name
+    by_metric: dict[str, list[dict]] = {}
+    for r in readings:
+        metric = r.metric_name.value if hasattr(r.metric_name, "value") else str(r.metric_name)
+        if metric not in by_metric:
+            by_metric[metric] = []
+        by_metric[metric].append({
+            "zone_name": r.zone_name,
+            "timestamp": r.reading_timestamp.isoformat(),
+            "metric_value": r.metric_value,
+            "is_outlier": r.is_outlier,
+        })
+
+    return {
+        "upload_id": upload_id,
+        "metrics": by_metric,
+    }

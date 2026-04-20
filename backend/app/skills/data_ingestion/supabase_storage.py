@@ -39,14 +39,17 @@ class SupabaseStorage:
 
         Returns the public URL of the uploaded file.
         """
-        file_obj = BytesIO(file_bytes)
-        result = self._client.storage.from_(self._bucket).upload(
-            path=destination_path,
-            file=file_obj,
-            file_options={"content_type": "text/csv", "cache_control": "no-cache"},
-        )
-        # result is the path on success; construct the public URL
-        return self.get_public_url(destination_path)
+        try:
+            result = self._client.storage.from_(self._bucket).upload(
+                path=destination_path,
+                file=file_bytes,
+                file_options={"content_type": "text/csv", "cache_control": "no-cache"},
+            )
+            # Newer Supabase client returns {path, id}; older returns path string
+            path = result.path if hasattr(result, "path") else result
+        except Exception as e:
+            raise SupabaseStorageError(f"Upload failed: {str(e)}") from e
+        return self.get_public_url(path)
 
     def download_file(self, file_path: str) -> bytes:
         """Download a file from the bucket and return its raw bytes."""

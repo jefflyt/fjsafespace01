@@ -3,16 +3,11 @@ backend/app/services/csv_parser.py
 
 CSV parsing and validation service for uHoo IAQ data exports.
 
-Responsibilities:
-- Validate that required column headers are present
-- Normalise readings into Reading model instances
-- Flag implausible outliers (is_outlier = True)
-- Produce parse warnings for non-fatal issues
-- Return ParseOutcome: PASS | PASS_WITH_WARNINGS | FAIL
-
-Expected CSV columns (uHoo export format):
+Reference format (NPE table header — canonical):
   device_id, timestamp, zone_name, co2_ppm, pm2_5_ugm3, tvoc_ppb,
   temperature_c, humidity_rh
+
+Also supports alternate uHoo export headers via COLUMN_ALIASES.
 
 Reference: TDD §4.1 (POST /api/uploads processing)
 """
@@ -25,34 +20,77 @@ import pandas as pd
 from app.models.enums import ParseOutcome, ReportType
 
 
-REQUIRED_COLUMNS = {
-    "device_id",
-    "timestamp",
-    "zone_name",
-    "co2_ppm",
-    "pm2_5_ugm3",
-    "tvoc_ppb",
-    "temperature_c",
-    "humidity_rh",
+# Standard column names — metadata (required) + sensor metrics (optional, parsed if present)
+METADATA_COLUMNS = {"device_id", "timestamp", "zone_name"}
+
+SENSOR_COLUMNS = {
+    "co2_ppm", "co_ppb", "pm2_5_ugm3", "humidity_rh", "temperature_c",
+    "tvoc_ppb", "o3_ppb", "no_ppb", "no2_ppb", "voc_ppb",
+    "pressure_hpa", "noise_dba", "pm10_ugm3", "aqi_index",
 }
 
-# Outlier detection thresholds
+# Map alternate uHoo export headers to standard column names
+COLUMN_ALIASES = {
+    # Metadata
+    "Sampling Location": "zone_name",
+    "Date and Time": "timestamp",
+    # Sensor metrics
+    "CO2": "co2_ppm",
+    "CO": "co_ppb",
+    "PM2.5": "pm2_5_ugm3",
+    "Humidity": "humidity_rh",
+    "Temperature": "temperature_c",
+    "TVOC": "tvoc_ppb",
+    "O3": "o3_ppb",
+    "NO": "no_ppb",
+    "NO2": "no2_ppb",
+    "VOC": "voc_ppb",
+    "PRS": "pressure_hpa",
+    "Noise Level": "noise_dba",
+    "Noise_Level": "noise_dba",
+    "PM10": "pm10_ugm3",
+    "Air Quality Index": "aqi_index",
+    "AQI": "aqi_index",
+}
+
+# Outlier detection thresholds — physically plausible bounds per metric
 OUTLIER_BOUNDS = {
     "co2_ppm": {"min": 300, "max": 5000},
+    "co_ppb": {"min": 0, "max": 1000},
     "pm2_5_ugm3": {"min": 0, "max": 500},
-    "tvoc_ppb": {"min": 0, "max": 1000},
-    "temperature_c": {"min": -10, "max": 60},
     "humidity_rh": {"min": 0, "max": 100},
+    "temperature_c": {"min": -10, "max": 60},
+    "tvoc_ppb": {"min": 0, "max": 2000},
+    "o3_ppb": {"min": 0, "max": 300},
+    "no_ppb": {"min": 0, "max": 500},
+    "no2_ppb": {"min": 0, "max": 500},
+    "voc_ppb": {"min": 0, "max": 2000},
+    "pressure_hpa": {"min": 870, "max": 1085},
+    "noise_dba": {"min": 0, "max": 140},
+    "pm10_ugm3": {"min": 0, "max": 600},
+    "aqi_index": {"min": 0, "max": 500},
 }
 
-# Map CSV column names to metric enum names and units
+# Map CSV column names to metric enum names and units (all 16 uHoo sensor metrics)
 METRIC_MAP = [
     ("co2_ppm", "co2_ppm", "ppm"),
+    ("co_ppb", "co_ppb", "ppb"),
     ("pm2_5_ugm3", "pm25_ugm3", "μg/m³"),
-    ("tvoc_ppb", "tvoc_ppb", "ppb"),
-    ("temperature_c", "temperature_c", "°C"),
     ("humidity_rh", "humidity_rh", "%RH"),
+    ("temperature_c", "temperature_c", "°C"),
+    ("tvoc_ppb", "tvoc_ppb", "ppb"),
+    ("o3_ppb", "o3_ppb", "ppb"),
+    ("no_ppb", "no_ppb", "ppb"),
+    ("no2_ppb", "no2_ppb", "ppb"),
+    ("voc_ppb", "voc_ppb", "ppb"),
+    ("pressure_hpa", "pressure_hpa", "hPa"),
+    ("noise_dba", "noise_dba", "dBA"),
+    ("pm10_ugm3", "pm10_ugm3", "μg/m³"),
+    ("aqi_index", "aqi_index", "AQI"),
 ]
+
+# Sensor metric columns that should be filled with 0 when data is missing
+FILL_COLUMNS = SENSOR_COLUMNS
 
 
 def detect_report_type(df: pd.DataFrame) -> ReportType:
@@ -86,6 +124,8 @@ def parse_csv(file: IO[bytes], site_id: str, upload_id: str) -> ParseResult:
     Parse a uHoo CSV export and return a ParseResult.
 
     - Reads file into pandas DataFrame
+    - Normalizes column headers (supports alternate uHoo formats)
+    - Fills missing metric data with 0 instead of failing rows
     - Validates required columns present → FAIL if missing
     - Parses timestamp to datetime
     - Detects outliers (e.g. CO2 > 5000 ppm, negative values)
@@ -107,24 +147,48 @@ def parse_csv(file: IO[bytes], site_id: str, upload_id: str) -> ParseResult:
             report_type=ReportType.ASSESSMENT,
         )
 
+    # Normalize column headers: map alternate uHoo headers to standard names
+    df.rename(columns=COLUMN_ALIASES, inplace=True)
+
+    # Handle missing device_id: derive from zone_name if absent
+    if "device_id" not in df.columns:
+        df["device_id"] = df["zone_name"] if "zone_name" in df.columns else "unknown"
+
+    # Fill missing metric data with 0 (user requirement: no data → "0")
+    for col in FILL_COLUMNS:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
+
     # Detect report type from timestamp patterns
     report_type = detect_report_type(df)
 
-    # Validate required columns
-    missing_columns = REQUIRED_COLUMNS - set(df.columns)
-    if missing_columns:
+    # Validate required metadata columns + at least one sensor column
+    missing_meta = METADATA_COLUMNS - set(df.columns)
+    if missing_meta:
         return ParseResult(
             parse_outcome=ParseOutcome.FAIL,
-            warnings=[f"Missing required columns: {', '.join(sorted(missing_columns))}"],
+            warnings=[f"Missing required columns: {', '.join(sorted(missing_meta))}"],
+            failed_row_count=0,
+            normalised_rows=[],
+        )
+    present_sensors = SENSOR_COLUMNS & set(df.columns)
+    if not present_sensors:
+        return ParseResult(
+            parse_outcome=ParseOutcome.FAIL,
+            warnings=["No recognized sensor columns found in CSV"],
             failed_row_count=0,
             normalised_rows=[],
         )
 
-    # Parse timestamps
+    # Parse timestamps (handles both ISO 8601 and UK DD/MM/YY formats)
     try:
-        df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True)
+        df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True, dayfirst=True)
     except Exception as e:
         warnings.append(f"Timestamp parsing failed for some rows: {str(e)}")
+
+    # Only process sensor columns present in the CSV
+    present_sensors = SENSOR_COLUMNS & set(df.columns)
+    active_metrics = [(c, m, u) for c, m, u in METRIC_MAP if c in present_sensors]
 
     total_rows = len(df)
 
@@ -141,7 +205,7 @@ def parse_csv(file: IO[bytes], site_id: str, upload_id: str) -> ParseResult:
         }
 
         # Process each metric and detect outliers
-        for csv_col, metric_name, unit in METRIC_MAP:
+        for csv_col, metric_name, unit in active_metrics:
             try:
                 value = float(row[csv_col])
                 is_outlier = False

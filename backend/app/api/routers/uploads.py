@@ -24,11 +24,11 @@ import uuid
 from datetime import datetime
 
 from fastapi import APIRouter, HTTPException, UploadFile, status
-from sqlmodel import Session, select
+from sqlmodel import Session, select, text
 
 from app.api.dependencies import SessionDep
 from app.models.enums import ParseOutcome, ParseStatus, ReportType
-from app.models.workflow_b import Finding, Upload
+from app.models.workflow_b import Finding, Reading, Upload
 from app.skills.data_ingestion.csv_parser import parse_csv
 from app.skills.data_ingestion.supabase_storage import SupabaseStorage, SupabaseStorageError
 from app.skills.iaq_rule_governor.rule_engine import evaluate_readings
@@ -67,6 +67,11 @@ async def create_upload(
             detail="File must be a CSV",
         )
 
+    # Auto-create site if it doesn't exist (using raw SQL to avoid model loading issues)
+    site_exists = session.execute(text("SELECT EXISTS(SELECT 1 FROM site WHERE id = :id)"), {"id": site_id}).scalar()
+    if not site_exists:
+        session.execute(text("INSERT INTO site (id, name, created_at) VALUES (:id, :name, NOW())"), {"id": site_id, "name": site_id})
+
     # Create upload record with PENDING status
     upload_id = str(uuid.uuid4())
     upload = Upload(
@@ -82,12 +87,17 @@ async def create_upload(
     session.refresh(upload)
 
     # Read file bytes
+    import re
+
     file_bytes = await file.read()
+
+    # Sanitize filename for Supabase Storage (S3 doesn't allow brackets, etc.)
+    safe_filename = re.sub(r'[\[\]{}^%`~#|\\]', '_', file.filename or "upload.csv")
 
     # Upload to Supabase Storage
     try:
         storage = SupabaseStorage()
-        storage_path = f"uploads/{upload_id}/{file.filename}"
+        storage_path = f"uploads/{upload_id}/{safe_filename}"
         file_url = storage.upload_file(file_bytes, storage_path)
     except SupabaseStorageError as e:
         upload.parse_status = ParseStatus.FAILED
@@ -131,6 +141,22 @@ async def create_upload(
     upload.warnings = ", ".join(parse_result.warnings) if parse_result.warnings else None
     upload.report_type = parse_result.report_type
 
+    # Persist readings to DB (one row per metric per CSV row)
+    for row in parse_result.normalised_rows:
+        reading = Reading(
+            upload_id=upload_id,
+            site_id=site_id,
+            device_id=row["device_id"],
+            zone_name=row["zone_name"],
+            reading_timestamp=row["reading_timestamp"],
+            metric_name=row["metric_name"],
+            metric_value=row["metric_value"],
+            metric_unit=row["metric_unit"],
+            is_outlier=row.get("is_outlier", False),
+        )
+        session.add(reading)
+    session.commit()
+
     # Evaluate readings against rulebook to generate findings
     eval_findings = evaluate_readings(
         parse_result.normalised_rows,
@@ -147,6 +173,7 @@ async def create_upload(
             site_id=site_id,
             zone_name=ef.zone_name,
             metric_name=ef.metric_name,
+            metric_value=ef.metric_value,
             threshold_band=ef.threshold_band,
             interpretation_text=ef.interpretation_text,
             workforce_impact_text=ef.workforce_impact_text,
@@ -269,6 +296,7 @@ async def get_findings(upload_id: str, session: SessionDep):
             "site_id": f.site_id,
             "zone_name": f.zone_name,
             "metric_name": f.metric_name.value,
+            "metric_value": f.metric_value,
             "threshold_band": f.threshold_band.value,
             "interpretation_text": f.interpretation_text,
             "workforce_impact_text": f.workforce_impact_text,

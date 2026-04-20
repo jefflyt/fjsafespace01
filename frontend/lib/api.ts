@@ -8,18 +8,32 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 async function fetcher<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
-  
+
+  // Don't set Content-Type for FormData uploads - browser handles it with boundary
+  const isFormData = options?.body instanceof FormData;
+
   const response = await fetch(url, {
     ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options?.headers,
-    },
+    headers: isFormData
+      ? { ...options?.headers }
+      : {
+          'Content-Type': 'application/json',
+          ...options?.headers,
+        },
   });
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ detail: 'An error occurred' }));
-    throw new Error(error.detail || response.statusText);
+    const errorBody = await response.json().catch(() => null);
+    const detail = errorBody?.detail;
+    let message: string;
+    if (typeof detail === 'string') {
+      message = detail;
+    } else if (Array.isArray(detail)) {
+      message = detail.map((e: any) => e.msg || JSON.stringify(e)).join('; ');
+    } else {
+      message = response.statusText || 'An error occurred';
+    }
+    throw new Error(message);
   }
 
   return response.json();

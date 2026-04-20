@@ -1,33 +1,30 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { UploadForm, UploadResult } from "@/components/UploadForm";
 import { ReportTypeBadge } from "@/components/ReportTypeBadge";
-import { CitationBadge } from "@/components/CitationBadge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, UploadCloud, ListChecks, ArrowRight } from "lucide-react";
 import { api } from "@/lib/api";
 
-interface Finding {
-  id: string;
-  upload_id: string;
-  site_id: string;
-  zone_name: string;
+import { FindingsSummaryBar } from "@/components/findings/FindingsSummaryBar";
+import { ZoneToggle } from "@/components/findings/ZoneToggle";
+import { TimeSeriesChart } from "@/components/findings/TimeSeriesChart";
+import { MetricToggle } from "@/components/findings/MetricToggle";
+import { FindingDetailDialog } from "@/components/findings/FindingDetailDialog";
+import { ActionList } from "@/components/findings/ActionList";
+import { METRIC_KEYS } from "@/components/findings/MetricConfig";
+import type { Finding } from "@/components/findings/types";
+
+interface Reading {
   metric_name: string;
-  threshold_band: string;
-  interpretation_text: string;
-  workforce_impact_text: string;
-  recommended_action: string;
-  rule_id: string;
-  rule_version: string;
-  citation_unit_ids: string;
-  confidence_level: string;
-  source_currency_status: string;
-  benchmark_lane: string;
-  created_at: string;
+  zone_name: string;
+  timestamp: string;
+  metric_value: number;
+  is_outlier: boolean;
 }
 
 interface Report {
@@ -54,23 +51,119 @@ export default function OpsPage() {
 
   const [uploadResult, setUploadResult] = useState<UploadResult | null>(null);
   const [findings, setFindings] = useState<Finding[]>([]);
+  const [readings, setReadings] = useState<Reading[]>([]);
   const [reports, setReports] = useState<Report[]>([]);
+  const [uploadWarnings, setUploadWarnings] = useState<string[]>([]);
+  const [selectedFinding, setSelectedFinding] = useState<Finding | null>(null);
+  const [activeZones, setActiveZones] = useState<Set<string>>(new Set());
+  const [activeMetrics, setActiveMetrics] = useState<Set<string>>(new Set(METRIC_KEYS));
 
   useEffect(() => {
     if (activeTab === "findings" && currentUploadId) {
       api.get<Finding[]>(`/api/uploads/${currentUploadId}/findings`)
         .then(setFindings)
         .catch(console.error);
+      api.get<{ metrics: Record<string, Reading[]> }>(`/api/uploads/${currentUploadId}/readings`)
+        .then((data) => {
+          const allReadings: Reading[] = [];
+          for (const [metricName, readings] of Object.entries(data.metrics)) {
+            for (const r of readings) {
+              allReadings.push({ ...r, metric_name: metricName });
+            }
+          }
+          setReadings(allReadings);
+        })
+        .catch(console.error);
     }
-    if (activeTab === "reports") {
+    if (activeTab === "reports" && currentUploadId) {
       api.get<Report[]>("/api/reports")
-        .then(setReports)
+        .then((allReports) => setReports(allReports.filter((r) => r.upload_id === currentUploadId)))
         .catch(console.error);
     }
   }, [activeTab, currentUploadId]);
 
+  // Zone color palette — FJ brand-aligned distinct colors
+  const ZONE_COLORS = [
+    "#8700E3", // FJ Purple
+    "#37CA37", // FJ Green
+    "#188BF6", // FJ Blue
+    "#F6AD55", // Warning amber
+    "#059669", // Teal
+    "#0891B2", // Cyan
+    "#6366f1", // Indigo
+    "#e11d48", // Rose
+    "#f59e0b", // Amber
+    "#8b5cf6", // Violet
+    "#14b8a6", // Teal alt
+    "#3b82f6", // Blue alt
+    "#dc2626", // Red
+    "#a855f7", // Purple alt
+    "#64748b", // Slate
+    "#84cc16", // Lime
+  ];
+
+  // Compute all zones and zone colors from readings
+  const allZones = useMemo(() => {
+    const zones = new Set<string>();
+    for (const r of readings) zones.add(r.zone_name);
+    return Array.from(zones).sort();
+  }, [readings]);
+
+  const zoneColors = useMemo(() => {
+    const colors: Record<string, string> = {};
+    allZones.forEach((zone, i) => {
+      colors[zone] = ZONE_COLORS[i % ZONE_COLORS.length];
+    });
+    return colors;
+  }, [allZones]);
+
+  const zonesWithData = useMemo(() => {
+    const zones = new Set<string>();
+    for (const r of readings) zones.add(r.zone_name);
+    return zones;
+  }, [readings]);
+
+  // Compute metrics with data
+  const metricsWithData = useMemo(() => {
+    const metrics = new Set<string>();
+    for (const r of readings) metrics.add(r.metric_name);
+    return metrics;
+  }, [readings]);
+
+  // Sync activeZones when readings load
+  useEffect(() => {
+    if (allZones.length > 0 && activeZones.size === 0) {
+      setActiveZones(new Set(allZones));
+    }
+  }, [allZones, activeZones]);
+
+  const toggleZone = (zone: string) => {
+    setActiveZones((prev) => {
+      const next = new Set(prev);
+      if (next.has(zone)) next.delete(zone);
+      else next.add(zone);
+      return next;
+    });
+  };
+
+  const toggleMetric = (key: string) => {
+    setActiveMetrics((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+
   const handleUploadComplete = useCallback((result: UploadResult) => {
     setUploadResult(result);
+    api.get<{ warnings: string | null }>(`/api/uploads/${result.upload_id}`)
+      .then((details) => {
+        if (details.warnings) {
+          setUploadWarnings(details.warnings.split(", ").filter(Boolean));
+        }
+      })
+      .catch(console.error);
     const params = new URLSearchParams();
     params.set("tab", "findings");
     params.set("uploadId", result.upload_id);
@@ -86,20 +179,23 @@ export default function OpsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Operations</h1>
-        <p className="text-muted-foreground">Upload, review findings, and generate reports</p>
+      {/* Page Header */}
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-[--fj-dark]">Operations</h1>
+          <p className="text-sm text-fj-gray mt-1">Upload IAQ scans, review findings, and generate reports</p>
+        </div>
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex gap-2 border-b pb-2">
+      <div className="flex items-center gap-1 border-b border-[--border] pb-2">
         {TABS.map((tab) => (
           <Button
             key={tab.id}
             variant={activeTab === tab.id ? "default" : "ghost"}
             size="sm"
             onClick={() => setActiveTab(tab.id)}
-            className="flex items-center gap-2"
+            className={`flex items-center gap-2 ${activeTab === tab.id ? "" : "text-fj-gray"}`}
           >
             <tab.icon className="h-4 w-4" />
             {tab.label}
@@ -135,6 +231,16 @@ export default function OpsPage() {
                     {uploadResult.parse_outcome || "N/A"}
                   </Badge>
                 </div>
+                {uploadWarnings.length > 0 && (
+                  <div className="mt-2 p-3 rounded-md bg-destructive/10 border border-destructive/20">
+                    <p className="text-sm font-medium text-destructive mb-1">Parse Warnings:</p>
+                    <ul className="text-sm text-destructive/90 space-y-1">
+                      {uploadWarnings.map((w, i) => (
+                        <li key={i}>• {w}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
                 <Button
                   variant="outline"
                   size="sm"
@@ -157,7 +263,7 @@ export default function OpsPage() {
 
       {/* Findings Tab */}
       {activeTab === "findings" && (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {!currentUploadId ? (
             <Card>
               <CardContent className="py-8 text-center text-muted-foreground">
@@ -171,45 +277,59 @@ export default function OpsPage() {
           ) : findings.length === 0 ? (
             <Card>
               <CardContent className="py-8 text-center text-muted-foreground">
+                <ListChecks className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
                 <p>No findings found for this upload.</p>
               </CardContent>
             </Card>
           ) : (
-            <div className="space-y-2">
-              {findings.map((finding) => (
-                <Card key={finding.id}>
-                  <CardContent className="pt-4">
-                    <div className="flex flex-wrap items-center gap-2 mb-2">
-                      <span className="font-medium">{finding.metric_name}</span>
-                      <Badge variant="outline">{finding.zone_name}</Badge>
-                      <Badge
-                        variant={
-                          finding.threshold_band.includes("CRITICAL")
-                            ? "destructive"
-                            : finding.threshold_band.includes("WARNING")
-                            ? "secondary"
-                            : "default"
-                        }
-                      >
-                        {finding.threshold_band}
-                      </Badge>
-                      <CitationBadge
-                        citationUnitId={finding.citation_unit_ids}
-                        ruleVersion={finding.rule_version}
-                        sourceCurrencyStatus={finding.source_currency_status}
-                      />
-                    </div>
-                    <p className="text-sm text-muted-foreground">{finding.interpretation_text}</p>
-                    {finding.recommended_action && (
-                      <p className="text-sm mt-1">
-                        <span className="font-medium">Action: </span>
-                        {finding.recommended_action}
-                      </p>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <>
+              <FindingsSummaryBar findings={findings} />
+
+              {/* Selector controls */}
+              <div className="space-y-3 p-4 rounded-xl bg-white border border-[--border] shadow-sm">
+                <ZoneToggle
+                  zones={allZones}
+                  activeZones={activeZones}
+                  zonesWithData={zonesWithData}
+                  zoneColors={zoneColors}
+                  onToggle={toggleZone}
+                />
+                <MetricToggle
+                  activeMetrics={activeMetrics}
+                  metricsWithData={metricsWithData}
+                  onToggle={toggleMetric}
+                />
+              </div>
+
+              {/* Time-series charts per active metric */}
+              <div className="space-y-6">
+                {METRIC_KEYS.map((key) => {
+                  if (!activeMetrics.has(key)) return null;
+                  const metricReadings = readings.filter(
+                    (r) => r.metric_name === key
+                  );
+                  // Show chart even if no data (empty state)
+                  return (
+                    <TimeSeriesChart
+                      key={key}
+                      metricKey={key}
+                      readings={metricReadings}
+                      activeZones={activeZones}
+                      zoneColors={zoneColors}
+                      onReadingClick={() => {
+                        // Find closest finding for this zone+metric
+                        const finding = findings.find(
+                          (f) => f.metric_name === key
+                        );
+                        if (finding) setSelectedFinding(finding);
+                      }}
+                    />
+                  );
+                })}
+              </div>
+
+              <ActionList findings={findings} onActionClick={(f) => setSelectedFinding(f)} />
+            </>
           )}
         </div>
       )}
@@ -233,7 +353,7 @@ export default function OpsPage() {
                 <Card key={report.id}>
                   <CardContent className="pt-4">
                     <div className="flex items-center gap-2">
-                      <ReportTypeBadge type={report.report_type} />
+                      <ReportTypeBadge type={report.report_type as "ASSESSMENT" | "INTERVENTION_IMPACT"} />
                       <Badge variant={report.reviewer_status === "approved" ? "default" : "secondary"}>
                         {report.reviewer_status}
                       </Badge>
@@ -248,6 +368,8 @@ export default function OpsPage() {
           )}
         </div>
       )}
+
+      <FindingDetailDialog finding={selectedFinding} onClose={() => setSelectedFinding(null)} />
     </div>
   );
 }
