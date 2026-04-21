@@ -33,13 +33,15 @@ from app.skills.data_ingestion.csv_parser import parse_csv
 from app.skills.data_ingestion.supabase_storage import SupabaseStorage, SupabaseStorageError
 from app.skills.iaq_rule_governor.rule_engine import evaluate_readings
 from app.skills.iaq_rule_governor.wellness_index import calculate_wellness_index, derive_certification_outcome
+from app.services.db_rule_service import fetch_rules_from_db
 
 router = APIRouter()
 
-# Phase 1 default rule version
-_DEFAULT_RULE_VERSION = "v1"
+# Phase 1 default rule version — matches seed_rulebook_v1.py
+_DEFAULT_RULE_VERSION = "v1.0"
 
-# Default rulebook weights for wellness index (sums to 100)
+# Interim weights for wellness index — will be sourced from DB in a future iteration.
+# These match the index_weight_percent values in rulebook_entry for v1.0.
 _DEFAULT_RULEBOOK_WEIGHTS: dict[str, float] = {
     "co2_ppm": 25.0,
     "pm25_ugm3": 25.0,
@@ -158,11 +160,14 @@ async def create_upload(
     session.commit()
 
     # Evaluate readings against rulebook to generate findings
+    # Fetch rules from DB; fall back to hardcoded rules if DB is empty
+    db_rules = fetch_rules_from_db(session, _DEFAULT_RULE_VERSION)
     eval_findings = evaluate_readings(
         parse_result.normalised_rows,
         site_id=site_id,
         upload_id=upload_id,
         rule_version=_DEFAULT_RULE_VERSION,
+        rules=db_rules if db_rules else None,
     )
 
     # Persist findings to DB
