@@ -294,12 +294,14 @@ _DEFAULT_RULES: list[RuleDefinition] = [
 def _find_matching_rule(
     metric_name: MetricName,
     value: float,
+    rules: list[RuleDefinition] | None = None,
 ) -> RuleDefinition | None:
     """
     Find the first rule that matches the given metric and value range.
     Returns None if no rule matches (which should not happen with the default set).
     """
-    for rule in _DEFAULT_RULES:
+    target_rules = rules if rules is not None else _DEFAULT_RULES
+    for rule in target_rules:
         if rule.metric_name != metric_name:
             continue
         min_ok = rule.min_value is None or value >= rule.min_value
@@ -320,6 +322,7 @@ def evaluate_readings(
     upload_id: str,
     rule_version: str,
     context_scope: str = "general",
+    rules: list[RuleDefinition] | None = None,
 ) -> list["EvaluatedFinding"]:
     """
     Evaluate normalised readings against the Rulebook and return findings.
@@ -336,11 +339,12 @@ def evaluate_readings(
     findings: list[EvaluatedFinding] = []
 
     for row in normalised_rows:
-        metric_name = row["metric_name"]
+        metric_name_str = row["metric_name"]
+        metric_name = MetricName(metric_name_str) if metric_name_str in [e.value for e in MetricName] else None
         value = row["metric_value"]
         is_outlier = row.get("is_outlier", False)
 
-        rule = _find_matching_rule(metric_name, value)
+        rule = _find_matching_rule(metric_name, value, rules) if metric_name else None
 
         if rule is None:
             # No matching rule — create an Insufficient Evidence finding (QA-G5 fallback)
@@ -351,7 +355,7 @@ def evaluate_readings(
                     metric_value=value,
                     metric_unit=row["metric_unit"],
                     threshold_band=ThresholdBand.WATCH,
-                    interpretation_text=f"No applicable rule found for {metric_name.value} at {value}. Manual review required.",
+                    interpretation_text=f"No applicable rule found for {metric_name_str} at {value}. Manual review required.",
                     workforce_impact_text="Unable to determine impact without applicable rule.",
                     recommended_action="Manual assessment required. No automated finding can be generated.",
                     rule_id="R-INSUFFICIENT",
@@ -393,7 +397,7 @@ def evaluate_readings(
 @dataclass
 class EvaluatedFinding:
     zone_name: str
-    metric_name: MetricName
+    metric_name: MetricName | None
     metric_value: float
     metric_unit: str
     threshold_band: ThresholdBand
