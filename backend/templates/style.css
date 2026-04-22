@@ -2,6 +2,9 @@
  *
  * PDF styles for FJ SafeSpace WeasyPrint reports.
  * Targets A4 print output with consistent margins and typography.
+ *
+ * PR9: Extended with professional report layout styles — cover page,
+ * zone analysis sections, metric blocks, benchmark callouts, and reference lists.
  */
 
 @page {
@@ -26,6 +29,112 @@ body {
     font-size: 11pt;
     line-height: 1.5;
     color: #1a1a1a;
+}
+
+/* ── Cover Page ──────────────────────────────────────────────────── */
+
+.cover-page {
+    min-height: 70vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    page-break-after: always;
+    padding: 40px 0;
+}
+
+.cover-header {
+    border-bottom: 3px solid #1e3a5f;
+    padding-bottom: 20px;
+    margin-bottom: 40px;
+}
+
+.cover-brand {
+    border-left: 4px solid #2563eb;
+    padding-left: 20px;
+}
+
+.cover-title {
+    font-size: 26pt;
+    font-weight: 700;
+    color: #1e3a5f;
+    line-height: 1.2;
+}
+
+.cover-subtitle {
+    font-size: 12pt;
+    color: #64748b;
+    margin-top: 8px;
+}
+
+.cover-client {
+    margin: 40px 0;
+}
+
+.cover-client-label {
+    font-size: 10pt;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+
+.cover-client-name {
+    font-size: 18pt;
+    font-weight: 600;
+    color: #1e3a5f;
+}
+
+.cover-client-address {
+    font-size: 12pt;
+    color: #475569;
+    margin-top: 4px;
+}
+
+.cover-reviewer {
+    font-size: 10pt;
+    color: #475569;
+}
+
+.cover-reviewer p {
+    margin-bottom: 4px;
+}
+
+.cover-standards {
+    background-color: #f1f5f9;
+    padding: 16px 20px;
+    border-radius: 4px;
+    border-left: 3px solid #2563eb;
+}
+
+.cover-standards-label {
+    font-size: 9pt;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #64748b;
+    margin-bottom: 8px;
+}
+
+.cover-standards-list {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.cover-standards-list span {
+    background-color: #ffffff;
+    padding: 4px 10px;
+    border-radius: 3px;
+    font-size: 9pt;
+    font-weight: 600;
+    color: #1e3a5f;
+    border: 1px solid #e2e8f0;
+}
+
+.cover-protocol {
+    font-size: 9pt;
+    color: #64748b;
+    margin-top: 8px;
+    font-style: italic;
 }
 
 /* ── Header ──────────────────────────────────────────────────────── */
@@ -67,7 +176,7 @@ body {
 /* ── Sections ────────────────────────────────────────────────────── */
 
 section {
-    margin-bottom: 20px;
+    margin-bottom: 24px;
     page-break-inside: avoid;
 }
 
@@ -75,20 +184,68 @@ section h2 {
     font-size: 14pt;
     font-weight: 600;
     color: #1e3a5f;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     padding-bottom: 4px;
     border-bottom: 1px solid #e2e8f0;
 }
 
-/* ── Certification Status ────────────────────────────────────────── */
+section h3 {
+    font-size: 11pt;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 6px;
+}
+
+/* ── Project Details ─────────────────────────────────────────────── */
+
+.details-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.details-table th {
+    text-align: left;
+    font-weight: 600;
+    padding: 6px 12px;
+    color: #64748b;
+    width: 35%;
+    background-color: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.details-table td {
+    padding: 6px 12px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+/* ── Dataset Summary ─────────────────────────────────────────────── */
+
+.source-note {
+    font-size: 10pt;
+    color: #475569;
+    font-style: italic;
+    margin-bottom: 12px;
+}
+
+.zone-dataset {
+    font-size: 10pt;
+    color: #334155;
+    margin-bottom: 4px;
+    padding-left: 12px;
+    border-left: 2px solid #e2e8f0;
+}
+
+/* ── Certification / Outcome Badges ──────────────────────────────── */
 
 .outcome-badge {
     display: inline-block;
-    padding: 6px 14px;
+    padding: 8px 16px;
     border-radius: 4px;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 11pt;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .outcome-healthy_workplace_certified,
@@ -107,12 +264,202 @@ section h2 {
     color: #475569;
 }
 
+/* ── Executive Summary ───────────────────────────────────────────── */
+
+.summary-overall {
+    font-size: 11pt;
+    color: #334155;
+    margin-bottom: 12px;
+}
+
+.breach-list {
+    list-style: none;
+    padding: 0;
+}
+
+.breach-list li {
+    padding: 6px 0 6px 12px;
+    border-left: 3px solid #f59e0b;
+    margin-bottom: 4px;
+    font-size: 10pt;
+    color: #334155;
+}
+
+.columns-captured {
+    font-size: 10pt;
+    color: #475569;
+    margin-top: 12px;
+}
+
 .data-quality-statement {
     font-size: 10pt;
     color: #475569;
     margin-top: 8px;
     font-style: italic;
 }
+
+/* ── Zone Analysis ───────────────────────────────────────────────── */
+
+.zone-header {
+    font-size: 13pt;
+    font-weight: 600;
+    color: #1e3a5f;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #2563eb;
+}
+
+.zone-letter {
+    font-weight: 700;
+    color: #2563eb;
+    margin-right: 6px;
+}
+
+.zone-time {
+    font-size: 10pt;
+    font-weight: 400;
+    color: #64748b;
+}
+
+.metric-block {
+    padding: 10px 0 10px 16px;
+    border-left: 3px solid #e2e8f0;
+    margin-bottom: 12px;
+}
+
+.metric-name {
+    font-size: 10pt;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 6px;
+}
+
+.exceedance-note {
+    font-size: 10pt;
+    color: #92400e;
+    background-color: #fffbeb;
+    padding: 6px 10px;
+    border-radius: 3px;
+    margin-bottom: 6px;
+}
+
+.within-range {
+    font-size: 10pt;
+    color: #166534;
+    background-color: #f0fdf4;
+    padding: 6px 10px;
+    border-radius: 3px;
+    margin-bottom: 6px;
+}
+
+.benchmark-callout {
+    font-size: 9pt;
+    color: #475569;
+    background-color: #f8fafc;
+    padding: 6px 10px;
+    border-radius: 3px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 6px;
+}
+
+.recommendation-block {
+    font-size: 10pt;
+    color: #1e3a5f;
+    background-color: #eff6ff;
+    padding: 8px 12px;
+    border-radius: 3px;
+    border-left: 3px solid #2563eb;
+}
+
+/* ── Recommendations Summary ─────────────────────────────────────── */
+
+.recommendations-summary ul {
+    list-style: none;
+    padding: 0;
+}
+
+.recommendations-summary ul li {
+    padding: 4px 0 4px 12px;
+    border-left: 3px solid #2563eb;
+    margin-bottom: 4px;
+    font-size: 10pt;
+    color: #334155;
+}
+
+.recommendations-summary h3 {
+    margin-top: 12px;
+    margin-bottom: 6px;
+}
+
+/* ── Conclusion ──────────────────────────────────────────────────── */
+
+.conclusion p {
+    font-size: 11pt;
+    line-height: 1.6;
+    color: #334155;
+}
+
+/* ── References ──────────────────────────────────────────────────── */
+
+.references h3 {
+    font-size: 10pt;
+    font-weight: 600;
+    color: #475569;
+    margin-top: 12px;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.reference-list {
+    list-style: none;
+    padding: 0;
+    columns: 2;
+    column-gap: 24px;
+}
+
+.reference-list li {
+    font-size: 9pt;
+    color: #334155;
+    padding: 3px 0 3px 16px;
+    text-indent: -16px;
+    margin-bottom: 2px;
+}
+
+.reference-list li::before {
+    content: "— ";
+    color: #94a3b8;
+}
+
+/* ── Disclaimer ──────────────────────────────────────────────────── */
+
+.disclaimer {
+    margin-top: 24px;
+    padding: 12px 14px;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    font-size: 8pt;
+    color: #64748b;
+    line-height: 1.5;
+    page-break-inside: avoid;
+}
+
+/* ── Footer ──────────────────────────────────────────────────────── */
+
+.report-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 8px;
+    font-size: 8pt;
+    color: #94a3b8;
+    text-align: center;
+}
+
+/* ── Intervention Context (legacy) ───────────────────────────────── */
 
 .intervention-context {
     font-size: 10pt;
@@ -123,31 +470,32 @@ section h2 {
     border-left: 3px solid #059669;
 }
 
-/* ── Summary Table ───────────────────────────────────────────────── */
+/* ── Badges (legacy) ─────────────────────────────────────────────── */
 
-.summary-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.summary-table th {
-    text-align: left;
+.badge {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 8pt;
     font-weight: 600;
-    padding: 4px 8px;
-    color: #64748b;
-    width: 40%;
 }
 
-.summary-table td {
-    padding: 4px 8px;
+.badge-good {
+    background-color: #dcfce7;
+    color: #166534;
 }
 
-.text-critical {
-    color: #dc2626;
-    font-weight: 700;
+.badge-watch {
+    background-color: #fef3c7;
+    color: #92400e;
 }
 
-/* ── Findings Table ──────────────────────────────────────────────── */
+.badge-critical {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+/* ── Findings Table (legacy) ─────────────────────────────────────── */
 
 .findings-table {
     width: 100%;
@@ -173,29 +521,6 @@ section h2 {
     vertical-align: top;
 }
 
-.badge {
-    display: inline-block;
-    padding: 1px 6px;
-    border-radius: 3px;
-    font-size: 8pt;
-    font-weight: 600;
-}
-
-.badge-good {
-    background-color: #dcfce7;
-    color: #166534;
-}
-
-.badge-watch {
-    background-color: #fef3c7;
-    color: #92400e;
-}
-
-.badge-critical {
-    background-color: #fee2e2;
-    color: #991b1b;
-}
-
 .band-critical {
     background-color: #fef2f2;
 }
@@ -217,7 +542,31 @@ section h2 {
     color: #b45309;
 }
 
-/* ── QA Table ────────────────────────────────────────────────────── */
+/* ── Summary Table (legacy) ──────────────────────────────────────── */
+
+.summary-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.summary-table th {
+    text-align: left;
+    font-weight: 600;
+    padding: 4px 8px;
+    color: #64748b;
+    width: 40%;
+}
+
+.summary-table td {
+    padding: 4px 8px;
+}
+
+.text-critical {
+    color: #dc2626;
+    font-weight: 700;
+}
+
+/* ── QA Table (legacy) ───────────────────────────────────────────── */
 
 .qa-table {
     width: 100%;
@@ -238,35 +587,4 @@ section h2 {
 .text-fail {
     color: #dc2626;
     font-weight: 600;
-}
-
-/* ── Disclaimer ──────────────────────────────────────────────────── */
-
-.disclaimer {
-    margin-top: 24px;
-    padding: 10px;
-    background-color: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 4px;
-    font-size: 9pt;
-    color: #64748b;
-    page-break-inside: avoid;
-}
-
-.disclaimer p {
-    line-height: 1.4;
-}
-
-/* ── Footer ──────────────────────────────────────────────────────── */
-
-.report-footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    border-top: 1px solid #e2e8f0;
-    padding-top: 8px;
-    font-size: 8pt;
-    color: #94a3b8;
-    text-align: center;
 }

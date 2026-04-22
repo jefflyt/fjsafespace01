@@ -2,135 +2,265 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>FJ SafeSpace IAQ Assessment Report</title>
+    <title>Indoor Air Quality Assessment Report</title>
     <link rel="stylesheet" href="{{ style_url }}">
 </head>
 <body>
-    <header class="report-header">
-        <h1>Indoor Air Quality Assessment Report</h1>
-        <p class="subtitle">FJ SafeSpace Wellness Platform</p>
-        <div class="report-meta">
-            <span>Site: {{ site_name }}</span>
-            <span>Generated: {{ generated_date }}</span>
-            <span>Report ID: {{ report_id }}</span>
+    {# ── Cover Page ────────────────────────────────────────────── #}
+    <div class="cover-page">
+        <div class="cover-header">
+            <div class="cover-brand">
+                <h1 class="cover-title">Indoor Air Quality Assessment Report</h1>
+                <p class="cover-subtitle">FJ SafeSpace Wellness Platform</p>
+            </div>
         </div>
-    </header>
+
+        <div class="cover-client">
+            {% if client_name %}
+            <p class="cover-client-label">Prepared for</p>
+            <p class="cover-client-name">{{ client_name }}</p>
+            {% endif %}
+            {% if site_address %}
+            <p class="cover-client-address">{{ site_address }}</p>
+            {% endif %}
+        </div>
+
+        <div class="cover-reviewer">
+            <p>Reviewed by: <strong>{{ reviewer_name or "The Indoor Generation" }}</strong></p>
+            {% if reviewer_approved_at %}
+            <p>Date: {{ reviewer_approved_at }}</p>
+            {% endif %}
+        </div>
+
+        <div class="cover-standards">
+            <p class="cover-standards-label">Benchmark Standards</p>
+            <div class="cover-standards-list">
+                <span>BCA Green Mark 2021</span>
+                <span>WELL Building Standard v2</span>
+                <span>SS 554:2016</span>
+            </div>
+            <p class="cover-protocol">Assessment conducted under the SAFE-AIR Protocol</p>
+        </div>
+    </div>
 
     <main>
-        {# ── Certification Status ────────────────────────────────── #}
-        <section class="certification-status">
-            <h2>Certification Status</h2>
-            <div class="outcome-badge outcome-{{ certification_outcome | lower }}">
-                {{ certification_outcome | replace("_", " ") }}
-            </div>
-            <p class="data-quality-statement">{{ data_quality_statement }}</p>
-        </section>
-
-        {# ── Executive Summary ───────────────────────────────────── #}
-        <section class="executive-summary">
-            <h2>Executive Summary</h2>
-            <table class="summary-table">
-                <tr><th>Rule Version</th><td>{{ rule_version_used }}</td></tr>
-                <tr><th>Report Type</th><td>{{ report_type | replace("_", " ") | title }}</td></tr>
-                <tr><th>Total Findings</th><td>{{ findings | length }}</td></tr>
-                {% if critical_count > 0 %}
-                <tr><th>Critical Findings</th><td class="text-critical">{{ critical_count }}</td></tr>
+        {# ── Project Details ───────────────────────────────────── #}
+        <section class="project-details">
+            <h2>Project Details</h2>
+            <table class="details-table">
+                <tr><th>Company / Client</th><td>{{ client_name or site_name }}</td></tr>
+                {% if site_address %}
+                <tr><th>Sampling Site</th><td>{{ site_address }}</td></tr>
+                {% endif %}
+                {% if premises_type %}
+                <tr><th>Premises Type</th><td>{{ premises_type }}</td></tr>
+                {% endif %}
+                {% if sampling_date %}
+                <tr><th>Sampling Date</th><td>{{ sampling_date }}</td></tr>
+                {% endif %}
+                {% if zone_names %}
+                <tr><th>Zones Monitored</th><td>{{ zone_names | join(", ") }}</td></tr>
+                {% endif %}
+                <tr><th>Benchmark Standard</th><td>BCA Green Mark 2021, SS 554:2016, WHO AQG 2021</td></tr>
+                {% if specific_event %}
+                <tr><th>Specific Event / Complaint</th><td>{{ specific_event }}</td></tr>
+                {% endif %}
+                {% if comparative_analysis %}
+                <tr><th>Comparative Analysis</th><td>Enabled — compared with previous assessments</td></tr>
                 {% endif %}
             </table>
         </section>
 
-        {# ── Top Findings by Priority ────────────────────────────── #}
-        {% if top_findings %}
-        <section class="top-findings">
-            <h2>Top Findings</h2>
-            <table class="findings-table">
-                <thead>
-                    <tr>
-                        <th>Metric</th>
-                        <th>Band</th>
-                        <th>Interpretation</th>
-                        <th>Recommended Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for finding in top_findings %}
-                    <tr class="band-{{ finding.threshold_band | lower }}">
-                        <td>{{ finding.metric_name | replace("_", " ") | upper }}</td>
-                        <td><span class="badge badge-{{ finding.threshold_band | lower }}">{{ finding.threshold_band }}</span></td>
-                        <td>{{ finding.interpretation_text }}</td>
-                        <td>{{ finding.recommended_action }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        {# ── Dataset Summary ───────────────────────────────────── #}
+        <section class="dataset-summary">
+            <h2>Dataset Summary</h2>
+            <p class="source-note">Data source: uHoo Aura minute-level readings.</p>
+            {% if zone_time_ranges %}
+            {% for zone, tr in zone_time_ranges.items() %}
+            <p class="zone-dataset">
+                <strong>{{ zone }}:</strong>
+                {{ tr.start_iso }} to {{ tr.end_iso }}
+                ({{ tr.count }} records)
+            </p>
+            {% endfor %}
+            {% endif %}
         </section>
-        {% endif %}
 
-        {# ── All Findings ────────────────────────────────────────── #}
-        {% if findings %}
-        <section class="all-findings">
-            <h2>All Findings</h2>
-            <table class="findings-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Metric</th>
-                        <th>Zone</th>
-                        <th>Band</th>
-                        <th>Confidence</th>
-                        <th>Source Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for finding in findings %}
-                    <tr class="band-{{ finding.threshold_band | lower }}{% if finding.source_currency_status != "CURRENT_VERIFIED" %} advisory-row{% endif %}">
-                        <td>{{ loop.index }}</td>
-                        <td>{{ finding.metric_name | replace("_", " ") | upper }}</td>
-                        <td>{{ finding.zone_name }}</td>
-                        <td><span class="badge badge-{{ finding.threshold_band | lower }}">{{ finding.threshold_band }}</span></td>
-                        <td>{{ finding.confidence_level }}</td>
-                        <td>
-                            {{ finding.source_currency_status | replace("_", " ") | title }}
-                            {% if finding.source_currency_status != "CURRENT_VERIFIED" %}
-                            <br><em class="advisory-label">(Advisory Only)</em>
-                            {% endif %}
-                        </td>
-                        <td>{{ finding.recommended_action }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        {# ── Executive Summary ─────────────────────────────────── #}
+        <section class="executive-summary">
+            <h2>Executive Summary</h2>
+
+            <div class="outcome-badge outcome-{{ certification_outcome | lower }}">
+                {{ certification_outcome | replace("_", " ") }}
+            </div>
+
+            {% if critical_count > 0 %}
+            <p class="summary-overall">
+                {{ critical_count }} critical finding{{ "s" if critical_count > 1 }} identified
+                across monitored zones requiring immediate attention.
+            </p>
+            {% elif findings | length > 0 %}
+            <p class="summary-overall">
+                No critical findings. All parameters within acceptable ranges with minor watch-band items noted.
+            </p>
+            {% endif %}
+
+            {# Threshold breach bullets #}
+            {% if findings %}
+            <ul class="breach-list">
+            {% for finding in findings %}
+            {% if finding.threshold_band in ["CRITICAL", "WATCH"] %}
+                <li>
+                    <strong>{{ finding.metric_name | replace("_", " ") | title }}</strong>
+                    in <em>{{ finding.zone_name }}</em>:
+                    {{ finding.interpretation_text }}
+                </li>
+            {% endif %}
+            {% endfor %}
+            </ul>
+            {% endif %}
+
+            {% if columns_captured %}
+            <p class="columns-captured">
+                <strong>Columns captured:</strong> {{ columns_captured | join(", ") }}
+            </p>
+            {% endif %}
         </section>
-        {% endif %}
 
-        {# ── QA Checklist Summary ────────────────────────────────── #}
-        <section class="qa-summary">
-            <h2>QA Compliance Checklist</h2>
-            <table class="qa-table">
-                {% for gate_id, passed in qa_checks.items() %}
-                <tr>
-                    <td>{{ gate_id }}</td>
-                    <td class="{% if passed %}text-pass{% else %}text-fail{% endif %}">
-                        {% if passed %}Passed{% else %}Failed{% endif %}
-                    </td>
-                </tr>
+        {# ── Per-Zone Analysis ─────────────────────────────────── #}
+        {% if zone_metric_stats %}
+        {% set zone_letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"] %}
+        {% set zone_list = zone_metric_stats | list %}
+        {% for zone_name in zone_list %}
+        <section class="zone-analysis" id="zone-{{ loop.index }}">
+            <h2 class="zone-header">
+                <span class="zone-letter">({{ zone_letters[loop.index0] }})</span>
+                {{ zone_name }}
+                {% if zone_time_ranges and zone_name in zone_time_ranges %}
+                <span class="zone-time">
+                    — {{ zone_time_ranges[zone_name].start_iso }} to {{ zone_time_ranges[zone_name].end_iso }}
+                </span>
+                {% endif %}
+            </h2>
+
+            {% set metrics = zone_metric_stats[zone_name] %}
+            {% for metric_name, stats in metrics.items() %}
+            <div class="metric-block">
+                <h3 class="metric-name">{{ metric_name | replace("_", " ") | title }} ({{ stats.min }} – {{ stats.max }})</h3>
+
+                {# Find any findings for this zone + metric #}
+                {% set zone_findings = [] %}
+                {% for f in findings %}
+                {% if f.zone_name == zone_name and f.metric_name == metric_name %}
+                {% set _ = zone_findings.append(f) %}
+                {% endif %}
                 {% endfor %}
-            </table>
+
+                {% if zone_findings %}
+                {% set finding = zone_findings[0] %}
+                {% if finding.threshold_band != "GOOD" %}
+                <p class="exceedance-note">
+                    <strong>Exceedance:</strong> Above the BCA ideal range in {{ zone_name }}.
+                    {{ finding.interpretation_text }}
+                </p>
+                {% else %}
+                <p class="within-range">Within acceptable range.</p>
+                {% endif %}
+
+                <div class="benchmark-callout">
+                    <strong>Benchmark Standard:</strong> BCA Green Mark 2021 / SS 554:2016 / WHO AQG 2021
+                </div>
+
+                {% if finding.recommended_action %}
+                <div class="recommendation-block">
+                    <strong>Recommendation:</strong> {{ finding.recommended_action }}
+                </div>
+                {% endif %}
+                {% else %}
+                <p class="within-range">Within acceptable range.</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </section>
+        {% endfor %}
+        {% endif %}
+
+        {# ── Recommendations Summary ───────────────────────────── #}
+        {% if findings %}
+        {% set critical_watch_findings = findings | selectattr("threshold_band", "in", ["CRITICAL", "WATCH"]) | list %}
+        {% if critical_watch_findings %}
+        <section class="recommendations-summary">
+            <h2>Recommendations Summary</h2>
+            {% set zones = critical_watch_findings | map(attribute="zone_name") | unique | list %}
+            {% for zone in zones %}
+            <h3>{{ zone }}</h3>
+            <ul>
+            {% for finding in critical_watch_findings %}
+            {% if finding.zone_name == zone and finding.recommended_action %}
+                <li>
+                    <strong>{{ finding.metric_name | replace("_", " ") | title }}</strong>
+                    [{{ finding.threshold_band }}]: {{ finding.recommended_action }}
+                </li>
+            {% endif %}
+            {% endfor %}
+            </ul>
+            {% endfor %}
+        </section>
+        {% endif %}
+        {% endif %}
+
+        {# ── Conclusion ────────────────────────────────────────── #}
+        <section class="conclusion">
+            <h2>Conclusion</h2>
+            {% if critical_count > 0 %}
+            <p>
+                This assessment identified {{ critical_count }} critical parameter{{ "s" if critical_count > 1 }}
+                exceeding established benchmark thresholds. Immediate corrective actions are recommended
+                to bring the indoor environment into compliance with BCA Green Mark 2021 and SS 554:2016 standards.
+            </p>
+            {% elif findings | length > 0 %}
+            <p>
+                All monitored parameters were within acceptable ranges during the sampling window.
+                Minor watch-band items have been noted for ongoing monitoring but do not require
+                immediate intervention. The site demonstrates good indoor air quality management practices.
+            </p>
+            {% else %}
+            <p>
+                Insufficient data was collected during the sampling window to make a comprehensive assessment.
+                Additional monitoring is recommended.
+            </p>
+            {% endif %}
         </section>
 
-        {# ── Disclaimer ──────────────────────────────────────────── #}
+        {# ── References ────────────────────────────────────────── #}
+        <section class="references">
+            <h2>References</h2>
+
+            <h3>Directly Applied Standards</h3>
+            <ul class="reference-list">
+            {% for ref in references_directly_applied %}
+                <li>{{ ref }}</li>
+            {% endfor %}
+            </ul>
+
+            <h3>Supporting Frameworks</h3>
+            <ul class="reference-list">
+            {% for ref in references_supporting %}
+                <li>{{ ref }}</li>
+            {% endfor %}
+            </ul>
+        </section>
+
+        {# ── Disclaimer ────────────────────────────────────────── #}
         <section class="disclaimer">
-            <p>This report was generated automatically by the FJ SafeSpace Wellness Platform.
-            Findings marked "Advisory Only" are derived from sources that are not current or fully verified
-            and must not be used for certification decisions.</p>
+            <p>This report was generated by the FJ SafeSpace Wellness Platform based on data collected during the specified sampling window. The findings and recommendations are derived from automated rule evaluation against published standards and guidelines. This report does not constitute professional engineering advice. FJ SafeSpace and its affiliates shall not be liable for any decisions made based on this report. Site-specific conditions, equipment calibration, and environmental factors at the time of sampling may affect the accuracy and applicability of the findings. This report is intended for the exclusive use of the client named herein and must not be reproduced or distributed without prior written consent.</p>
         </section>
     </main>
 
     <footer class="report-footer">
         <p>FJ SafeSpace Wellness Platform — Confidential</p>
         {% if reviewer_name %}
-        <p>Reviewed and approved by: {{ reviewer_name }} on {{ reviewer_approved_at }}</p>
+        <p>Reviewed and approved by: {{ reviewer_name }}{% if reviewer_approved_at %} on {{ reviewer_approved_at }}{% endif %}</p>
         {% endif %}
     </footer>
 </body>

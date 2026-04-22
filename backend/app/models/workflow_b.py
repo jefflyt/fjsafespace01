@@ -11,7 +11,7 @@ import uuid
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import Column, Index
+from sqlalchemy import Index
 from sqlmodel import Field, Relationship, SQLModel
 
 from app.models.enums import (

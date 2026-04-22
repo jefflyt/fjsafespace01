@@ -225,7 +225,7 @@ async def approve_report(
     report.qa_checks = json.dumps({r.gate: True for r in qa_results})
 
     # Build immutable snapshot of report content at approval time
-    snapshot = build_report_snapshot(report, findings, site_name=site_name)
+    snapshot = build_report_snapshot(report, findings, site_name=site_name, session=session)
     report.report_snapshot = json.dumps(snapshot)
 
     session.add(report)
@@ -262,7 +262,7 @@ async def preview_report(report_id: str, session: SessionDep):
     site_name = site_obj.name if site_obj else "Unknown Site"
 
     findings = session.exec(select(Finding).where(Finding.upload_id == report.upload_id)).all()
-    snapshot = build_report_snapshot(report, findings, site_name=site_name)
+    snapshot = build_report_snapshot(report, findings, site_name=site_name, session=session)
     return {"html": snapshot["html"]}
 
 

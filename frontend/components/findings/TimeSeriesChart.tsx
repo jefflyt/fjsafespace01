@@ -99,6 +99,19 @@ function buildThresholds(
   return lines;
 }
 
+// Custom X-axis tick: time only
+function CustomTick({ x, y, payload }: { x: number; y: number; payload: { value: string } }) {
+  const d = parseTimestamp(payload.value);
+  const time = `${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`;
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text x={0} y={0} textAnchor="middle" fontSize={10} fill="hsl(var(--muted-foreground) / 0.8)">
+        {time}
+      </text>
+    </g>
+  );
+}
+
 export function TimeSeriesChart({
   metricKey,
   readings,
@@ -107,9 +120,9 @@ export function TimeSeriesChart({
   onReadingClick,
 }: TimeSeriesChartProps) {
   const config = METRIC_CONFIGS[metricKey];
-  if (!config) return null;
 
   const chartData = useMemo(() => {
+    if (!config) return [];
     const metricReadings = readings.filter((r) => r.metric_name === metricKey);
     const byTimestamp = new Map<string, Record<string, unknown>>();
     for (const r of metricReadings) {
@@ -123,29 +136,30 @@ export function TimeSeriesChart({
     return Array.from(byTimestamp.values()).sort((a, b) =>
       (a.timestamp as string).localeCompare(b.timestamp as string)
     );
-  }, [readings, metricKey]);
-
-  if (chartData.length === 0) return null;
+  }, [readings, metricKey, config]);
 
   const zoneKeys = Array.from(activeZones);
   const [yMin, yMax] = useMemo(
-    () => computeYDomain(chartData, zoneKeys, config.yAxisDomain[1]),
-    [chartData, zoneKeys, config.yAxisDomain]
+    () => config ? computeYDomain(chartData, zoneKeys, config.yAxisDomain[1]) : [0, 1],
+    [chartData, zoneKeys, config]
   );
 
   const thresholds = useMemo(
-    () => buildThresholds(config.goodBand, config.watchBand, config.criticalBand, config.unit, yMax),
+    () => config ? buildThresholds(config.goodBand, config.watchBand, config.criticalBand, config.unit, yMax) : [],
     [config, yMax]
   );
 
   // Multi-day detection
-  const dates = chartData.map((d) => parseTimestamp(d.timestamp as string));
-  const firstDate = dates[0];
-  const lastDate = dates[dates.length - 1];
-  const isMultiDay =
-    lastDate.getDate() !== firstDate.getDate() ||
-    lastDate.getMonth() !== firstDate.getMonth() ||
-    lastDate.getFullYear() !== firstDate.getFullYear();
+  const { dates, isMultiDay } = useMemo(() => {
+    if (chartData.length === 0 || !config) return { dates: [] as Date[], isMultiDay: false };
+    const d = chartData.map((r) => parseTimestamp(r.timestamp as string));
+    const multi = d.length >= 2 && (
+      d[d.length - 1].getDate() !== d[0].getDate() ||
+      d[d.length - 1].getMonth() !== d[0].getMonth() ||
+      d[d.length - 1].getFullYear() !== d[0].getFullYear()
+    );
+    return { dates: d, isMultiDay: multi };
+  }, [chartData, config]);
 
   const uniqueDates = useMemo(() => {
     if (!isMultiDay) return [];
@@ -162,18 +176,7 @@ export function TimeSeriesChart({
     return result;
   }, [dates, isMultiDay]);
 
-  // Custom tick: time only
-  const CustomTick = ({ x, y, payload }: { x: number; y: number; payload: { value: string } }) => {
-    const d = parseTimestamp(payload.value);
-    const time = `${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`;
-    return (
-      <g transform={`translate(${x},${y})`}>
-        <text x={0} y={0} textAnchor="middle" fontSize={10} fill="hsl(var(--muted-foreground) / 0.8)">
-          {time}
-        </text>
-      </g>
-    );
-  };
+  if (!config || chartData.length === 0) return null;
 
   return (
     <Card className="shadow-sm animate-fade-in">

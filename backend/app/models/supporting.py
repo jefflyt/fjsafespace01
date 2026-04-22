@@ -22,6 +22,14 @@ class Tenant(SQLModel, table=True):
     certification_due_date: Optional[datetime] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
+    # PR9: Customer information fields (nullable for backward compatibility)
+    client_name: Optional[str] = Field(default=None)
+    site_address: Optional[str] = Field(default=None)
+    premises_type: Optional[str] = Field(default=None)
+    contact_person: Optional[str] = Field(default=None)
+    specific_event: Optional[str] = Field(default=None)
+    comparative_analysis: bool = Field(default=False)
+
 
 class Notification(SQLModel, table=True):
     """

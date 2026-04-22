@@ -24,10 +24,10 @@ import uuid
 from datetime import datetime
 
 from fastapi import APIRouter, HTTPException, UploadFile, status
-from sqlmodel import Session, select, text
+from sqlmodel import select, text
 
 from app.api.dependencies import SessionDep
-from app.models.enums import ParseOutcome, ParseStatus, ReportType
+from app.models.enums import ParseOutcome, ParseStatus
 from app.models.workflow_b import Finding, Reading, Upload
 from app.skills.data_ingestion.csv_parser import parse_csv
 from app.skills.data_ingestion.supabase_storage import SupabaseStorage, SupabaseStorageError
@@ -55,12 +55,19 @@ _DEFAULT_RULEBOOK_WEIGHTS: dict[str, float] = {
 async def create_upload(
     session: SessionDep,
     file: UploadFile,
-    site_id: str,
-    context: str | None = None,
+    client_name: str,
+    site_address: str,
+    premises_type: str,
+    contact_person: str,
+    specific_event: str | None = None,
+    comparative_analysis: bool = False,
 ):
     """
     Accept a CSV export from uHoo, parse, validate, evaluate against the
     active Rulebook version, store findings, and return the upload summary.
+
+    PR9: Accepts customer information instead of a manual site_id.
+    A site UUID is auto-generated behind the scenes.
     """
     # Validate content type
     if not file.filename or not file.filename.endswith(".csv"):
@@ -69,10 +76,70 @@ async def create_upload(
             detail="File must be a CSV",
         )
 
-    # Auto-create site if it doesn't exist (using raw SQL to avoid model loading issues)
-    site_exists = session.execute(text("SELECT EXISTS(SELECT 1 FROM site WHERE id = :id)"), {"id": site_id}).scalar()
-    if not site_exists:
-        session.execute(text("INSERT INTO site (id, name, created_at) VALUES (:id, :name, NOW())"), {"id": site_id, "name": site_id})
+    # PR9: Create/find tenant with customer info, then create site linked to tenant
+    # Use contact_person as a simple deduplication key for now
+    existing_tenant = session.execute(
+        text("SELECT id FROM tenant WHERE contact_person = :cp LIMIT 1"),
+        {"cp": contact_person},
+    ).first()
+
+    if existing_tenant:
+        tenant_id = existing_tenant[0]
+        # Update customer info on existing tenant
+        session.execute(
+            text(
+                "UPDATE tenant SET client_name = :cn, site_address = :sa, "
+                "premises_type = :pt, contact_person = :cp, "
+                "specific_event = :se, comparative_analysis = :ca "
+                "WHERE id = :id"
+            ),
+            {
+                "cn": client_name,
+                "sa": site_address,
+                "pt": premises_type,
+                "cp": contact_person,
+                "se": specific_event,
+                "ca": comparative_analysis,
+                "id": tenant_id,
+            },
+        )
+    else:
+        tenant_id = str(uuid.uuid4())
+        session.execute(
+            text(
+                "INSERT INTO tenant (id, tenant_name, contact_email, client_name, "
+                "site_address, premises_type, contact_person, specific_event, "
+                "comparative_analysis, created_at) "
+                "VALUES (:id, :tn, :ce, :cn, :sa, :pt, :cp, :se, :ca, NOW())"
+            ),
+            {
+                "id": tenant_id,
+                "tn": client_name,
+                "ce": f"{contact_person.lower().replace(' ', '.')}@example.com",
+                "cn": client_name,
+                "sa": site_address,
+                "pt": premises_type,
+                "cp": contact_person,
+                "se": specific_event,
+                "ca": comparative_analysis,
+            },
+        )
+
+    # Auto-generate site UUID, linked to tenant
+    site_id = str(uuid.uuid4())
+    site_name = f"{client_name} — {site_address}"
+
+    session.execute(
+        text(
+            "INSERT INTO site (id, name, tenant_id, created_at) "
+            "VALUES (:id, :name, :tenant_id, NOW())"
+        ),
+        {
+            "id": site_id,
+            "name": site_name,
+            "tenant_id": tenant_id,
+        },
+    )
 
     # Create upload record with PENDING status
     upload_id = str(uuid.uuid4())
