@@ -16,25 +16,25 @@ const STATUS_CONFIG = {
     label: "Verified",
     icon: Check,
     variant: "default" as const,
-    color: "text-green-600",
+    color: "text-[#37CA37]",
   },
   PARTIAL_EXTRACT: {
     label: "Partial",
     icon: AlertTriangle,
     variant: "secondary" as const,
-    color: "text-yellow-600",
+    color: "text-[#F6AD55]",
   },
   VERSION_UNVERIFIED: {
     label: "Unverified",
     icon: AlertCircle,
     variant: "outline" as const,
-    color: "text-orange-600",
+    color: "text-[#F6AD55]",
   },
   SUPERSEDED: {
     label: "Superseded",
     icon: Info,
     variant: "destructive" as const,
-    color: "text-red-600",
+    color: "text-[#E93D3D]",
   },
 };
 

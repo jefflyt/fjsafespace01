@@ -1,0 +1,5 @@
+{"type":"server-started","port":55814,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:55814","screen_dir":"/Users/jefflee/Documents/AIProjects/fjsafespace01/.superpowers/brainstorm/86213-1776760133/content","state_dir":"/Users/jefflee/Documents/AIProjects/fjsafespace01/.superpowers/brainstorm/86213-1776760133/state"}
+{"type":"screen-added","file":"/Users/jefflee/Documents/AIProjects/fjsafespace01/.superpowers/brainstorm/86213-1776760133/content/architecture.html"}
+{"type":"screen-added","file":"/Users/jefflee/Documents/AIProjects/fjsafespace01/.superpowers/brainstorm/86213-1776760133/content/rulebook-wiring.html"}
+{"type":"screen-added","file":"/Users/jefflee/Documents/AIProjects/fjsafespace01/.superpowers/brainstorm/86213-1776760133/content/operations-view.html"}
+{"type":"server-stopped","reason":"idle timeout"}

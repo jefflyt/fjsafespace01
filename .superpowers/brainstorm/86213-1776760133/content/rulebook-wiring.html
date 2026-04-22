@@ -1,0 +1,56 @@
+<h2>Section 2: Rulebook Population & Rule Engine Wiring</h2>
+<p class="subtitle">How standards get into the database and how the rule engine reads them</p>
+
+<div class="section">
+<h3>Step 1 — Merge & Refine Curated JSONs</h3>
+<p>Three standards need to be composed into one coherent rule set:</p>
+<table>
+<tr><th>Standard</th><th>Metrics</th><th>Role</th></tr>
+<tr><td>SS 554:2016</td><td>CO2, PM2.5, Temp, Humidity</td><td>Singapore mandatory IAQ standard</td></tr>
+<tr><td>WHO AQG 2021</td><td>PM2.5, TVOC</td><td>Global health guidelines</td></tr>
+<tr><td>Green Mark 2021 HW</td><td>TBD</td><td>Green building certification</td></tr>
+</table>
+<p><strong>Decision needed from Jay:</strong> When standards overlap (PM2.5 in both SS 554 and WHO), which takes priority?</p>
+</div>
+
+<div class="section">
+<h3>Step 2 — Seed Script Updates</h3>
+<p>The existing <code>seed_rulebook.py</code> gets updated to:</p>
+<ul>
+<li>Read merged curated JSONs</li>
+<li>Upsert <code>reference_source</code>, <code>citation_unit</code>, <code>rulebook_entry</code> tables</li>
+<li>Set <code>rule_version</code> to a semantic version (e.g., "v1.0.0-ss554-who-2024")</li>
+</ul>
+</div>
+
+<div class="section">
+<h3>Step 3 — Rule Engine Wiring</h3>
+<p>Current: <code>rule_engine.py</code> iterates over hardcoded <code>_DEFAULT_RULES</code></p>
+<p>New: <code>rule_engine.py</code> queries <code>rulebook_entry</code> at upload time:</p>
+<pre style="font-size:12px;line-height:1.6">
+def evaluate_readings(rows, site_id, upload_id):
+    rulebook = fetch_active_rules_from_db(session, rule_version)
+    # Same matching logic as before, but rules come from DB
+    for row in rows:
+        rule = find_matching_rule(rulebook, row.metric, row.value)
+        findings.append(...)
+</pre>
+</div>
+
+<div class="pros-cons">
+  <div class="pros">
+    <h4>Benefits</h4>
+    <ul>
+      <li>Every finding traces to a specific standard clause</li>
+      <li>Wellness Index weights come from DB (already queries but empty)</li>
+      <li>Reports can show "evaluated against SS 554 / WHO" per metric</li>
+    </ul>
+  </div>
+  <div class="cons">
+    <h4>Open Items</h4>
+    <ul>
+      <li>Threshold gaps between embedded and curated rules need Jay's sign-off</li>
+      <li>Some metrics (CO, O3, PM10, etc.) still produce R-INSUFFICIENT findings</li>
+    </ul>
+  </div>
+</div>

@@ -25,10 +25,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={`${inter.variable} ${montserrat.variable} font-sans antialiased`}>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${inter.variable} ${montserrat.variable} font-sans antialiased`} suppressHydrationWarning>
         <Navbar />
-        <main className="flex-1 bg-background min-h-screen">
+        <main className="flex-1 bg-background min-h-screen bg-dot-grid">
           {children}
         </main>
       </body>

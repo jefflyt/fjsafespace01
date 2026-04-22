@@ -135,6 +135,12 @@
 - **PR8.6**: Frontend Vitest tests + production hardening ✅
 - **Post-PR8**: Immutable report snapshot architecture (migration 005) ✅
 
+### PR9: Professional Report Template & Customer Info Capture ⏳
+
+- **PR9.1**: Customer info schema & upload form (Site model extension, customer fields on upload)
+- **PR9.2**: Readings aggregation & snapshot context (per-zone stats, site info in report context)
+- **PR9.3**: Professional report template (cover page, per-zone analysis, recommendations, references)
+
 ## 6. Risks, Trade-offs, and Open Questions
 
 - **Risk 1 (Performance)**: Synchronous PDF generation might timeout for large datasets. *Mitigation*: Move to background tasks/Celery if 2 min constraint is consistently breached.

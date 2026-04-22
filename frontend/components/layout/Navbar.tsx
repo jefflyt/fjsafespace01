@@ -32,9 +32,12 @@ export function Navbar() {
         </div>
         <div className="flex flex-1 items-center justify-end space-x-3">
           <NotificationBell />
-          <div className="flex items-center rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
-            <span className="mr-1.5 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
-            Ops
+          <div className="relative overflow-hidden rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
+            <span className="relative z-10 flex items-center">
+              <span className="mr-1.5 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
+              Ops
+            </span>
+            <span className="pointer-events-none absolute inset-0 animate-scan" />
           </div>
         </div>
       </div>

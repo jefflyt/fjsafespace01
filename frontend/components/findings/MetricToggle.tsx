@@ -10,8 +10,8 @@ interface MetricToggleProps {
 
 export function MetricToggle({ activeMetrics, metricsWithData, onToggle }: MetricToggleProps) {
   return (
-    <div className="flex items-center gap-3">
-      <span className="text-xs font-semibold uppercase tracking-widest text-fj-gray shrink-0">
+    <div className="flex flex-col gap-2">
+      <span className="text-xs uppercase tracking-wider font-medium text-muted-foreground">
         Metrics
       </span>
       <div className="flex flex-wrap gap-2">
@@ -30,15 +30,10 @@ export function MetricToggle({ activeMetrics, metricsWithData, onToggle }: Metri
                 ${!hasData
                   ? "text-gray-300 border-gray-200 bg-gray-50 cursor-not-allowed"
                   : isActive
-                    ? "text-white border-transparent shadow-sm cursor-pointer"
-                    : "text-fj-gray border-[--border] bg-white hover:bg-[--muted] cursor-pointer"
+                    ? "bg-primary text-primary-foreground border-transparent shadow-sm cursor-pointer"
+                    : "text-muted-foreground border-border bg-card hover:bg-muted cursor-pointer"
                 }
               `}
-              style={isActive && hasData ? {
-                backgroundColor: config.color,
-                borderColor: config.color,
-                boxShadow: `0 1px 3px ${config.color}30`,
-              } : {}}
             >
               {config.symbol}
             </button>

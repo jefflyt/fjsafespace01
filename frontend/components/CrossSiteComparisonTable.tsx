@@ -107,10 +107,10 @@ export function CrossSiteComparisonTable({ sites }: CrossSiteComparisonTableProp
                     <TableCell className="text-right">
                       {site.wellness_index_score != null ? (
                         <span className={`font-heading text-lg font-bold tabular-nums ${
-                          site.wellness_index_score >= 80 ? "text-green-600"
-                          : site.wellness_index_score >= 60 ? "text-blue-600"
-                          : site.wellness_index_score >= 40 ? "text-yellow-600"
-                          : "text-red-600"
+                          site.wellness_index_score >= 80 ? "text-[#37CA37]"
+                          : site.wellness_index_score >= 60 ? "text-[#F6AD55]"
+                          : site.wellness_index_score >= 40 ? "text-[#F6AD55]"
+                          : "text-[#E93D3D]"
                         }`}>
                           {Math.round(site.wellness_index_score)}
                         </span>

@@ -1,0 +1,69 @@
+<h2>Section 3: Operations View Enhancements</h2>
+<p class="subtitle">Sparkline charts and report generation improvements for Phase 1</p>
+
+<div class="section">
+<h3>Sparkline Charts in Findings Tab</h3>
+<p>Each metric row in the Findings table gets a mini time series chart showing values across the upload period:</p>
+
+<div class="mockup">
+  <div class="mockup-header">Findings Table — Per-Metric Rows</div>
+  <div class="mockup-body">
+    <table style="width:100%;font-size:12px;border-collapse:collapse">
+      <tr style="border-bottom:1px solid #eee">
+        <th style="text-align:left;padding:8px">Metric</th>
+        <th>Value</th>
+        <th>Band</th>
+        <th>Trend</th>
+        <th>Standard</th>
+        <th>Action</th>
+      </tr>
+      <tr style="border-bottom:1px solid #eee">
+        <td style="padding:8px">CO2</td>
+        <td>950 ppm</td>
+        <td><span style="color:#f59e0b">WATCH</span></td>
+        <td><em style="color:#888">──╱── (sparkline)</em></td>
+        <td style="font-size:11px">SS 554 §5.2.1</td>
+        <td style="font-size:11px">Increase ventilation</td>
+      </tr>
+      <tr style="border-bottom:1px solid #eee">
+        <td style="padding:8px">PM2.5</td>
+        <td>8 μg/m³</td>
+        <td><span style="color:#22c55e">GOOD</span></td>
+        <td><em style="color:#888">─── (flat sparkline)</em></td>
+        <td style="font-size:11px">WHO AQG Ch.6</td>
+        <td style="font-size:11px">No action required</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<p><strong>Implementation:</strong> Recharts <code>LineChart</code> (already in frontend dependencies) or lightweight SVG sparkline component. Data comes from readings grouped by upload_id + metric_name.</p>
+</div>
+
+<div class="section">
+<h3>Report Generation Flow</h3>
+<p>Unchanged from current implementation:</p>
+<ol>
+  <li>Findings → QA checklist → Approver (Jay Choy) → JSON snapshot stored in DB</li>
+  <li>PDF generated on-demand from snapshot via WeasyPrint</li>
+  <li>Each finding's citation badge links to the specific standard (SS 554, WHO, etc.)</li>
+</ol>
+</div>
+
+<div class="pros-cons">
+  <div class="pros">
+    <h4>What Sparklines Enable</h4>
+    <ul>
+      <li>Quick visual: is a metric trending up, down, or stable?</li>
+      <li>No new backend API — readings already stored per timestamp</li>
+      <li>Phase 2 full monitoring view can reuse this component</li>
+    </ul>
+  </div>
+  <div class="cons">
+    <h4>Scope Note</h4>
+    <ul>
+      <li>Sparklines show data for ONE upload only (the one being reviewed)</li>
+      <li>No cross-upload historical trends (Phase 2 with uHoo live API)</li>
+    </ul>
+  </div>
+</div>

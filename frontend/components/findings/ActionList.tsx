@@ -32,11 +32,11 @@ export function ActionList({ findings, onActionClick }: ActionListProps) {
 
   if (actions.critical.length === 0 && actions.watch.length === 0) {
     return (
-      <Card className="border-[--border] shadow-sm">
+      <Card className="shadow-sm animate-fade-in">
         <CardContent className="py-6 text-center">
           <CheckCircle2 className="mx-auto h-8 w-8 text-[#37CA37] mb-2" />
           <p className="text-sm font-medium text-[#37CA37]">No actions needed</p>
-          <p className="text-xs text-fj-gray mt-0.5">All readings are within acceptable ranges.</p>
+          <p className="text-xs text-muted-foreground mt-0.5">All readings are within acceptable ranges.</p>
         </CardContent>
       </Card>
     );
@@ -44,7 +44,7 @@ export function ActionList({ findings, onActionClick }: ActionListProps) {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-xs font-semibold uppercase tracking-widest text-fj-gray">Recommended Actions</h3>
+      <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Recommended Actions</h3>
 
       {actions.critical.length > 0 && (
         <div className="space-y-2">
@@ -93,15 +93,15 @@ function ActionCard({
   return (
     <button
       onClick={onClick}
-      className="w-full text-left rounded-xl border border-[--border] p-4 hover:shadow-md hover:-translate-y-0.5 transition-all bg-white"
+      className="w-full text-left rounded-lg border border-border p-4 hover:shadow-md hover:-translate-y-0.5 transition-all bg-white"
     >
       <div className="flex items-start gap-3">
         <div className="mt-1.5 h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: color }} />
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-[--fj-dark] truncate">
+          <p className="text-sm font-semibold text-foreground truncate">
             {finding.zone_name} — {finding.metric_name}
           </p>
-          <p className="text-xs text-fj-gray mt-0.5 line-clamp-2">
+          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
             {finding.recommended_action}
           </p>
         </div>

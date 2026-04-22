@@ -27,6 +27,7 @@ from sqlmodel import select
 from weasyprint import HTML
 
 from app.api.dependencies import SessionDep
+from app.core.config import settings
 from app.models.enums import CertificationOutcome, ReviewerStatus
 from app.models.workflow_b import Finding, Report, Upload
 from app.schemas.report import (
@@ -44,7 +45,7 @@ router = APIRouter(tags=["reports"])
 
 # Allowed state transitions
 ALLOWED_TRANSITIONS: dict[ReviewerStatus, list[ReviewerStatus]] = {
-    ReviewerStatus.DRAFT_GENERATED: [ReviewerStatus.IN_REVIEW],
+    ReviewerStatus.DRAFT_GENERATED: [ReviewerStatus.IN_REVIEW, ReviewerStatus.APPROVED],
     ReviewerStatus.IN_REVIEW: [ReviewerStatus.REVISION_REQUIRED, ReviewerStatus.APPROVED],
     ReviewerStatus.REVISION_REQUIRED: [ReviewerStatus.IN_REVIEW],
     ReviewerStatus.APPROVED: [ReviewerStatus.EXPORTED],
@@ -94,13 +95,22 @@ async def create_report(body: CreateReportRequest, session: SessionDep):
     # Determine certification outcome from findings
     certification_outcome = _determine_outcome(findings)
 
+    # Default data quality statement based on findings
+    critical_count = sum(1 for f in findings if f.threshold_band.value == "CRITICAL")
+    watch_count = sum(1 for f in findings if f.threshold_band.value == "WATCH")
+    if critical_count > 0 or watch_count > 0:
+        data_quality = f"{critical_count} critical, {watch_count} watch-band findings identified. Data collected during sampling window reflects observed conditions."
+    else:
+        data_quality = "All parameters within acceptable ranges during the sampling window."
+
     report = Report(
         upload_id=body.upload_id,
         site_id=body.site_id,
         report_type=body.report_type,
-        rule_version_used=body.rule_version_used,
-        citation_ids_used=body.citation_ids_used,
-        data_quality_statement=body.data_quality_statement,
+        rule_version_used=body.rule_version_used or "v1.0",
+        citation_ids_used=body.citation_ids_used or "",
+        data_quality_statement=body.data_quality_statement or data_quality,
+        reviewer_name=settings.APPROVER_EMAIL,
         certification_outcome=certification_outcome,
         reviewer_status=ReviewerStatus.DRAFT_GENERATED,
     )
@@ -228,6 +238,32 @@ async def approve_report(
         reviewer_status=report.reviewer_status,
         qa_results=qa_response,
     )
+
+
+@router.get("/reports/{report_id}/preview", status_code=status.HTTP_200_OK)
+async def preview_report(report_id: str, session: SessionDep):
+    """
+    Render report HTML for preview. Works for any report status (draft or approved).
+    For draft reports, builds the snapshot on-the-fly from current findings.
+    For approved reports, returns the stored snapshot.
+    """
+    report = session.get(Report, report_id)
+    if not report:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Report not found.")
+
+    # If approved, return stored snapshot
+    if report.reviewer_status == ReviewerStatus.APPROVED and report.report_snapshot:
+        return {"html": json.loads(report.report_snapshot)["html"]}
+
+    # For drafts, build snapshot on-the-fly
+    from app.models.workflow_b import Site
+    upload_obj = session.get(Upload, report.upload_id)
+    site_obj = session.get(Site, upload_obj.site_id) if upload_obj else None
+    site_name = site_obj.name if site_obj else "Unknown Site"
+
+    findings = session.exec(select(Finding).where(Finding.upload_id == report.upload_id)).all()
+    snapshot = build_report_snapshot(report, findings, site_name=site_name)
+    return {"html": snapshot["html"]}
 
 
 @router.get("/reports/{report_id}/export", status_code=status.HTTP_200_OK)

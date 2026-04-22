@@ -5,7 +5,6 @@ export interface MetricConfig {
   label: string;
   symbol: string;
   unit: string;
-  color: string;
   goodBand: [number, number];
   watchBand: [number, number][];
   criticalBand: [number, number][];
@@ -13,13 +12,11 @@ export interface MetricConfig {
 }
 
 export const METRIC_CONFIGS: Record<string, MetricConfig> = {
-  // Core IAQ metrics (existing 5)
   co2_ppm: {
     key: "co2_ppm",
     label: "CO2",
     symbol: "CO₂",
     unit: "ppm",
-    color: "#6366f1",
     goodBand: [300, 800],
     watchBand: [[800, 1200]],
     criticalBand: [[1200, 9999]],
@@ -30,7 +27,6 @@ export const METRIC_CONFIGS: Record<string, MetricConfig> = {
     label: "CO",
     symbol: "CO",
     unit: "ppb",
-    color: "#dc2626",
     goodBand: [0, 248],
     watchBand: [[248, 500]],
     criticalBand: [[500, 1000]],
@@ -41,7 +37,6 @@ export const METRIC_CONFIGS: Record<string, MetricConfig> = {
     label: "PM2.5",
     symbol: "PM2.5",
     unit: "μg/m³",
-    color: "#3b82f6",
     goodBand: [0, 12],
     watchBand: [[12, 35]],
     criticalBand: [[35, 500]],
@@ -52,7 +47,6 @@ export const METRIC_CONFIGS: Record<string, MetricConfig> = {
     label: "Humidity",
     symbol: "RH",
     unit: "%RH",
-    color: "#06b6d4",
     goodBand: [30, 60],
     watchBand: [[20, 30], [60, 70]],
     criticalBand: [[0, 20], [70, 100]],
@@ -63,7 +57,6 @@ export const METRIC_CONFIGS: Record<string, MetricConfig> = {
     label: "Temperature",
     symbol: "Temp",
     unit: "°C",
-    color: "#f59e0b",
     goodBand: [20, 26],
     watchBand: [[17, 20], [26, 30]],
     criticalBand: [[-10, 10], [30, 60]],
@@ -74,19 +67,16 @@ export const METRIC_CONFIGS: Record<string, MetricConfig> = {
     label: "TVOC",
     symbol: "TVOC",
     unit: "ppb",
-    color: "#10b981",
     goodBand: [0, 220],
     watchBand: [[220, 660]],
     criticalBand: [[660, 2000]],
     yAxisDomain: [0, 800],
   },
-  // Extended sensor metrics (16 total uHoo columns)
   o3_ppb: {
     key: "o3_ppb",
     label: "Ozone",
     symbol: "O₃",
     unit: "ppb",
-    color: "#a855f7",
     goodBand: [0, 50],
     watchBand: [[50, 100]],
     criticalBand: [[100, 300]],
@@ -97,7 +87,6 @@ export const METRIC_CONFIGS: Record<string, MetricConfig> = {
     label: "Nitric Oxide",
     symbol: "NO",
     unit: "ppb",
-    color: "#f97316",
     goodBand: [0, 50],
     watchBand: [[50, 200]],
     criticalBand: [[200, 500]],
@@ -108,7 +97,6 @@ export const METRIC_CONFIGS: Record<string, MetricConfig> = {
     label: "Nitrogen Dioxide",
     symbol: "NO₂",
     unit: "ppb",
-    color: "#e11d48",
     goodBand: [0, 53],
     watchBand: [[53, 100]],
     criticalBand: [[100, 500]],
@@ -119,7 +107,6 @@ export const METRIC_CONFIGS: Record<string, MetricConfig> = {
     label: "VOC",
     symbol: "VOC",
     unit: "ppb",
-    color: "#14b8a6",
     goodBand: [0, 220],
     watchBand: [[220, 660]],
     criticalBand: [[660, 2000]],
@@ -130,7 +117,6 @@ export const METRIC_CONFIGS: Record<string, MetricConfig> = {
     label: "Pressure",
     symbol: "PRS",
     unit: "hPa",
-    color: "#64748b",
     goodBand: [990, 1030],
     watchBand: [[970, 990], [1030, 1050]],
     criticalBand: [[870, 970], [1050, 1085]],
@@ -141,7 +127,6 @@ export const METRIC_CONFIGS: Record<string, MetricConfig> = {
     label: "Noise",
     symbol: "Noise",
     unit: "dBA",
-    color: "#8b5cf6",
     goodBand: [0, 50],
     watchBand: [[50, 70]],
     criticalBand: [[70, 140]],
@@ -152,7 +137,6 @@ export const METRIC_CONFIGS: Record<string, MetricConfig> = {
     label: "PM10",
     symbol: "PM10",
     unit: "μg/m³",
-    color: "#2563eb",
     goodBand: [0, 45],
     watchBand: [[45, 150]],
     criticalBand: [[150, 600]],
@@ -163,7 +147,6 @@ export const METRIC_CONFIGS: Record<string, MetricConfig> = {
     label: "AQI",
     symbol: "AQI",
     unit: "",
-    color: "#84cc16",
     goodBand: [0, 50],
     watchBand: [[50, 100]],
     criticalBand: [[100, 500]],
@@ -172,9 +155,3 @@ export const METRIC_CONFIGS: Record<string, MetricConfig> = {
 };
 
 export const METRIC_KEYS = Object.keys(METRIC_CONFIGS);
-
-export const BAND_COLORS = {
-  GOOD: "#22c55e",
-  WATCH: "#f59e0b",
-  CRITICAL: "#ef4444",
-};

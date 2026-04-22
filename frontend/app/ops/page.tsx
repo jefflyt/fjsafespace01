@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, UploadCloud, ListChecks, ArrowRight } from "lucide-react";
 import { api } from "@/lib/api";
+import { cn } from "@/lib/utils";
 
 import { FindingsSummaryBar } from "@/components/findings/FindingsSummaryBar";
 import { ZoneToggle } from "@/components/findings/ZoneToggle";
@@ -57,11 +58,20 @@ export default function OpsPage() {
   const [selectedFinding, setSelectedFinding] = useState<Finding | null>(null);
   const [activeZones, setActiveZones] = useState<Set<string>>(new Set());
   const [activeMetrics, setActiveMetrics] = useState<Set<string>>(new Set(METRIC_KEYS));
+  const [uploadSiteId, setUploadSiteId] = useState<string | null>(null);
+  const [isGeneratingReport, setIsGeneratingReport] = useState(false);
+  const [approvingReportId, setApprovingReportId] = useState<string | null>(null);
+  const [qaError, setQaError] = useState<string | null>(null);
 
   useEffect(() => {
     if (activeTab === "findings" && currentUploadId) {
       api.get<Finding[]>(`/api/uploads/${currentUploadId}/findings`)
-        .then(setFindings)
+        .then((data) => {
+          setFindings(data);
+          if (data.length > 0 && data[0].site_id) {
+            setUploadSiteId(data[0].site_id);
+          }
+        })
         .catch(console.error);
       api.get<{ metrics: Record<string, Reading[]> }>(`/api/uploads/${currentUploadId}/readings`)
         .then((data) => {
@@ -82,25 +92,11 @@ export default function OpsPage() {
     }
   }, [activeTab, currentUploadId]);
 
-  // Zone color palette — FJ brand-aligned distinct colors
-  const ZONE_COLORS = [
-    "#8700E3", // FJ Purple
-    "#37CA37", // FJ Green
-    "#188BF6", // FJ Blue
-    "#F6AD55", // Warning amber
-    "#059669", // Teal
-    "#0891B2", // Cyan
-    "#6366f1", // Indigo
-    "#e11d48", // Rose
-    "#f59e0b", // Amber
-    "#8b5cf6", // Violet
-    "#14b8a6", // Teal alt
-    "#3b82f6", // Blue alt
-    "#dc2626", // Red
-    "#a855f7", // Purple alt
-    "#64748b", // Slate
-    "#84cc16", // Lime
-  ];
+  // Zone color palette — systematic HSL distribution for distinct, scalable colors
+  const getZoneColor = (index: number): string => {
+    const hue = (260 + index * 30) % 360;
+    return `hsl(${hue}, 65%, 50%)`;
+  };
 
   // Compute all zones and zone colors from readings
   const allZones = useMemo(() => {
@@ -112,7 +108,7 @@ export default function OpsPage() {
   const zoneColors = useMemo(() => {
     const colors: Record<string, string> = {};
     allZones.forEach((zone, i) => {
-      colors[zone] = ZONE_COLORS[i % ZONE_COLORS.length];
+      colors[zone] = getZoneColor(i);
     });
     return colors;
   }, [allZones]);
@@ -155,6 +151,61 @@ export default function OpsPage() {
     });
   };
 
+  const handleGenerateReport = async () => {
+    if (!currentUploadId || !uploadSiteId) return;
+    setIsGeneratingReport(true);
+    setQaError(null);
+    try {
+      await api.post("/api/reports", {
+        upload_id: currentUploadId,
+        site_id: uploadSiteId,
+        report_type: "ASSESSMENT",
+      });
+      // Refresh reports list
+      const allReports = await api.get<Report[]>("/api/reports");
+      setReports(allReports.filter((r) => r.upload_id === currentUploadId));
+    } catch (err) {
+      console.error("Failed to generate report:", err);
+      alert(err instanceof Error ? err.message : "Failed to generate report");
+    } finally {
+      setIsGeneratingReport(false);
+    }
+  };
+
+  const handleApproveReport = async (reportId: string) => {
+    setApprovingReportId(reportId);
+    setQaError(null);
+    try {
+      const result = await api.post(`/api/reports/${reportId}/approve`, {
+        reviewer_name: "Jay Choy",
+      });
+      if (result.success) {
+        const allReports = await api.get<Report[]>("/api/reports");
+        setReports(allReports.filter((r) => r.upload_id === currentUploadId));
+      } else {
+        setQaError(result.error || "QA gates failed");
+      }
+    } catch (err) {
+      console.error("Failed to approve report:", err);
+      alert(err instanceof Error ? err.message : "Failed to approve report");
+    } finally {
+      setApprovingReportId(null);
+    }
+  };
+
+  const handleViewPdf = async (reportId: string) => {
+    const url = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/reports/${reportId}/pdf`;
+    window.open(url, "_blank");
+  };
+
+  const handlePreviewReport = async (reportId: string) => {
+    const url = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/reports/${reportId}/preview`;
+    const response = await api.get<{ html: string }>(`/api/reports/${reportId}/preview`);
+    const blob = new Blob([response.html], { type: "text/html" });
+    const blobUrl = URL.createObjectURL(blob);
+    window.open(blobUrl, "_blank");
+  };
+
   const handleUploadComplete = useCallback((result: UploadResult) => {
     setUploadResult(result);
     api.get<{ warnings: string | null }>(`/api/uploads/${result.upload_id}`)
@@ -179,28 +230,39 @@ export default function OpsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
+      {/* Page Header with tech accent bar */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-[--fj-dark]">Operations</h1>
-          <p className="text-sm text-fj-gray mt-1">Upload IAQ scans, review findings, and generate reports</p>
+          <div className="flex items-center gap-3">
+            <h1 className="text-3xl font-bold tracking-tight">Operations</h1>
+            <span className="relative inline-flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#37CA37] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#37CA37]"></span>
+            </span>
+            <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">Live</span>
+          </div>
+          <p className="text-sm text-muted-foreground mt-1">Upload IAQ scans, review findings, and generate reports</p>
+          {/* Accent bar */}
+          <div className="h-0.5 w-24 bg-gradient-to-r from-primary to-transparent mt-3 rounded-full"></div>
         </div>
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex items-center gap-1 border-b border-[--border] pb-2">
+      <div className="flex items-center gap-1 border-b border-border pb-2 relative">
         {TABS.map((tab) => (
           <Button
             key={tab.id}
             variant={activeTab === tab.id ? "default" : "ghost"}
             size="sm"
             onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 ${activeTab === tab.id ? "" : "text-fj-gray"}`}
+            className={cn("flex items-center gap-2 transition-all duration-200", activeTab === tab.id ? "" : "text-muted-foreground hover:text-foreground")}
           >
             <tab.icon className="h-4 w-4" />
             {tab.label}
           </Button>
         ))}
+        {/* Scan line effect on active tab bar */}
+        <div className="absolute bottom-0 left-0 h-0.5 bg-primary animate-shimmer w-1/4 rounded-full"></div>
       </div>
 
       {/* Upload Tab */}
@@ -286,7 +348,7 @@ export default function OpsPage() {
               <FindingsSummaryBar findings={findings} />
 
               {/* Selector controls */}
-              <div className="space-y-3 p-4 rounded-xl bg-white border border-[--border] shadow-sm">
+              <div className="space-y-4 p-4 rounded-lg bg-card border border-border shadow-sm">
                 <ZoneToggle
                   zones={allZones}
                   activeZones={activeZones}
@@ -339,31 +401,98 @@ export default function OpsPage() {
         <div className="space-y-4">
           {reports.length === 0 ? (
             <Card>
-              <CardContent className="py-8 text-center text-muted-foreground">
+              <CardContent className="py-8 text-center">
                 <FileText className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
-                <p>No reports generated yet.</p>
-                <Button variant="outline" size="sm" onClick={() => setActiveTab("findings")} className="mt-4">
-                  Go to Findings
-                </Button>
+                <p className="text-muted-foreground mb-4">No reports generated yet.</p>
+                <div className="flex items-center justify-center gap-2">
+                  <Button
+                    variant="default"
+                    size="sm"
+                    disabled={isGeneratingReport || !uploadSiteId}
+                    onClick={handleGenerateReport}
+                  >
+                    {isGeneratingReport ? (
+                      <>
+                        <span className="animate-pulse mr-2">...</span>
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        Generate Report
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </>
+                    )}
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setActiveTab("findings")}>
+                    Go to Findings
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ) : (
             <div className="space-y-2">
-              {reports.map((report) => (
-                <Card key={report.id}>
-                  <CardContent className="pt-4">
-                    <div className="flex items-center gap-2">
-                      <ReportTypeBadge type={report.report_type as "ASSESSMENT" | "INTERVENTION_IMPACT"} />
-                      <Badge variant={report.reviewer_status === "approved" ? "default" : "secondary"}>
-                        {report.reviewer_status}
-                      </Badge>
-                      <span className="text-sm text-muted-foreground ml-auto">
-                        {new Date(report.generated_at).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+              {qaError && (
+                <div className="p-3 rounded-md bg-destructive/10 border border-destructive/20">
+                  <p className="text-sm font-medium text-destructive">{qaError}</p>
+                </div>
+              )}
+              {reports.map((report) => {
+                const isApproved = report.reviewer_status === "APPROVED";
+                const isDraft = report.reviewer_status === "DRAFT_GENERATED" || report.reviewer_status === "IN_REVIEW";
+                return (
+                  <Card key={report.id}>
+                    <CardContent className="pt-4">
+                      <div className="flex items-center gap-2">
+                        <ReportTypeBadge type={report.report_type as "ASSESSMENT" | "INTERVENTION_IMPACT"} />
+                        <Badge variant={isApproved ? "default" : "secondary"}>
+                          {report.reviewer_status}
+                        </Badge>
+                        <span className="text-sm text-muted-foreground ml-auto">
+                          {new Date(report.generated_at).toLocaleDateString()}
+                        </span>
+                        {isDraft && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handlePreviewReport(report.id)}
+                          >
+                            Preview
+                          </Button>
+                        )}
+                        {isDraft && (
+                          <Button
+                            variant="default"
+                            size="sm"
+                            disabled={approvingReportId === report.id}
+                            onClick={() => handleApproveReport(report.id)}
+                          >
+                            {approvingReportId === report.id ? "Approving..." : "Approve"}
+                          </Button>
+                        )}
+                        {isApproved && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleViewPdf(report.id)}
+                          >
+                            View PDF
+                          </Button>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+              <div className="flex justify-end pt-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={isGeneratingReport}
+                  onClick={handleGenerateReport}
+                >
+                  {isGeneratingReport ? "Generating..." : "Generate Another Report"}
+                </Button>
+              </div>
             </div>
           )}
         </div>

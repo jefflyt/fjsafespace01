@@ -29,11 +29,11 @@ export function FindingsSummaryBar({ findings }: FindingsSummaryBarProps) {
   if (total === 0) return null;
 
   return (
-    <Card className="border-[--border] shadow-sm">
+    <Card className="shadow-sm animate-fade-in">
       <CardContent className="pt-5 pb-4">
         <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-semibold uppercase tracking-widest text-fj-gray">Finding Summary</span>
-          <span className="text-xs font-mono tabular-nums text-fj-gray">{total} total</span>
+          <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Finding Summary</span>
+          <span className="text-xs font-mono tabular-nums text-muted-foreground">{total} total</span>
         </div>
         <div className="flex h-3 w-full overflow-hidden rounded-full bg-gray-100">
           {(["CRITICAL", "WATCH", "GOOD"] as const).map((band) => {
@@ -53,7 +53,7 @@ export function FindingsSummaryBar({ findings }: FindingsSummaryBarProps) {
           {(["CRITICAL", "WATCH", "GOOD"] as const).map((band) => (
             <div key={band} className="flex items-center gap-1.5">
               <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: SEGMENT_COLORS[band] }} />
-              <span className="text-xs font-medium text-fj-gray">
+              <span className="text-xs font-medium text-muted-foreground">
                 {band.charAt(0) + band.slice(1).toLowerCase()} ({counts[band]})
               </span>
             </div>

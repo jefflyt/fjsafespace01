@@ -1,7 +1,94 @@
 @import "tailwindcss";
 
+/* ── Keyframes (root level) ─────────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(135, 0, 227, 0.25); }
+  50%      { box-shadow: 0 0 12px 4px rgba(135, 0, 227, 0.1); }
+}
+
+@keyframes scanSweep {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes borderGlow {
+  0%, 100% { border-color: rgba(135, 0, 227, 0.15); }
+  50%      { border-color: rgba(135, 0, 227, 0.4); }
+}
+
+@keyframes countIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ── Custom animation classes ───────────────────────────────── */
+.animate-fade-in {
+  animation: fadeInUp 0.5s ease-out both;
+}
+
+.animate-glow {
+  animation: glowPulse 2.5s ease-in-out infinite;
+}
+
+.animate-border-glow {
+  animation-name: borderGlow;
+  animation-duration: 3s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.animate-count-in {
+  animation: countIn 0.4s ease-out both;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(240, 234, 255, 0) 0%,
+    rgba(240, 234, 255, 0.6) 50%,
+    rgba(240, 234, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+/* Scanning line overlay */
+.animate-scan {
+  position: relative;
+  overflow: hidden;
+}
+
+.animate-scan::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(135, 0, 227, 0.08), transparent);
+  animation: scanSweep 2.5s ease-in-out infinite;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* Dot-grid background pattern */
+.bg-dot-grid {
+  background-image: radial-gradient(circle, rgba(135, 0, 227, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* ── Theme tokens ────────────────────────────────────────────── */
 @theme {
-  /* Brand colors */
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
@@ -22,52 +109,48 @@
   --color-card: hsl(var(--card));
   --color-card-foreground: hsl(var(--card-foreground));
 
-  /* Semantic dashboard colors */
   --color-healthy: hsl(var(--color-healthy));
   --color-warning: hsl(var(--color-warning));
   --color-info: hsl(var(--color-info));
   --color-gray: hsl(var(--color-gray));
 
-  /* Radii */
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
 
-  /* Font families */
   --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-heading), ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, monospace;
 }
 
+/* ── Base styles ─────────────────────────────────────────────── */
 @layer base {
   :root {
-    /* FJ SafeSpace brand colors — sourced from fjsafespace.com */
-    --background: 167 30% 98%; /* Light mint page background */
-    --foreground: 0 0% 20%;    /* #333 primary text */
-    --card: 0 0% 100%;         /* White card surfaces */
+    --background: 220 14% 96%;
+    --foreground: 0 0% 20%;
+    --card: 0 0% 100%;
     --card-foreground: 0 0% 20%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 20%;
-    --primary: 276 100% 44%;   /* FJ Purple #8700E3 */
+    --primary: 276 100% 44%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 167 30% 94%;  /* FJ Mint #E8F5F2 */
+    --secondary: 220 14% 96%;
     --secondary-foreground: 276 79% 25%;
-    --muted: 167 15% 90%;
-    --muted-foreground: 0 0% 40%;  /* #666 secondary text */
-    --accent: 276 100% 96%;    /* Light purple tint */
+    --muted: 220 14% 90%;
+    --muted-foreground: 0 0% 40%;
+    --accent: 276 80% 92%;
     --accent-foreground: 276 100% 44%;
-    --destructive: 0 75% 57%;  /* #E93D3D critical red */
+    --destructive: 0 75% 57%;
     --destructive-foreground: 0 0% 100%;
-    --border: 167 20% 85%;     /* Mint-tinted borders */
-    --input: 167 20% 85%;
+    --border: 219 14% 90%;
+    --input: 219 14% 90%;
     --ring: 276 100% 44%;
-    --radius: 1rem;            /* 16px — brand radius */
+    --radius: 0.75rem;
 
-    /* Semantic colors for dashboard */
-    --color-healthy: 120 57% 50%;   /* #37CA37 */
-    --color-warning: 33 90% 71%;    /* #F6AD55 */
-    --color-info: 206 91% 53%;      /* #63B3ED */
-    --color-gray: 210 14% 82%;      /* #CBD5E0 */
+    --color-healthy: 120 57% 50%;
+    --color-warning: 33 90% 71%;
+    --color-info: 211 91% 53%;
+    --color-gray: 220 10% 84%;
   }
   .dark {
     --background: 222.2 84% 4.9%;
@@ -90,9 +173,7 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 48%;
   }
-}
 
-@layer base {
   * {
     @apply border-border;
   }
@@ -102,9 +183,16 @@
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading), ui-sans-serif, system-ui, sans-serif;
   }
-  /* Tabular numbers for dashboard metrics */
   .font-mono {
     font-variant-numeric: tabular-nums;
   }
 }
 
+/* ── Reduced motion ──────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

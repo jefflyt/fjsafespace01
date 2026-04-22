@@ -1,0 +1,76 @@
+<h2>Phase 1 Architecture: Scan-to-Report with DB-Backed Rulebook</h2>
+<p class="subtitle">Data flow from CSV upload through rule evaluation to report generation</p>
+
+<div class="section">
+<h3>Data Flow</h3>
+<pre style="font-size:12px;line-height:1.6">
+CSV Upload ──► Parse (csv_parser.py) ──► Readings stored in DB
+                                               │
+                                               ▼
+                                        Rule Engine queries
+                                        rulebook_entry table
+                                               │
+                                               ▼
+                                      Findings stored in DB
+                                               │
+                                               ▼
+                                    ┌──────────────────────┐
+                                    │  Report Generation    │
+                                    │  JSON snapshot → DB   │
+                                    │  PDF export on-demand │
+                                    └──────────────────────┘
+                                               │
+                                               ▼
+                                    ┌──────────────────────┐
+                                    │  Executive Dashboard  │
+                                    │  Wellness Index       │
+                                    │  (DB-sourced weights) │
+                                    └──────────────────────┘
+                                               │
+                                               ▼
+                                    ┌──────────────────────┐
+                                    │  Operations View      │
+                                    │  Findings + Sparklines│
+                                    │  Report PDF Export    │
+                                    └──────────────────────┘
+</pre>
+</div>
+
+<div class="section">
+<h3>Rulebook Population Pipeline</h3>
+<pre style="font-size:12px;line-height:1.6">
+Curated JSONs (assets/standards/curated/)
+       │
+       ▼
+Seed Script ──► reference_source table
+       │            │
+       ▼            ▼
+       └────► citation_unit table
+                  │
+                  ▼
+            rulebook_entry table
+                  │
+                  ▼
+  rule_engine.py queries DB at runtime
+</pre>
+</div>
+
+<div class="pros-cons">
+  <div class="pros">
+    <h4>Key Design Decisions</h4>
+    <ul>
+      <li>Database is the single source of truth for certification thresholds</li>
+      <li>Each finding traces back to specific standard clauses via citation_unit_ids</li>
+      <li>Multi-standard reports supported (SS 554 for CO2, WHO for PM2.5, etc.)</li>
+      <li>Sparkline charts added to Operations findings tab (Phase 1 scope)</li>
+    </ul>
+  </div>
+  <div class="cons">
+    <h4>Deferred to Phase 2</h4>
+    <ul>
+      <li>Full time series monitoring view with date range picker</li>
+      <li>uHoo live API integration</li>
+      <li>Customer portal (Clerk auth)</li>
+    </ul>
+  </div>
+</div>

@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { AlertTriangle, ShieldCheck, ShieldX, ShieldAlert, Loader2, Activity } from "lucide-react"
+import { AlertTriangle, ShieldCheck, ShieldX, ShieldAlert, Loader2, Activity, ArrowUpRight } from "lucide-react"
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -73,11 +73,11 @@ interface UploadSummary {
 function getOutcomeColor(outcome: string): string {
   switch (outcome) {
     case "HEALTHY_WORKPLACE_CERTIFIED":
-      return "bg-green-100 text-green-800 border-green-200"
+      return "bg-green-50 text-green-700 border-green-200"
     case "HEALTHY_SPACE_VERIFIED":
-      return "bg-amber-100 text-amber-800 border-amber-200"
+      return "bg-amber-50 text-amber-700 border-amber-200"
     case "IMPROVEMENT_RECOMMENDED":
-      return "bg-red-100 text-red-800 border-red-200"
+      return "bg-red-50 text-red-700 border-red-200"
     case "INSUFFICIENT_EVIDENCE":
       return "bg-gray-100 text-gray-600 border-gray-200"
     default:
@@ -115,11 +115,11 @@ function getOutcomeLabel(outcome: string): string {
   }
 }
 
-function getScoreColorClass(score: number): string {
-  if (score >= 90) return "text-green-600"
-  if (score >= 75) return "text-amber-600"
-  if (score > 0) return "text-red-600"
-  return "text-gray-400"
+function getScoreColor(score: number): string {
+  if (score >= 90) return "text-[#37CA37]"
+  if (score >= 75) return "text-[#F6AD55]"
+  if (score > 0) return "text-[#E93D3D]"
+  return "text-muted-foreground"
 }
 
 function formatScore(score: number): string {
@@ -137,43 +137,48 @@ function formatDate(dateStr: string | null): string {
 
 // ── Components ───────────────────────────────────────────────────────────────
 
+function AnimatedMetric({ value, label, color, delay }: { value: number | string; label: string; color?: string; delay: number }) {
+  return (
+    <div
+      className="animate-fade-in text-center"
+      style={{ animationDelay: `${delay}ms` }}
+    >
+      <div className={cn("font-heading text-3xl font-bold tabular-nums", color)}>
+        {value}
+      </div>
+      <div className="text-[11px] uppercase tracking-widest text-muted-foreground mt-1">{label}</div>
+    </div>
+  )
+}
+
 function HealthSummaryCard({ ratings }: { ratings: HealthRatings }) {
   return (
-    <Card>
+    <Card className="animate-fade-in border-l-2 border-l-primary bg-accent/30 animate-border-glow">
       <CardHeader className="pb-3">
         <CardTitle className="font-heading flex items-center gap-2 text-lg">
           <Activity className="h-5 w-5 text-primary" />
           Portfolio Health
+          <span className="ml-auto text-[10px] uppercase tracking-widest text-muted-foreground">Live</span>
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#37CA37] opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#37CA37]"></span>
+          </span>
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
-          <div className="text-center">
-            <div className="font-heading text-3xl font-bold tabular-nums">{ratings.total_sites}</div>
-            <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Total Sites</div>
-          </div>
-          <div className="text-center">
-            <div className="font-heading text-3xl font-bold tabular-nums text-green-600">{ratings.certified}</div>
-            <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Certified</div>
-          </div>
-          <div className="text-center">
-            <div className="font-heading text-3xl font-bold tabular-nums text-amber-600">{ratings.verified}</div>
-            <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Verified</div>
-          </div>
-          <div className="text-center">
-            <div className="font-heading text-3xl font-bold tabular-nums text-red-600">{ratings.improvement_recommended}</div>
-            <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Needs Work</div>
-          </div>
-          <div className="text-center">
-            <div className="font-heading text-3xl font-bold tabular-nums text-gray-400">{ratings.insufficient_evidence}</div>
-            <div className="text-[11px] uppercase tracking-wider text-muted-foreground">No Data</div>
-          </div>
+          <AnimatedMetric value={ratings.total_sites} label="Total Sites" delay={0} />
+          <AnimatedMetric value={ratings.certified} label="Certified" color="text-[#37CA37]" delay={50} />
+          <AnimatedMetric value={ratings.verified} label="Verified" color="text-[#F6AD55]" delay={100} />
+          <AnimatedMetric value={ratings.improvement_recommended} label="Needs Work" color="text-[#E93D3D]" delay={150} />
+          <AnimatedMetric value={ratings.insufficient_evidence} label="No Data" color="text-muted-foreground" delay={200} />
         </div>
-        <div className="mt-4 border-t pt-4 text-center">
-          <span className="text-xs text-muted-foreground">Average Wellness Index: </span>
-          <span className={cn("font-heading text-lg font-bold tabular-nums", getScoreColorClass(ratings.average_wellness_index))}>
+        <div className="mt-4 border-t pt-4 flex items-center justify-center gap-3">
+          <span className="text-xs text-muted-foreground uppercase tracking-wider">Average Wellness Index</span>
+          <span className={cn("font-heading text-2xl font-bold tabular-nums", getScoreColor(ratings.average_wellness_index))}>
             {formatScore(ratings.average_wellness_index)}%
           </span>
+          <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
         </div>
       </CardContent>
     </Card>
@@ -192,12 +197,12 @@ function RiskCard({ risk }: { risk: TopRisk }) {
       <div className="flex items-center justify-between">
         <span className="text-sm font-semibold">{risk.site_name}</span>
         {risk.is_advisory && (
-          <Badge variant="outline" className="text-[10px] text-gray-500">Advisory</Badge>
+          <Badge variant="outline" className="text-[10px] text-muted-foreground">Advisory</Badge>
         )}
       </div>
       <div className="flex items-center gap-2">
         <AlertTriangle size={14} className="text-red-500" />
-        <span className="font-mono text-xs uppercase">{risk.metric_name}</span>
+        <span className="font-mono text-xs uppercase tracking-wider">{risk.metric_name}</span>
       </div>
       <p className="text-xs text-muted-foreground">{risk.interpretation_text}</p>
       <p className="text-xs font-medium">Action: {risk.recommended_action}</p>
@@ -207,7 +212,7 @@ function RiskCard({ risk }: { risk: TopRisk }) {
 
 function TopRisksPanel({ risks }: { risks: TopRisk[] }) {
   return (
-    <Card>
+    <Card className="animate-fade-in" style={{ animationDelay: "150ms" }}>
       <CardHeader className="pb-3">
         <CardTitle className="font-heading flex items-center gap-2 text-lg">
           <AlertTriangle size={16} className="text-red-500" />
@@ -216,9 +221,12 @@ function TopRisksPanel({ risks }: { risks: TopRisk[] }) {
       </CardHeader>
       <CardContent className="space-y-2">
         {risks.length === 0 ? (
-          <p className="py-6 text-center text-sm text-muted-foreground">
-            No critical risks detected.
-          </p>
+          <div className="py-8 text-center">
+            <ShieldCheck className="mx-auto h-10 w-10 text-[#37CA37]/40 mb-3" />
+            <p className="text-sm text-muted-foreground">
+              No critical risks detected.
+            </p>
+          </div>
         ) : (
           risks.map((risk, idx) => <RiskCard key={idx} risk={risk} />)
         )}
@@ -229,7 +237,7 @@ function TopRisksPanel({ risks }: { risks: TopRisk[] }) {
 
 function TopActionsPanel({ actions }: { actions: TopAction[] }) {
   return (
-    <Card>
+    <Card className="animate-fade-in" style={{ animationDelay: "200ms" }}>
       <CardHeader className="pb-3">
         <CardTitle className="font-heading text-lg">Recommended Actions</CardTitle>
       </CardHeader>
@@ -241,14 +249,14 @@ function TopActionsPanel({ actions }: { actions: TopAction[] }) {
         ) : (
           <ul className="space-y-2">
             {actions.map((action, idx) => (
-              <li key={idx} className="flex items-start gap-3 rounded-lg bg-secondary/30 p-3">
+              <li key={idx} className="flex items-start gap-3 rounded-lg bg-accent/30 p-3 transition-colors hover:bg-accent/50">
                 <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
                   {idx + 1}
                 </span>
                 <div>
                   <p className="text-sm font-medium">{action.recommended_action}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {action.site_name} · {action.metric_name} · Priority: {action.priority}
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {action.site_name} &middot; <span className="font-mono uppercase">{action.metric_name}</span> &middot; Priority: {action.priority}
                   </p>
                 </div>
               </li>
@@ -301,7 +309,7 @@ export default function ExecutiveDashboardPage() {
 
   if (!data) {
     return (
-      <div className="rounded-xl border bg-card p-8 text-center text-muted-foreground">
+      <div className="rounded-lg border bg-card p-8 text-center text-muted-foreground">
         No data available — upload scan data to populate the dashboard.
       </div>
     )
@@ -311,10 +319,18 @@ export default function ExecutiveDashboardPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="font-heading text-2xl font-bold tracking-tight">Executive Dashboard</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="font-heading text-2xl font-bold tracking-tight">Executive Dashboard</h1>
+            <span className="relative inline-flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#37CA37] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#37CA37]"></span>
+            </span>
+            <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">Live</span>
+          </div>
           <p className="mt-1 text-sm text-muted-foreground">
             Portfolio-level IAQ wellness overview across all managed sites.
           </p>
+          <div className="h-0.5 w-24 bg-gradient-to-r from-primary to-transparent mt-3 rounded-full"></div>
         </div>
 
         {/* Historical Scan Selector */}
@@ -326,7 +342,7 @@ export default function ExecutiveDashboardPage() {
             <SelectItem value="all">All Scans (Latest)</SelectItem>
             {uploads.map((upload) => (
               <SelectItem key={upload.id} value={upload.id}>
-                {upload.file_name} — {formatDate(upload.uploaded_at)}
+                {upload.file_name} &mdash; {formatDate(upload.uploaded_at)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -339,22 +355,26 @@ export default function ExecutiveDashboardPage() {
         <div className="lg:col-span-2 space-y-6">
           {/* Leaderboard kept for now — can be replaced with per-scan results */}
           {data.leaderboard.length > 0 && (
-            <Card>
+            <Card className="animate-fade-in" style={{ animationDelay: "100ms" }}>
               <CardHeader className="pb-3">
                 <CardTitle className="font-heading text-lg">Site Results</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {data.leaderboard.map((row) => (
-                    <div key={row.site_id} className="flex items-center justify-between rounded-lg border p-3">
+                  {data.leaderboard.map((row, idx) => (
+                    <div
+                      key={row.site_id}
+                      className="flex items-center justify-between rounded-lg border p-3 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 bg-white"
+                      style={{ animationDelay: `${idx * 50 + 150}ms` }}
+                    >
                       <div>
                         <p className="text-sm font-medium">{row.site_name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          Last scan: {formatDate(row.last_scan_date)} · {row.finding_count} findings
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Last scan: {formatDate(row.last_scan_date)} &middot; {row.finding_count} findings
                         </p>
                       </div>
                       <div className="text-right">
-                        <div className={cn("font-heading text-xl font-bold tabular-nums", getScoreColorClass(row.wellness_index_score))}>
+                        <div className={cn("font-heading text-xl font-bold tabular-nums", getScoreColor(row.wellness_index_score))}>
                           {formatScore(row.wellness_index_score)}%
                         </div>
                         <Badge variant="outline" className={cn("mt-1", getOutcomeColor(row.certification_outcome))}>

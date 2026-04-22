@@ -8,28 +8,28 @@ const OUTCOME_CONFIG = {
   HEALTHY_WORKPLACE_CERTIFIED: {
     label: "Certified",
     icon: ShieldCheck,
-    color: "text-green-600",
+    color: "text-[#37CA37]",
     bg: "bg-green-50",
     border: "border-green-200",
   },
   HEALTHY_SPACE_VERIFIED: {
     label: "Verified",
     icon: Shield,
-    color: "text-blue-600",
-    bg: "bg-blue-50",
-    border: "border-blue-200",
+    color: "text-[#F6AD55]",
+    bg: "bg-amber-50",
+    border: "border-amber-200",
   },
   IMPROVEMENT_REQUIRED: {
     label: "Improvement Needed",
     icon: AlertTriangle,
-    color: "text-yellow-600",
-    bg: "bg-yellow-50",
-    border: "border-yellow-200",
+    color: "text-[#E93D3D]",
+    bg: "bg-red-50",
+    border: "border-red-200",
   },
   INSUFFICIENT_EVIDENCE: {
     label: "Insufficient Evidence",
     icon: Info,
-    color: "text-gray-600",
+    color: "text-muted-foreground",
     bg: "bg-gray-50",
     border: "border-gray-200",
   },
@@ -37,18 +37,18 @@ const OUTCOME_CONFIG = {
 
 function getScoreColor(score: number | null): string {
   if (score == null) return "text-muted-foreground";
-  if (score >= 80) return "text-green-600";
-  if (score >= 60) return "text-blue-600";
-  if (score >= 40) return "text-yellow-600";
-  return "text-red-600";
+  if (score >= 80) return "text-[#37CA37]";
+  if (score >= 60) return "text-[#F6AD55]";
+  if (score >= 40) return "text-[#F6AD55]";
+  return "text-[#E93D3D]";
 }
 
 function getTrendIcon(trend: "up" | "down" | "stable" | undefined) {
   switch (trend) {
     case "up":
-      return <TrendingUp className="h-4 w-4 text-green-600" />;
+      return <TrendingUp className="h-4 w-4 text-[#37CA37]" />;
     case "down":
-      return <TrendingDown className="h-4 w-4 text-red-600" />;
+      return <TrendingDown className="h-4 w-4 text-[#E93D3D]" />;
     default:
       return <Minus className="h-4 w-4 text-muted-foreground" />;
   }
@@ -105,12 +105,12 @@ export function WellnessIndexCard({
                 width: `${wellnessIndexScore}%`,
                 background:
                   wellnessIndexScore >= 80
-                    ? "linear-gradient(90deg, #16a34a, #22c55e)"
+                    ? "linear-gradient(90deg, #2da82d, #37CA37)"
                     : wellnessIndexScore >= 60
-                    ? "linear-gradient(90deg, #2563eb, #60a5fa)"
+                    ? "linear-gradient(90deg, #d4940a, #F6AD55)"
                     : wellnessIndexScore >= 40
-                    ? "linear-gradient(90deg, #ca8a04, #fbbf24)"
-                    : "linear-gradient(90deg, #dc2626, #f87171)",
+                    ? "linear-gradient(90deg, #d4940a, #F6AD55)"
+                    : "linear-gradient(90deg, #c93030, #E93D3D)",
               }}
             />
           </div>

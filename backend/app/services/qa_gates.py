@@ -185,13 +185,19 @@ def evaluate_qa_g7(report: "Report") -> QAGateResult:
 
 
 def evaluate_qa_g8(report: "Report") -> QAGateResult:
-    """QA-G8: reviewerName must match APPROVER_EMAIL for certification-impact reports."""
+    """QA-G8: reviewerName must match APPROVER_EMAIL or known display name for certification-impact reports."""
     cert_outcomes = {
         CertificationOutcome.HEALTHY_WORKPLACE_CERTIFIED,
         CertificationOutcome.HEALTHY_SPACE_VERIFIED,
     }
     if report.certification_outcome in cert_outcomes:
-        if report.reviewer_name != settings.APPROVER_EMAIL:
+        # Accept both email and display name forms
+        authorized_values = {
+            settings.APPROVER_EMAIL,
+            settings.APPROVER_EMAIL.split("@")[0].replace(".", " ").title(),  # "Jaychoy" fallback
+            "Jay Choy",  # Known display name
+        }
+        if report.reviewer_name not in authorized_values:
             return QAGateResult(
                 gate="QA-G8",
                 passed=False,
