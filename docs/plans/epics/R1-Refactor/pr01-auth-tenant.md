@@ -5,8 +5,10 @@
 Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confirm:
 
 - **Dependencies**: PR-R1-01 has no prior PR dependencies (it is the first PR)
-- **Scope boundaries**: Scope (in) = migration 014, seed script, config, dependencies.py, frontend auth. Scope (out) = tenant scoping enforcement on routes, user assignment UI
-- **Risks**: Review risk #2 (tenant migration assigns sites incorrectly) — seed script is deterministic, manual review before prod
+- **Scope boundaries**: Scope (in) = migration 014, seed script, config, dependencies.py,
+  frontend auth. Scope (out) = tenant scoping enforcement on routes, user assignment UI
+- **Risks**: Review risk #2 (tenant migration assigns sites incorrectly) — seed script is
+  deterministic, manual review before prod
 - **Status**: Verify no prior PRs are in progress or partially merged
 
 **Post-Completion Check**: After merging, re-read ROADMAP.md to verify:
@@ -27,7 +29,8 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
 ## 1) Feature Summary
 
 - **Goal**: Establish foundational authentication and tenant isolation layer
-- **User Story**: As a facility manager, I want to log in and see only my site's data so that I can't accidentally access other tenants' information.
+- **User Story**: As a facility manager, I want to log in and see only my site's data so that I can't
+  accidentally access other tenants' information.
 - **Acceptance Criteria**:
   1. `user_tenant` table exists with correct schema (supabase_user_id unique, tenant_id FK, role)
   2. Seed script creates "FJ Internal" tenant and assigns all NULL-tenant sites to it (idempotent)
@@ -40,13 +43,17 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
 
 ## 2) Approach Overview
 
-- **Proposed UX**: Simple login page with email input and "Send Magic Link" button. AuthProvider wraps layout to manage session state.
-- **Proposed API**: Replace stub `get_tenant_id()` with Supabase JWT extraction. Returns None when no token present (backward compatible). New `get_current_tenant()` for routes that require auth (R2).
+- **Proposed UX**: Simple login page with email input and "Send Magic Link" button. AuthProvider
+  wraps layout to manage session state.
+- **Proposed API**: Replace stub `get_tenant_id()` with Supabase JWT extraction. Returns None
+  when no token present (backward compatible). New `get_current_tenant()` for routes that require
+  auth (R2).
 - **Proposed Data Changes**: New `user_tenant` table (migration 014). Seed script assigns existing sites to default tenant.
 
 ## 3) PR Plan
 
 ### PR Title: `feat(R1-01): auth foundation and tenant activation`
+
 ### Branch Name: `r1-01-auth-tenant`
 
 ### Key Changes by Layer
@@ -55,7 +62,12 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
 
 1. **Migration 014_user_tenant** (`backend/migrations/versions/014_user_tenant.py`)
    - down_revision: `'007_tenant_customer_info'`
-   - Create `user_tenant` table: id (String PK), supabase_user_id (String, unique, indexed), tenant_id (String FK tenant.id), role (String default 'facility_manager'), created_at
+   - Create `user_tenant` table:
+     - id (String PK)
+     - supabase_user_id (String, unique, indexed)
+     - tenant_id (String FK tenant.id)
+     - role (String default 'facility_manager')
+     - created_at
    - downgrade: drop_table('user_tenant')
 
 2. **Seed script** (`scripts/seed_default_tenant.py`)
@@ -69,31 +81,35 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
    - Update comment from "Phase 3 -- Clerk auth" to "Supabase Auth JWT"
 
 4. **Dependencies** (`backend/app/api/dependencies.py`)
-   - Rewrite `get_tenant_id()` to: accept Request + Session deps, extract Authorization header, if none return None, if present decode JWT with PyJWT (HS256, verify aud="authenticated"), lookup user in user_tenant table, return tenant_id or None. Raise 401 on invalid token.
-   - Add `get_current_tenant()` — same logic but requires valid token (raises 401 if no header)
+   - Rewrite `get_tenant_id()` to: accept Request + Session deps, extract Authorization
+     header, if none return None, if present decode JWT with PyJWT (HS256,
+     verify aud="authenticated"), lookup user in user_tenant table, return tenant_id or
+     None. Raise 401 on invalid token.
+   - Add `get_current_tenant()` — same logic but requires valid token (raises 401 if no
+     header)
    - Add `RequiredTenantIdDep = Annotated[str, Depends(get_current_tenant)]`
 
 **Frontend:**
 
-5. **Dependencies**: `pnpm add @supabase/supabase-js`. Remove `@clerk/nextjs` (optional, can be cleanup follow-up).
+1. **Dependencies**: `pnpm add @supabase/supabase-js`. Remove `@clerk/nextjs` (optional, can be cleanup follow-up).
 
-6. **Supabase client** (`frontend/lib/supabase.ts` — new)
+2. **Supabase client** (`frontend/lib/supabase.ts` — new)
    - Create and export singleton Supabase client using NEXT_PUBLIC_SUPABASE_URL + NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-7. **AuthProvider** (`frontend/components/layout/AuthProvider.tsx` — new)
+3. **AuthProvider** (`frontend/components/layout/AuthProvider.tsx` — new)
    - React context: user, session, signOut(), loading
    - On mount: `supabase.auth.getSession()`
    - Subscribe to `supabase.auth.onAuthStateChange`
 
-8. **Login page** (`frontend/app/login/page.tsx` — new)
+4. **Login page** (`frontend/app/login/page.tsx` — new)
    - Client component with email input, "Send Magic Link" button
    - Uses `supabase.auth.signInWithOtp({ email })`
    - Success/error messages, redirect if already logged in
 
-9. **Layout** (`frontend/app/layout.tsx`)
+5. **Layout** (`frontend/app/layout.tsx`)
    - Wrap Navbar + main content with AuthProvider
 
-10. **API client** (`frontend/lib/api.ts`)
+6. **API client** (`frontend/lib/api.ts`)
     - Modify `fetcher` to accept optional authToken
     - When token provided, inject `Authorization: Bearer <token>` header
     - Export `api.withToken(token)` factory method
@@ -108,6 +124,7 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
 ## 4) Testing & Verification
 
 ### Automated Tests
+
 - Unit test: `get_tenant_id()` with no header → returns None
 - Unit test: `get_tenant_id()` with valid JWT, no user_tenant mapping → returns None
 - Unit test: `get_tenant_id()` with valid JWT + mapping → returns tenant_id
@@ -115,6 +132,7 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
 - Unit test: `get_current_tenant()` with no header → raises 401
 
 ### Manual Verification Checklist
+
 1. `alembic upgrade head` succeeds, `user_tenant` table exists
 2. `python scripts/seed_default_tenant.py` assigns NULL-tenant sites, idempotent
 3. `GET /api/dashboard/sites` without auth returns all sites (same as before)
@@ -122,6 +140,7 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
 5. All existing pages (`/`, `/ops`, `/executive`) load without regression
 
 ### Commands to Run
+
 ```bash
 cd backend && alembic upgrade head
 python scripts/seed_default_tenant.py
