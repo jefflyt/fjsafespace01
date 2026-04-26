@@ -2,6 +2,7 @@
 backend/app/schemas/report.py
 
 Pydantic schemas for report API request/response payloads.
+QA/approval schemas deferred to R3.
 """
 
 from __future__ import annotations
@@ -39,27 +40,3 @@ class ReportResponse(BaseModel):
     certification_outcome: Optional[CertificationOutcome] = None
     report_snapshot: Optional[str] = None
     generated_at: datetime
-
-
-class UpdateQAChecklistRequest(BaseModel):
-    qa_checks: dict[str, bool]
-    data_quality_statement: Optional[str] = None
-    reviewer_name: Optional[str] = None
-
-
-class ApproveReportRequest(BaseModel):
-    reviewer_name: str
-
-
-class QAGateResponse(BaseModel):
-    gate: str
-    passed: bool
-    message: str
-
-
-class ApprovalResponse(BaseModel):
-    success: bool
-    report_id: str
-    reviewer_status: ReviewerStatus
-    qa_results: list[QAGateResponse]
-    error: Optional[str] = None

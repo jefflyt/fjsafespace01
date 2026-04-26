@@ -167,7 +167,7 @@ async def create_upload(
     try:
         storage = SupabaseStorage()
         storage_path = f"uploads/{upload_id}/{safe_filename}"
-        file_url = storage.upload_file(file_bytes, storage_path)
+        _ = storage.upload_file(file_bytes, storage_path)
     except SupabaseStorageError as e:
         upload.parse_status = ParseStatus.FAILED
         upload.parse_outcome = ParseOutcome.FAIL

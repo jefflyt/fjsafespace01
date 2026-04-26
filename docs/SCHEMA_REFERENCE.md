@@ -12,9 +12,11 @@ The dashboard (Workflow B) has **SELECT-only** access. Writes must use `ADMIN_DA
 
 ### `reference_source`
 
-**What it is:** Registry of every external standard, guideline, whitepaper, or vendor spec that the platform references (e.g. WHO AQG 2021, SS 554:2018).
+**What it is:** Registry of every external standard, guideline, whitepaper, or vendor spec referenced by the platform.
+Examples include WHO AQG 2021 and SS 554:2018.
 
-**When updated:** When a new standard is ingested or an existing one is superseded/retired. Populated by the rulebook seed script or admin console.
+**When updated:** When a new standard is ingested or an existing one is superseded or retired.
+Populated by the rulebook seed script or admin console.
 
 | Column | Type | Notes |
 | --- | --- | --- |
@@ -37,9 +39,11 @@ The dashboard (Workflow B) has **SELECT-only** access. Writes must use `ADMIN_DA
 
 ### `citation_unit`
 
-**What it is:** Individual clauses or paragraphs extracted from a reference source. Each unit contains the verbatim excerpt and metadata about which metrics it applies to.
+**What it is:** Individual clauses or paragraphs extracted from a reference source.
+Each unit contains the verbatim excerpt and metadata about which metrics it applies to.
 
-**When updated:** When a new standard is parsed and its clauses are extracted. Always created alongside or after a `reference_source`.
+**When updated:** When a new standard is parsed and its clauses are extracted.
+Always created alongside or after a `reference_source`.
 
 | Column | Type | Notes |
 | --- | --- | --- |
@@ -57,9 +61,11 @@ The dashboard (Workflow B) has **SELECT-only** access. Writes must use `ADMIN_DA
 
 ### `rulebook_entry`
 
-**What it is:** The runtime source of truth for IAQ thresholds, certification logic, and Wellness Index weights. Dashboard services read this table to evaluate findings.
+**What it is:** The runtime source of truth for IAQ thresholds, certification logic, and Wellness Index weights.
+Dashboard services read this table to evaluate findings.
 
-**When updated:** When thresholds change — the old entry is marked `superseded` with an `effective_to` date, and a new entry is created with an incremented `rule_version`.
+**When updated:** When thresholds change — the old entry is marked `superseded` with an `effective_to` date.
+A new entry is created with an incremented `rule_version`.
 
 | Column | Type | Notes |
 | --- | --- | --- |
@@ -90,21 +96,31 @@ The dashboard (Workflow B) has **SELECT-only** access. Writes must use `ADMIN_DA
 
 ### `tenant`
 
-**What it is:** Multi-tenant customer profile. Phase 3 only — currently nullable and unused in Phase 1/2.
+**What it is:** Multi-tenant customer profile. Used in R1+ for tenant
+isolation and customer management. Created during CSV upload with customer
+info, linked to sites.
 
-**When updated:** When a new customer is onboarded or their certification due date changes.
+**When updated:** Created when a new customer uploads data (auto-created
+from upload form fields). Sites reference tenants via `tenant_id` FK.
 
 | Column | Type | Notes |
 | --- | --- | --- |
 | `id` | UUID | PK |
-| `tenant_name` | TEXT | Customer name |
+| `tenant_name` | TEXT | Customer name (defaults to `client_name`) |
 | `contact_email` | TEXT | Primary contact |
 | `certification_due_date` | TIMESTAMPTZ | Renewal deadline |
+| `client_name` | TEXT | Nullable — client organization name |
+| `site_address` | TEXT | Nullable — physical address |
+| `premises_type` | TEXT | Nullable — office, industrial, etc. |
+| `contact_person` | TEXT | Nullable — primary contact name |
+| `specific_event` | TEXT | Nullable — event context for scan |
+| `comparative_analysis` | BOOL | Whether this is a before/after scan |
 | `created_at` | TIMESTAMPTZ | Onboarding timestamp |
 
 ### `notification`
 
-**What it is:** In-app notifications for the ops team. Frontend polls `GET /api/notifications` every 60 seconds. Phase 3: also triggers Resend emails for `renewal_due` events.
+**What it is:** In-app notifications for the ops team.
+Frontend polls `GET /api/notifications` every 60 seconds. Phase 3 also triggers Resend emails for `renewal_due` events.
 
 **When updated:** Automatically when events occur — new alerts, overdue reports, approved reports, upcoming renewals.
 
@@ -135,14 +151,18 @@ These tables form the core operational pipeline: Upload → Readings → Finding
 | --- | --- | --- |
 | `id` | UUID | PK |
 | `name` | TEXT | Human-readable site name |
-| `tenant_id` | UUID | FK → `tenant.id` (nullable for Phase 1/2) |
+| `tenant_id` | UUID | FK → `tenant.id` |
+| `context_scope` | TEXT | `office` \| `industrial` \| `school` \| `residential` \| `general`. Default `general`. |
+| `standard_ids` | TEXT | JSON string[] — shortcut to site_standards join |
 | `created_at` | TIMESTAMPTZ | Registration timestamp |
 
 ### `upload`
 
 **What it is:** A single CSV file upload from a site sensor. Tracks the parse lifecycle and auto-detected report type.
 
-**When updated:** Created when a CSV is uploaded. `parse_status` and `parse_outcome` are updated during the synchronous parse → evaluate pipeline. `report_type` is auto-detected during upload (single day = `ASSESSMENT`, multi-day = `INTERVENTION_IMPACT`).
+**When updated:** Created when a CSV is uploaded.
+`parse_status` and `parse_outcome` are updated during the synchronous parse → evaluate pipeline.
+`report_type` is auto-detected during upload (single day = `ASSESSMENT`, multi-day = `INTERVENTION_IMPACT`).
 
 | Column | Type | Notes |
 | --- | --- | --- |
@@ -156,6 +176,8 @@ These tables form the core operational pipeline: Upload → Readings → Finding
 | `report_type` | TEXT | `ASSESSMENT` \| `INTERVENTION_IMPACT` (auto-detected) |
 | `rule_version_used` | TEXT | Rulebook version at time of evaluation |
 | `warnings` | TEXT | JSON string[] of parse warnings |
+| `scan_type` | TEXT | `adhoc` \| `continuous`. Default `adhoc`. |
+| `standards_evaluated` | TEXT | JSON string[] — reference_source IDs used during evaluation |
 
 ### `reading`
 
@@ -178,9 +200,12 @@ These tables form the core operational pipeline: Upload → Readings → Finding
 
 ### `finding`
 
-**What it is:** The output of rule evaluation for a single metric reading. Each finding compares a reading against the rulebook and determines its threshold band, interpretation, and recommended action.
+**What it is:** The output of rule evaluation for a single metric reading.
+Each finding compares a reading against the rulebook.
+It determines the threshold band, interpretation, and recommended action.
 
-**When updated:** Bulk-inserted during the rule evaluation step (immediately after parse completes). Never modified — findings are the authoritative record of what the rules said at that point in time.
+**When updated:** Bulk-inserted during the rule evaluation step (immediately after parse completes).
+Never modified — findings are the authoritative record of what the rules said at that point in time.
 
 | Column | Type | Notes |
 | --- | --- | --- |
@@ -203,9 +228,15 @@ These tables form the core operational pipeline: Upload → Readings → Finding
 
 ### `report`
 
-**What it is:** The final report generated from an upload's findings. Contains QA checklist state, certification outcome, and an immutable HTML snapshot captured at approval time for reproducible PDF generation.
+**What it is:** The final report generated from an upload's findings.
+It contains QA checklist state, certification outcome, and an immutable HTML snapshot.
+The snapshot is captured at approval time for reproducible PDF generation.
 
-**When updated:** Created as a draft after upload evaluation. Updated incrementally as the analyst works through the QA checklist. Final update happens on approval — the `report_snapshot` is populated with rendered HTML and `reviewer_status` transitions to `APPROVED`. After approval, only `reviewer_status` can change to `EXPORTED`.
+**When updated:** Created as a draft after upload evaluation.
+Updated incrementally as the analyst works through the QA checklist.
+Final update happens on approval.
+The `report_snapshot` is populated with rendered HTML and `reviewer_status` transitions to `APPROVED`.
+After approval, only `reviewer_status` can change to `EXPORTED`.
 
 | Column | Type | Notes |
 | --- | --- | --- |
@@ -227,11 +258,110 @@ These tables form the core operational pipeline: Upload → Readings → Finding
 
 ---
 
+## New Tables (R1/R2 Refactor)
+
+### `site_metric_preferences`
+
+**What it is:** Per-site metric display preferences. One row per site.
+Facility managers choose which metrics to show and can adjust alert
+thresholds within safe bounds.
+
+**When updated:** When a facility manager changes metric visibility or alert threshold overrides for their site.
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | UUID | PK |
+| `site_id` | UUID | FK → `site.id`, UNIQUE — one row per site |
+| `active_metrics` | TEXT[] | Array of metric names to display (e.g., `ARRAY['co2_ppm', 'pm25_ugm3']`) |
+| `alert_threshold_overrides` | JSONB | Per-metric threshold overrides: `{"co2_ppm": {"watch_max": 1100}}` |
+| `created_at` | TIMESTAMPTZ | Default `NOW()` |
+| `updated_at` | TIMESTAMPTZ | Default `NOW()` |
+
+### `site_standards`
+
+**What it is:** Maps sites to certification standards (WELL, ASHRAE, SS554,
+SafeSpace). A site can have multiple active standards, each judged
+independently.
+
+**When updated:** When FJ staff adds or removes a standard from a site during setup.
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | UUID | PK |
+| `site_id` | UUID | FK → `site.id` |
+| `reference_source_id` | UUID | FK → `reference_source.id` |
+| `is_active` | BOOL | Default `TRUE` |
+| `created_at` | TIMESTAMPTZ | Default `NOW()` |
+
+**Unique constraint:** `(site_id, reference_source_id)` — a site can't have
+the same standard twice.
+
+### `user_tenant`
+
+**What it is:** Maps Supabase Auth users to tenants for tenant isolation.
+Enables facility managers to log in and see only their own sites.
+
+**When updated:** When a facility manager account is created or assigned to a tenant.
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | UUID | PK |
+| `supabase_user_id` | UUID | UNIQUE — from Supabase Auth |
+| `tenant_id` | UUID | FK → `tenant.id` |
+| `role` | TEXT | `facility_manager` \| `admin` |
+| `created_at` | TIMESTAMPTZ | Default `NOW()` |
+
+### `device_connection` (R2)
+
+**What it is:** Tracks uHoo device connectivity state for continuous monitoring.
+Stores encrypted API credentials and polling configuration.
+
+**When updated:** When a device is registered, polled, or loses connection.
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | UUID | PK |
+| `site_id` | UUID | FK → `site.id` |
+| `device_id` | TEXT | uHoo device identifier |
+| `uhoo_api_key` | TEXT | Encrypted API credential |
+| `polling_interval_seconds` | INTEGER | Default `600` (10 min, range: 300–900) |
+| `last_poll_at` | TIMESTAMPTZ | Nullable — last successful poll |
+| `last_heartbeat_at` | TIMESTAMPTZ | Nullable — last device heartbeat |
+| `connection_status` | TEXT | `online` \| `offline` \| `error` |
+| `error_message` | TEXT | Nullable — last poll error |
+| `created_at` | TIMESTAMPTZ | Default `NOW()` |
+| `updated_at` | TIMESTAMPTZ | Default `NOW()` |
+
+**Unique constraint:** `(site_id, device_id)`.
+
+### `alert_log` (R2)
+
+**What it is:** Tracks sent alerts for deduplication.
+Prevents repeated alerts for the same metric/zone within a 4-hour cooldown window.
+
+**When updated:** Every time an email alert is sent.
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | UUID | PK |
+| `site_id` | UUID | FK → `site.id` |
+| `zone_name` | TEXT | Zone name |
+| `metric_name` | TEXT | Metric that triggered the alert |
+| `threshold_band` | TEXT | `'CRITICAL'` at trigger time |
+| `sent_at` | TIMESTAMPTZ | Default `NOW()` |
+| `recipients` | TEXT[] | Email addresses that received it |
+
+**Index:** `(site_id, zone_name, metric_name, sent_at DESC)` — used for deduplication queries.
+
+---
+
 ## Legacy Table
 
 ### `rulebook`
 
-**What it is:** Legacy flat-structure table from early development. Stores rules as a single JSONB blob per source. **Not used by the current pipeline** — the new flow uses `reference_source` → `citation_unit` → `rulebook_entry`.
+**What it is:** Legacy flat-structure table from early development.
+Stores rules as a single JSONB blob per source.
+**Not used by the current pipeline** — the new flow uses `reference_source` → `citation_unit` → `rulebook_entry`.
 
 **Status:** Can be dropped once migration to the new tables is confirmed working. Keep for now as backup reference.
 

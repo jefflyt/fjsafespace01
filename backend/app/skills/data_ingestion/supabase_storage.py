@@ -9,7 +9,6 @@ Usage:
     content = storage.download_file("upload-id.csv")
 """
 
-from io import BytesIO
 
 from supabase import Client, create_client
 

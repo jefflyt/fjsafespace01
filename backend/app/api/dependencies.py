@@ -9,7 +9,6 @@ Phase 3:   Clerk JWT extraction and tenant_id validation will be added here.
            where the Phase 3 injection point lives.
 """
 
-from collections.abc import Generator
 from typing import Annotated
 
 from fastapi import Depends

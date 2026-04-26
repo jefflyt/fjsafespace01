@@ -1,5 +1,13 @@
 {
   "psd_path": "docs/PSD-Refactor.md",
+  "tdd_path": "docs/TDD-Refactor.md",
   "project_type": "Full-Stack Web App",
-  "_updated_by": "/01-create-psd"
+  "stack": {
+    "frontend": "Next.js 15 (App Router), TypeScript, Tailwind CSS, Shadcn UI, Recharts",
+    "backend": "FastAPI, Python 3.12+, SQLModel (SQLAlchemy 2.x)",
+    "database": "PostgreSQL 16 (Supabase prod, Docker Compose local)",
+    "storage": "Supabase Storage (iaq-scans bucket, CSV uploads only)",
+    "auth": "Supabase Auth (email + magic link, R1 setup / R2 enforcement)"
+  },
+  "_updated_by": "/02-create-tdd"
 }

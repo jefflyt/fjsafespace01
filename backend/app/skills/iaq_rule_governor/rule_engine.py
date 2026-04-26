@@ -18,7 +18,7 @@ rule_version, and citation_unit_ids (non-empty list).
 Reference: TDD §4.1 (processing step), TDD §8.1 (unit test invariants)
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from app.models.enums import (
     BenchmarkLane,

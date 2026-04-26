@@ -6,7 +6,6 @@ Pydantic response schemas for the Executive Dashboard API.
 Reference: PLAN docs/plans/epics/pr6-executive-dashboard/PLAN.md § PR 6.2
 """
 
-from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel

@@ -15,7 +15,7 @@ Reference: TDD §4.6
 
 from sqlmodel import Session, col, select
 
-from fastapi import APIRouter, HTTPException, Query, status
+from fastapi import APIRouter, HTTPException, status
 
 from app.api.dependencies import SessionDep
 from app.models.enums import MetricName
