@@ -4,12 +4,13 @@
 
 ### 1.1 Brand Essence
 
-FJ SafeSpace is a **technology-driven indoor air quality and wellness platform**. The dashboard should feel like a modern command center — clean, data-rich, and trustworthy — with subtle technological flair that signals sophistication without overwhelming the user.
+FJ SafeSpace is a **technology-driven indoor air quality and wellness platform**. The dashboard should feel like a modern command center — clean, data-rich, and trustworthy — with subtle technological flair that signals sophistication without overwhelming the user. It must convey engineering precision and deterministic outcomes, specifically avoiding any "generative AI" aesthetics or ambiguity.
 
 ### 1.2 Visual Personality
 
 - **Primary**: Professional, clinical, trustworthy (healthcare/wellness domain)
 - **Secondary**: Modern, tech-forward, data-driven (IoT monitoring, real-time analytics)
+- **Anti-Persona**: Not conversational, not "magical", no AI-fluff
 - **Tone**: Calm but authoritative — like a medical instrument meets a mission control dashboard
 
 ---
@@ -37,15 +38,17 @@ FJ SafeSpace is a **technology-driven indoor air quality and wellness platform**
 | `--gray-200` | `#E5E7EB` | `219 14% 90%` | Borders, dividers, disabled states |
 | `--gray-300` | `#D1D5DB` | `220 10% 84%` | Disabled borders, placeholder rings |
 
-### 2.3 Semantic Colors
+### 2.3 Semantic Colors & Accessibility
 
-| Semantic | Hex | Usage |
-| ---------- | ----- | ------- |
-| **Healthy / Pass** | `#37CA37` | Certified sites, within threshold |
-| **Warning / Advisory** | `#F6AD55` | Near threshold, needs monitoring |
-| **Critical / Fail** | `#E93D3D` | Exceeds threshold, immediate action |
-| **Info** | `#188BF6` | Neutral data, metadata |
-| **Advisory Only** | `#D1D5DB` | Non-current standards |
+To ensure WCAG AA compliance (4.5:1 contrast ratio) on light backgrounds, semantic colors are split into **Base** (for icons, charts, and fills) and **Text** (for typography). The base brand colors are too light to be legible as text on white backgrounds.
+
+| Semantic | Base Hex (Fills/Icons) | Text Hex (Typography) | Usage |
+| ---------- | ---------------------- | --------------------- | ------- |
+| **Healthy / Pass** | `#37CA37` | `#15803D` (Green 700) | Certified sites, within threshold |
+| **Warning / Advisory** | `#F6AD55` | `#B45309` (Amber 700) | Near threshold, needs monitoring |
+| **Critical / Fail** | `#E93D3D` | `#B91C1C` (Red 700) | Exceeds threshold, immediate action |
+| **Info** | `#188BF6` | `#1D4ED8` (Blue 700) | Neutral data, metadata |
+| **Advisory Only** | `#D1D5DB` | `#4B5563` (Gray 600) | Non-current standards |
 
 ### 2.4 Tailwind Mapping (globals.css)
 
@@ -74,7 +77,8 @@ FJ SafeSpace is a **technology-driven indoor air quality and wellness platform**
 | Role | Font | Weight | Source |
 | ------ | ------ | -------- | -------- |
 | **Headlines** | Montserrat | 500–700 | fjsafespace.com |
-| **Body / Data** | Inter | 400–600 | Dashboard numbers, badges, body text |
+| **Body UI** | Inter | 400–600 | General interface text, labels |
+| **Telemetry**| JetBrains Mono / Roboto Mono | 400–500 | Sensor IDs, MAC addresses, exact timestamps, raw metrics |
 | **Fallback** | system-ui, sans-serif | — | All layers |
 
 ### 3.2 Type Scale
@@ -90,8 +94,8 @@ FJ SafeSpace is a **technology-driven indoor air quality and wellness platform**
 
 ### 3.3 Typography Rules
 
-- **Never use more than 2 font families per view** (Montserrat for headings + Inter for body/data)
-- **Data numbers** should always use `tabular-nums` font feature
+- **Font Hierarchy**: Montserrat for semantic headings, Inter for UI text/body, and a strict **Monospace font** for machine data (MAC addresses, exact timestamps, raw telemetry).
+- **Data numbers** should always use `tabular-nums` font feature, and ideally use the monospace font for alignment.
 - **Uppercase labels** use `tracking-wider` (0.05em) for readability, `tracking-widest` (0.1em) for tech badges only
 
 ---
@@ -104,9 +108,9 @@ FJ SafeSpace is a **technology-driven indoor air quality and wellness platform**
 - **Tablet**: 8-column grid
 - **Mobile**: 4-column grid, full bleed
 
-### 4.2 Spacing Scale
+### 4.2 Spacing Scale & Density
 
-Use Tailwind's default spacing scale. Key patterns:
+Use Tailwind's default spacing scale, but bias toward **high information density**. Command centers show structured data without excessive white space. Key patterns:
 
 - **Card gap**: `gap-4` (16px) between cards
 - **Section gap**: `gap-6` (24px) between sections
@@ -138,12 +142,12 @@ Use Tailwind's default spacing scale. Key patterns:
 
 ## 5. Technology Feel & Motion
 
-These elements differentiate the dashboard from a generic admin panel:
+These elements differentiate the dashboard from a generic admin panel, while strictly maintaining a deterministic, engineered feel rather than an "AI" feel:
 
 ### 5.1 Data Visualization Style
 
-- **Charts**: Clean lines, no grid clutter, smooth curves (`tension: 0.4`)
-- **Sparklines**: Inline mini-charts for trend indicators
+- **Charts**: Sharp, deterministic lines (`tension: 0` or stepped curves). Avoid organic smoothing (`tension: 0.4`); raw data should look engineered and precise.
+- **Sparklines**: Inline mini-charts for trend indicators, using sharp line segments.
 - **Pulse indicators**: Subtle animated dot on live data status
 - **Monospace numbers**: Use `font-mono tabular-nums` for metric values
 
@@ -157,12 +161,12 @@ These elements differentiate the dashboard from a generic admin panel:
 
 ### 5.3 Micro-interactions
 
-- **Hover on cards**: `transition-all duration-200 hover:shadow-md hover:-translate-y-0.5`
-- **Active nav items**: `bg-accent text-accent-foreground` with left border accent (`border-l-2 border-primary`)
-- **Button press**: `active:scale-95` for tactile feedback
-- **Loading states**: Skeleton shimmer, not spinners (where possible)
-- **Staggered entrance**: Cards in a grid fade in with 50ms stagger (`animate-fade-in`)
-- **Number counting**: Hero metrics animate from 0 to final value on mount (`animate-count-up`)
+- **Hover on cards**: `transition-all duration-150 ease-out hover:border-primary/50 hover:shadow-sm` (avoid lifting cards with `translate-y`; border highlights feel more technical)
+- **Active nav items**: `bg-accent text-accent-foreground` with strict left border accent (`border-l-2 border-primary`)
+- **Button press**: `active:scale-95` for immediate tactile feedback
+- **Loading states**: Fast, deterministic skeleton sweeps or monospace loading sequences (e.g., `[...]`); avoid slow spinning circles.
+- **Staggered entrance**: Cards in a grid fade in with fast 50ms stagger (`animate-fade-in`)
+- **Number counting**: Fast rolling numbers (`tabular-nums`) from 0 to final value on mount.
 
 ### 5.4 Tech Accents (use sparingly)
 
@@ -344,6 +348,8 @@ Add these to `globals.css`:
 
 ## 11. What to Avoid
 
+- **No AI aesthetics** — no sparkle icons (✨), magic wands, blurred neon aurora backgrounds, or text-streaming animations. The platform is deterministic and engineered, not "magical".
+- **No conversational UI** — avoid chat bubbles or floating AI assistants. Present data directly and authoritatively.
 - **No dark mode** — brand is light and airy (dark mode is a Phase 3+ consideration)
 - **No neon colors** — the tech feel comes from layout and motion, not saturated colors
 - **No gradients on large surfaces** — use subtle tints, not full gradients
