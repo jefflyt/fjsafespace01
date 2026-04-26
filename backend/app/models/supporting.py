@@ -1,9 +1,9 @@
 """
 backend/app/models/supporting.py
 
-Supporting tables: Tenant (Phase 3) and Notification.
+Supporting tables: Tenant, UserTenant (R1 auth), and Notification.
 
-Reference: TDD §3.4
+Reference: TDD §3.4, §3.6 (user_tenant)
 """
 
 import uuid
@@ -31,6 +31,19 @@ class Tenant(SQLModel, table=True):
     comparative_analysis: bool = Field(default=False)
 
 
+class UserTenant(SQLModel, table=True):
+    """Maps Supabase Auth users to tenants with role-based access."""
+
+    __tablename__ = "user_tenant"
+
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True)
+    supabase_user_id: str = Field(unique=True, index=True)
+    tenant_id: str = Field(foreign_key="tenant.id")
+    # 'facility_manager' | 'admin'
+    role: str = Field(default="facility_manager")
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+
 class Notification(SQLModel, table=True):
     """
     In-app notifications.  Frontend polls GET /api/notifications every 60 seconds.
@@ -45,7 +58,6 @@ class Notification(SQLModel, table=True):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True)
     # null = broadcast to ops team
     user_id: Optional[str] = None
-    # null for Phase 1/2
     tenant_id: Optional[str] = None
     type: str
     title: str

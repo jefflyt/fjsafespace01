@@ -10,7 +10,9 @@
 
 The Supabase project `fjsafespace` (`jertvmbhgehajcrfifwl`) is **already set up** with:
 
-- **Postgres**: All 11 tables created via migration `001_fjsafespace_full_schema`
+- **Postgres**: All tables created via Alembic migrations (001 through 007,
+  plus R1 migrations 008-011 pending). Schema reference:
+  `docs/SCHEMA_REFERENCE.md`.
 - **Storage**: `iaq-scans` bucket for raw CSV uploads
 - **Region**: `ap-southeast-1` (Singapore)
 
@@ -55,17 +57,18 @@ Once the project is ready:
 
 ## Step 3: Apply Database Schema
 
-The project uses 11 tables across two workflows. Full schema reference: [`docs/SCHEMA_REFERENCE.md`](../../docs/SCHEMA_REFERENCE.md).
+The project uses tables across workflows. Full schema reference:
+[`docs/SCHEMA_REFERENCE.md`](../../docs/SCHEMA_REFERENCE.md).
 
 ### Option A: Via Supabase MCP (recommended)
 
-If you have the Supabase MCP server configured, run the migration through the MCP `apply_migration` tool. The migration file `001_fjsafespace_full_schema` is already applied to the production project.
+If you have the Supabase MCP server configured, run migrations through the MCP
+`apply_migration` tool. Migrations are already applied to the production project.
 
 ### Option B: Via SQL Editor
 
 1. In the Supabase dashboard, go to **SQL Editor**.
-2. Paste the full migration SQL from `backend/migrations/versions/001_fjsafespace_full_schema.sql` (if exported) or from the migration tool output.
-3. Click **Run**.
+2. Run migrations sequentially from `backend/migrations/versions/`.
 
 ### Option C: Via Alembic (local development)
 
@@ -78,21 +81,24 @@ export DATABASE_URL="postgresql+psycopg2://dev:dev@localhost:5432/fjsafespace"
 alembic upgrade head
 ```
 
-### Tables Created
+### Tables (as of 2026-04-26)
 
 | Workflow | Table | Purpose |
 | --- | --- | --- |
 | **A** | `reference_source` | Standards registry (WHO, SS554, etc.) |
 | **A** | `citation_unit` | Individual clauses with verbatim excerpts |
 | **A** | `rulebook_entry` | Runtime thresholds linked to citations |
-| **Supporting** | `tenant` | Phase 3 multi-tenant profiles |
+| **A** | `rulebook` | Flat JSON structure — superseded, kept as backup |
+| **Supporting** | `tenant` | Multi-tenant profiles |
 | **Supporting** | `notification` | In-app alerts for ops team |
+| **Supporting** | `user_tenant` | User-to-tenant mapping (R1-01) |
 | **B** | `site` | IAQ monitoring locations |
 | **B** | `upload` | CSV uploads with parse status |
 | **B** | `reading` | Raw sensor data rows |
 | **B** | `finding` | Rule evaluation output |
 | **B** | `report` | Final reports with QA checklist + snapshot |
-| **Legacy** | `rulebook` | Flat JSON structure — superseded, kept as backup |
+| **R1** | `site_metric_preferences` | Per-site metric visibility + thresholds |
+| **R1** | `site_standards` | Per-site active certification standards |
 
 ---
 
@@ -213,7 +219,7 @@ cd frontend && pnpm dev
 | Region | `ap-southeast-1` (Singapore) |
 | Service Role Key | `eyJhbGci...` (long JWT) |
 | Storage Bucket | `iaq-scans` (Public) |
-| Tables | 11 (see SCHEMA_REFERENCE.md) |
+| Tables | 14+ (see SCHEMA_REFERENCE.md) |
 
 ## Common Issues
 
