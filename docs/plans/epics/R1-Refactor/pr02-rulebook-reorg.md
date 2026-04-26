@@ -109,6 +109,7 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
 ## 4) Testing & Verification
 
 ### Manual Verification Checklist
+
 1. `alembic upgrade head` succeeds, `reference_source_id` column added
 2. `python scripts/seed_rulebook_v1.py` creates 4 sources, links rules
 3. `SELECT DISTINCT reference_source_id FROM rulebook_entry` shows all 4 sources
@@ -117,6 +118,7 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
 6. Old findings with rule_version="v1.0" still queryable
 
 ### Commands to Run
+
 ```bash
 cd backend && alembic upgrade head
 python scripts/seed_rulebook_v1.py
@@ -129,7 +131,13 @@ curl http://localhost:8000/api/rulebook/sources
 1. `alembic downgrade -1` (drops reference_source_id column from rulebook_entry)
 2. Revert `backend/app/models/workflow_a.py` to remove reference_source_id field
 3. Revert `scripts/seed_rulebook_v1.py` to original (if needed — seed changes are data-only)
-4. Note: New reference_source entries and rulebook entries created by seed script will remain. To fully clean: `DELETE FROM rulebook_entry WHERE rule_version = 'v2-refactor'; DELETE FROM reference_source WHERE title IN ('WELL Building Standard', 'ASHRAE 62.1', 'SS554', 'SafeSpace');`
+4. Note: New reference_source entries and rulebook entries created by seed script will remain. To
+   fully clean:
+   
+   ```sql
+   DELETE FROM rulebook_entry WHERE rule_version = 'v2-refactor';
+   DELETE FROM reference_source WHERE title IN ('WELL Building Standard', 'ASHRAE 62.1', 'SS554', 'SafeSpace');
+   ```
 
 ## 6) Follow-ups
 
