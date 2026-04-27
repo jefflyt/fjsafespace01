@@ -7,7 +7,8 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
 - **Dependencies**: PR-R1-05 depends on PR-R1-04 — APIs must exist
 - **Scope boundaries**: Scope (in) = 6 new components, refactored /ops and /executive pages, UploadForm update.
   Scope (out) = PDF UI (R3), real-time charts (R2)
-- **Risks**: Review risk #4 (frontend refactor too large for single PR) — can split into components-first + pages-refactor if needed
+- **Risks**: Review risk #4 (frontend refactor too large for single PR) — can split into components-first +
+pages-refactor if needed
 - **Status**: Verify PR-R1-04 is merged, all API endpoints return expected data
 
 **Post-Completion Check**: After merging, re-read ROADMAP.md to verify:
@@ -19,7 +20,8 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
 ## 1) Assumptions
 
 - All backend APIs from PR-R1-04 are functional and documented.
-- Existing frontend components: UploadForm, WellnessIndexCard, CrossSiteComparisonTable, TimeSeriesChart, Navbar, Sidebar.
+- Existing frontend components: UploadForm, WellnessIndexCard, CrossSiteComparisonTable, TimeSeriesChart, Navbar,
+Sidebar.
 - Existing pages: `/ops` (operations), `/executive` (executive view).
 - `/ops` Findings tab currently shows placeholder "under construction" message.
 - Shadcn UI components available: card, badge, select, button, dialog, input, table.
@@ -28,8 +30,10 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
 
 ## 1) Feature Summary
 
-- **Goal**: Replace compliance findings panel with human-friendly metric cards, site overview, zone detail, standard selector, metric selector
-- **User Story**: As a facility manager, I want to see my site's health in plain language with colour-coded urgency so that I can quickly identify what needs attention and what to do about it.
+- **Goal**: Replace compliance findings panel with human-friendly metric cards, site overview, zone detail, standard
+selector, metric selector
+- **User Story**: As a facility manager, I want to see my site's health in plain language with colour-coded urgency so
+that I can quickly identify what needs attention and what to do about it.
 - **Acceptance Criteria**:
   1. Upload form includes standard selector (multi-select, SS554 default)
   2. After upload, dashboard shows site overview card with per-standard wellness scores
@@ -44,13 +48,16 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
 
 ## 2) Approach Overview
 
-- **Proposed UX**: Site overview cards with wellness badges, zone detail with metric cards showing value + interpretation + action. Standard selector tabs, metric selector checkboxes.
-- **Proposed Frontend**: New components (SiteOverviewCard, MetricCard, StandardSelector, MetricSelector, ThresholdConfigDialog, ZoneDetailView). Refactored /ops and /executive pages.
+- **Proposed UX**: Site overview cards with wellness badges, zone detail with metric cards showing value +
+interpretation + action. Standard selector tabs, metric selector checkboxes.
+- **Proposed Frontend**: New components (SiteOverviewCard, MetricCard, StandardSelector, MetricSelector,
+ThresholdConfigDialog, ZoneDetailView). Refactored /ops and /executive pages.
 - **Proposed API**: No backend changes — all APIs implemented in PR-R1-04.
 
 ## 3) PR Plan
 
 ### PR Title: `feat(R1-05): frontend refactor to human-friendly dashboard`
+
 ### Branch Name: `r1-05-frontend-refactor`
 
 ### Key Changes by Layer
@@ -140,12 +147,14 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
 ## 4) Testing & Verification
 
 ### Automated Tests
+
 - Vitest: SiteOverviewCard renders per-standard scores correctly
 - Vitest: MetricCard shows correct colour for threshold_band
 - Vitest: StandardSelector switches between standards
 - Vitest: MetricSelector persists preferences via API
 
 ### Manual Verification Checklist
+
 1. Upload CSV with SS554 selected → dashboard shows site overview with SS554 score
 2. Switch standard to WELL → score updates
 3. Click zone → metric cards show with interpretation text
@@ -156,6 +165,7 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
 8. No regression on existing upload flow
 
 ### Commands to Run
+
 ```bash
 cd frontend && pnpm dev
 cd frontend && pnpm test
@@ -164,7 +174,8 @@ cd frontend && pnpm test
 ## 5) Rollback Plan
 
 1. Revert `frontend/app/ops/page.tsx` and `frontend/app/executive/page.tsx` to originals
-2. Remove new component files (SiteOverviewCard, MetricCard, StandardSelector, MetricSelector, ThresholdConfigDialog, ZoneDetailView)
+2. Remove new component files (SiteOverviewCard, MetricCard, StandardSelector, MetricSelector, ThresholdConfigDialog,
+ZoneDetailView)
 3. Revert UploadForm.tsx and WellnessIndexCard.tsx to originals
 4. Revert CrossSiteComparisonTable.tsx
 5. Note: No backend changes to revert

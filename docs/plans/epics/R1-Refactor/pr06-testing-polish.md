@@ -28,7 +28,8 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
 ## 1) Feature Summary
 
 - **Goal**: Build comprehensive test suite for R1 features, verify performance SLAs, fix any issues
-- **User Story**: As the developer, I need automated tests and performance validation so that I can confidently deploy R1 to production.
+- **User Story**: As the developer, I need automated tests and performance validation so that I can confidently deploy
+R1 to production.
 - **Acceptance Criteria**:
   1. All backend tests pass (> 80% coverage target)
   2. All frontend tests pass (> 70% coverage target)
@@ -40,13 +41,16 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
 
 ## 2) Approach Overview
 
-- **Proposed Tests**: Backend integration tests for tenant isolation, preferences, upload. Unit tests for rule engine, interpretations, auth middleware. Frontend component tests for new UI.
-- **Proposed Backend**: New test files with conftest fixtures. Uses existing test patterns (db_session, client fixtures).
+- **Proposed Tests**: Backend integration tests for tenant isolation, preferences, upload. Unit tests for rule engine,
+interpretations, auth middleware. Frontend component tests for new UI.
+- **Proposed Backend**: New test files with conftest fixtures. Uses existing test patterns (db_session, client
+fixtures).
 - **Proposed Frontend**: Vitest tests with jsdom + testing-library for new components.
 
 ## 3) PR Plan
 
 ### PR Title: `test(R1-06): comprehensive test suite and performance verification`
+
 ### Branch Name: `r1-06-testing`
 
 ### Key Changes by Layer
@@ -101,23 +105,23 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
 
 **Frontend:**
 
-8. **SiteOverviewCard tests** (`frontend/tests/site-overview-card.test.tsx` — new)
+1. **SiteOverviewCard tests** (`frontend/tests/site-overview-card.test.tsx` — new)
    - Renders site name, last updated, scan mode indicator
    - Shows per-standard wellness scores with correct badges
    - Colour coding matches threshold bands
    - Top insight displayed
 
-9. **MetricCard tests** (`frontend/tests/metric-card.test.tsx` — new)
+2. **MetricCard tests** (`frontend/tests/metric-card.test.tsx` — new)
    - Renders metric value, unit, interpretation text, action
    - Colour badge matches threshold_band
    - Multiple standards displayed correctly
 
-10. **StandardSelector tests** (`frontend/tests/standard-selector.test.tsx` — new)
+3. **StandardSelector tests** (`frontend/tests/standard-selector.test.tsx` — new)
     - Renders list of active standards
     - Clicking standard updates selected state
     - Placeholder standards (SafeSpace) show "Coming Soon"
 
-11. **MetricSelector tests** (`frontend/tests/metric-selector.test.tsx` — new)
+4. **MetricSelector tests** (`frontend/tests/metric-selector.test.tsx` — new)
     - Renders checkboxes for all metrics
     - Toggling checkbox calls API to persist preference
     - Loading state while saving
@@ -133,12 +137,14 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
 ## 4) Testing & Verification
 
 ### Automated Tests
+
 ```bash
 cd backend && pytest tests/ -v --cov=app --cov-report=term-missing
 cd frontend && pnpm test -- --coverage
 ```
 
 ### Manual Verification Checklist
+
 1. All backend tests pass, coverage > 80%
 2. All frontend tests pass, coverage > 70%
 3. Dashboard loads in < 3 seconds (measure with browser DevTools)
@@ -147,6 +153,7 @@ cd frontend && pnpm test -- --coverage
 6. No regressions: existing upload flow, readings, findings all work
 
 ### Performance Commands
+
 ```bash
 # API response time
 curl -w "@curl-format.txt" -o /dev/null -s http://localhost:8000/api/dashboard/sites

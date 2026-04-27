@@ -48,7 +48,8 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
 - **Proposed API**: Replace stub `get_tenant_id()` with Supabase JWT extraction. Returns None
   when no token present (backward compatible). New `get_current_tenant()` for routes that require
   auth (R2).
-- **Proposed Data Changes**: New `user_tenant` table (migration 014). Seed script assigns existing sites to default tenant.
+- **Proposed Data Changes**: New `user_tenant` table (migration 014). Seed script assigns existing sites to default
+tenant.
 
 ## 3) PR Plan
 

@@ -7,7 +7,8 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
 - **Dependencies**: PR-R1-04 depends on PR-R1-03 — schema tables must exist
 - **Scope boundaries**: Scope (in) = all new API routes, schemas, aggregation service update.
   Scope (out) = frontend UI, rate limiting, uHoo API
-- **Risks**: Review risk #3 (per-standard evaluation doubles query load) — index on (site_id, rule_version), cache per-standard scores
+- **Risks**: Review risk #3 (per-standard evaluation doubles query load) — index on (site_id, rule_version), cache
+per-standard scores
 - **Status**: Verify PR-R1-03 is merged, all migrations applied
 
 **Post-Completion Check**: After merging, re-read ROADMAP.md to verify:
@@ -27,29 +28,37 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
 
 ## 1) Feature Summary
 
-- **Goal**: Add new API endpoints for metric preferences, standards management, interpretations. Enhance upload and findings for per-standard evaluation.
-- **User Story**: As the frontend, I need endpoints to manage site preferences and display per-standard evaluation results so that users can customize their dashboard and see independent standard outcomes.
+- **Goal**: Add new API endpoints for metric preferences, standards management, interpretations. Enhance upload and
+findings for per-standard evaluation.
+- **User Story**: As the frontend, I need endpoints to manage site preferences and display per-standard evaluation
+results so that users can customize their dashboard and see independent standard outcomes.
 - **Acceptance Criteria**:
   1. `POST /api/uploads` accepts optional `standards` parameter (array of source IDs), stores `standards_evaluated`
-  2. `GET /api/uploads/{id}/findings` includes `standard_id` and `standard_title` per finding, supports `?standard_id=` filter
-  3. `GET /api/sites/{id}/metric-preferences` returns active_metrics and threshold overrides (200, or 404 if site not found)
+  2. `GET /api/uploads/{id}/findings` includes `standard_id` and `standard_title` per finding, supports `?standard_id=`
+filter
+  3. `GET /api/sites/{id}/metric-preferences` returns active_metrics and threshold overrides (200, or 404 if site not
+found)
   4. `PATCH /api/sites/{id}/metric-preferences` validates metric names and threshold bounds (400 if invalid)
   5. `GET /api/sites/{id}/standards` returns active standards for site
   6. `POST /api/sites/{id}/standards/{source_id}/activate` and `/deactivate` work (204)
   7. `GET /api/interpretations/{metric_name}/{threshold_band}` returns human-readable text
   8. Dashboard routes apply tenant scoping via TenantIdDep (WHERE clause for facility managers)
   9. Aggregation service computes per-standard wellness index
-- **Non-goals**: Frontend UI for these endpoints (deferred to PR-R1-05), rate limiting (TDD §4.4), uHoo API endpoints (R2)
+- **Non-goals**: Frontend UI for these endpoints (deferred to PR-R1-05), rate limiting (TDD §4.4), uHoo API endpoints
+(R2)
 
 ## 2) Approach Overview
 
-- **Proposed API**: 3 new routers (preferences, standards, interpretations), enhanced upload/findings routers. All use existing FastAPI patterns.
-- **Proposed Backend**: New schemas, new service functions for preferences and interpretations, updated aggregation for per-standard scoring.
+- **Proposed API**: 3 new routers (preferences, standards, interpretations), enhanced upload/findings routers. All use
+existing FastAPI patterns.
+- **Proposed Backend**: New schemas, new service functions for preferences and interpretations, updated aggregation for
+per-standard scoring.
 - **Proposed Data**: No schema changes (all created in PR-R1-03).
 
 ## 3) PR Plan
 
 ### PR Title: `feat(R1-04): backend API for preferences, standards, and per-standard evaluation`
+
 ### Branch Name: `r1-04-backend-api`
 
 ### Key Changes by Layer
@@ -67,7 +76,8 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
    - Each finding in response includes `standard_id` and `standard_title` (join with reference_source)
 
 3. **Preferences router** (`backend/app/api/routers/preferences.py` — new)
-   - `GET /api/sites/{id}/metric-preferences`: Query site_metric_preferences by site_id. If no row exists, return defaults (empty active_metrics, empty overrides).
+   - `GET /api/sites/{id}/metric-preferences`: Query site_metric_preferences by site_id. If no row exists, return
+defaults (empty active_metrics, empty overrides).
    - `PATCH /api/sites/{id}/metric-preferences`: Update active_metrics and alert_threshold_overrides. Validate:
      - Each metric in active_metrics is a valid MetricName enum value
      - Threshold overrides have numeric watch_max/watch_min/critical_max/critical_min fields
@@ -81,7 +91,8 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
    - Returns 404 if site or source not found
 
 5. **Interpretations router** (`backend/app/api/routers/interpretations.py` — new)
-   - `GET /api/interpretations/{metric_name}/{threshold_band}`: Query rulebook_entry for the metric. Map threshold_band to interpretation_template, business_impact_template, recommendation_template.
+   - `GET /api/interpretations/{metric_name}/{threshold_band}`: Query rulebook_entry for the metric. Map threshold_band
+to interpretation_template, business_impact_template, recommendation_template.
    - Accept optional `?context_scope=` query param (default "general")
    - Return interpretation, business_impact, recommendation, context_scope
    - Returns 404 if no rule found for metric
@@ -108,8 +119,9 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
 
 **Frontend:**
 
-10. **API client types** (`frontend/lib/api.ts`)
-    - Add typed functions: `api.getSitesMetricPreferences()`, `api.updateSitesMetricPreferences()`, `api.getSitesStandards()`, `api.activateStandard()`, `api.deactivateStandard()`, `api.getInterpretation()`
+1. **API client types** (`frontend/lib/api.ts`)
+    - Add typed functions: `api.getSitesMetricPreferences()`, `api.updateSitesMetricPreferences()`,
+`api.getSitesStandards()`, `api.activateStandard()`, `api.deactivateStandard()`, `api.getInterpretation()`
     - Keep existing unauthenticated functions
 
 ### Edge Cases to Handle
@@ -125,6 +137,7 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
 ## 4) Testing & Verification
 
 ### Manual Verification Checklist
+
 1. `POST /api/uploads` with standards=[source_id] → upload succeeds, standards_evaluated stored
 2. `GET /api/uploads/{id}/findings?standard_id=X` → returns only findings for that standard
 3. `GET /api/sites/{id}/metric-preferences` → returns preferences object
@@ -134,6 +147,7 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
 7. Dashboard routes filter by tenant when tenant_id present
 
 ### Commands to Run
+
 ```bash
 cd backend && fastapi dev app/main.py
 curl -X POST http://localhost:8000/api/uploads -F "file=@test.csv" -F "standards=[\"source-uuid\"]"

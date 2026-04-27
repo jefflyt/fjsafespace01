@@ -20,14 +20,17 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
 - Migrations 001-007 exist. Migrations 014 (user_tenant) and 015 (rulebook_standard_link) from prior PRs exist.
 - New migrations 008-011 are numbered by topic, not execution order. Alembic revision chain handles execution order.
 - `site` table exists with columns: id, name, tenant_id, created_at.
-- `upload` table exists with columns: id, site_id, file_name, uploaded_by, uploaded_at, parse_status, parse_outcome, report_type, rule_version_used, warnings.
+- `upload` table exists with columns: id, site_id, file_name, uploaded_by, uploaded_at, parse_status, parse_outcome,
+report_type, rule_version_used, warnings.
 - TEXT[] PostgreSQL array type supported (per D-R1-09).
 - Site model in `backend/app/models/workflow_b.py`.
 
 ## 1) Feature Summary
 
-- **Goal**: Create database tables and columns needed for per-site metric preferences, standard selection, and scan tracking
-- **User Story**: As a facility manager, I want to customize which metrics I see and adjust alert thresholds so that my dashboard is relevant to my site's needs.
+- **Goal**: Create database tables and columns needed for per-site metric preferences, standard selection, and scan
+tracking
+- **User Story**: As a facility manager, I want to customize which metrics I see and adjust alert thresholds so that my
+dashboard is relevant to my site's needs.
 - **Acceptance Criteria**:
   1. `site_metric_preferences` table exists with UNIQUE site_id, active_metrics TEXT[], alert_threshold_overrides JSONB
   2. `site_standards` table exists with UNIQUE (site_id, reference_source_id) constraint
@@ -35,7 +38,8 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
   4. `upload` table has new columns: scan_type TEXT, standards_evaluated TEXT[]
   5. All migrations apply cleanly on existing data (additive, nullable columns with defaults)
   6. SQLModel classes reflect new schema
-- **Non-goals**: API endpoints for preferences (deferred to PR-R1-04), frontend UI for preferences (deferred to PR-R1-05)
+- **Non-goals**: API endpoints for preferences (deferred to PR-R1-04), frontend UI for preferences (deferred to
+PR-R1-05)
 
 ## 2) Approach Overview
 
@@ -45,6 +49,7 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
 ## 3) PR Plan
 
 ### PR Title: `feat(R1-03): schema additions for preferences, standards, context`
+
 ### Branch Name: `r1-03-schema-additions`
 
 ### Key Changes by Layer
@@ -86,8 +91,10 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
    - downgrade: drop_table('site_standards')
 
 5. **Model update** (`backend/app/models/workflow_b.py`)
-   - Add to Site: `context_scope: Optional[str] = Field(default=None)`, `standard_ids: Optional[list[str]] = Field(default=None)`
-   - Add to Upload: `scan_type: Optional[str] = Field(default=None)`, `standards_evaluated: Optional[list[str]] = Field(default=None)`
+   - Add to Site: `context_scope: Optional[str] = Field(default=None)`, `standard_ids: Optional[list[str]] =
+Field(default=None)`
+   - Add to Upload: `scan_type: Optional[str] = Field(default=None)`, `standards_evaluated: Optional[list[str]] =
+Field(default=None)`
 
 6. **Model update** (`backend/app/models/supporting.py`)
    - Add `SiteMetricPreferences` SQLModel class matching migration 010 schema
@@ -110,6 +117,7 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
 ## 4) Testing & Verification
 
 ### Manual Verification Checklist
+
 1. `alembic upgrade head` succeeds
 2. `\d site_metric_preferences` in psql shows correct schema with UNIQUE constraint on site_id
 3. `\d site_standards` shows composite unique constraint (site_id, reference_source_id)
@@ -119,6 +127,7 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
 7. SQLModel classes import without error
 
 ### Commands to Run
+
 ```bash
 cd backend && alembic upgrade head
 psql -c "\d site_metric_preferences"

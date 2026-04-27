@@ -6,7 +6,8 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
 
 - **Dependencies**: PR-R1-02 depends on PR-R1-01 — sites must have
   `tenant_id` assigned
-- **Scope boundaries**: Scope (in) = migration 015, seed script refactor, rule engine standard filter. Scope (out) = per-standard evaluation in API, frontend standard selector
+- **Scope boundaries**: Scope (in) = migration 015, seed script refactor, rule engine standard filter. Scope (out) =
+per-standard evaluation in API, frontend standard selector
 - **Risks**: Review risk #1 (rulebook breaks existing evaluations) — bump to v2-refactor without deleting v1.0 entries
 - **Status**: Verify PR-R1-01 is merged, `user_tenant` table exists, seed script has been run
 
@@ -26,8 +27,10 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
 
 ## 1) Feature Summary
 
-- **Goal**: Add 4 certification standards (WELL, ASHRAE, SS554, SafeSpace) and link existing rules to their parent standard
-- **User Story**: As FJ staff, I want to select which standard to evaluate IAQ data against so that each standard produces an independent pass/fail outcome.
+- **Goal**: Add 4 certification standards (WELL, ASHRAE, SS554, SafeSpace) and link existing rules to their parent
+standard
+- **User Story**: As FJ staff, I want to select which standard to evaluate IAQ data against so that each standard
+produces an independent pass/fail outcome.
 - **Acceptance Criteria**:
   1. 4 reference_source entries exist: WELL, ASHRAE, SS554, SafeSpace
   2. Existing WHO AQG 2021 rules linked to WELL source
@@ -36,17 +39,21 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
   5. Rule engine can filter rules by standard_id
   6. Legacy rule_version entries preserved — old findings still queryable
   7. All rulebook entries get `rule_version = "v2-refactor"` to distinguish from legacy
-- **Non-goals**: Full SS554 certification document loading, SafeSpace threshold definition, per-standard evaluation in API (deferred to PR-R1-04)
+- **Non-goals**: Full SS554 certification document loading, SafeSpace threshold definition, per-standard evaluation in
+API (deferred to PR-R1-04)
 
 ## 2) Approach Overview
 
-- **Proposed Data**: New migration adds `reference_source_id` FK to `rulebook_entry`. Seed script creates 4 sources and links rules.
-- **Proposed Backend**: `db_rule_service.py` gains `fetch_rules_by_standard()` function. Rule engine accepts `standard_id` filter parameter.
+- **Proposed Data**: New migration adds `reference_source_id` FK to `rulebook_entry`. Seed script creates 4 sources and
+links rules.
+- **Proposed Backend**: `db_rule_service.py` gains `fetch_rules_by_standard()` function. Rule engine accepts
+`standard_id` filter parameter.
 - **Proposed API**: `GET /api/rulebook/sources` enhanced to return all 4 standards with status.
 
 ## 3) PR Plan
 
 ### PR Title: `feat(R1-02): rulebook reorganization by certification standard`
+
 ### Branch Name: `r1-02-rulebook-reorg`
 
 ### Key Changes by Layer
@@ -55,7 +62,8 @@ Before starting this PR, read `docs/plans/epics/R1-Refactor/ROADMAP.md` to confi
 
 1. **Migration 015_rulebook_standard_link** (`backend/migrations/versions/015_rulebook_standard_link.py`)
    - down_revision: `'014_user_tenant'`
-   - Add `reference_source_id` column to `rulebook_entry` table (String, FK reference_source.id, nullable for backward compat)
+   - Add `reference_source_id` column to `rulebook_entry` table (String, FK reference_source.id, nullable for backward
+compat)
    - Add index on `rulebook_entry(reference_source_id)`
    - downgrade: drop column
 
@@ -133,7 +141,7 @@ curl http://localhost:8000/api/rulebook/sources
 3. Revert `scripts/seed_rulebook_v1.py` to original (if needed — seed changes are data-only)
 4. Note: New reference_source entries and rulebook entries created by seed script will remain. To
    fully clean:
-   
+
    ```sql
    DELETE FROM rulebook_entry WHERE rule_version = 'v2-refactor';
    DELETE FROM reference_source WHERE title IN ('WELL Building Standard', 'ASHRAE 62.1', 'SS554', 'SafeSpace');

@@ -2,13 +2,19 @@
 
 ## 1. Product Summary
 
-The FJ SafeSpace Dashboard replaces the uHoo native dashboard as the customer-facing IAQ interface. Unlike uHoo's technical raw-metric display (e.g., "CO₂: 850ppm"), this dashboard translates sensor data into **human-readable insights** about what those numbers mean for the people inside:
+The FJ SafeSpace Dashboard replaces the uHoo native dashboard as the customer-facing IAQ interface. Unlike uHoo's
+technical raw-metric display (e.g., "CO₂: 850ppm"), this dashboard translates sensor data into **human-readable
+insights** about what those numbers mean for the people inside:
 
 > **CO₂: 850ppm** → **"Staff may feel drowsy. Consider opening a window or boosting ventilation."**
 
-The system ingests IAQ data via CSV upload (adhoc scans) or live uHoo API (continuous monitoring), evaluates it against selected certification standards (WELL, ASHRAE, SS554, SafeSpace), and surfaces colour-coded insights with business impact language. Each standard is judged independently — a site can pass WELL but fail SS554.
+The system ingests IAQ data via CSV upload (adhoc scans) or live uHoo API (continuous monitoring), evaluates it against
+selected certification standards (WELL, ASHRAE, SS554, SafeSpace), and surfaces colour-coded insights with business
+impact language. Each standard is judged independently — a site can pass WELL but fail SS554.
 
-The current codebase represents ~9 months of prior build (PR1-8) focused on a compliance/reporting model. This refactor pivots that investment toward a wellness-first dashboard, reusing the upload pipeline, Supabase schema, and existing dashboard endpoints while replacing the compliance findings panel with human-friendly metric cards.
+The current codebase represents ~9 months of prior build (PR1-8) focused on a compliance/reporting model. This refactor
+pivots that investment toward a wellness-first dashboard, reusing the upload pipeline, Supabase schema, and existing
+dashboard endpoints while replacing the compliance findings panel with human-friendly metric cards.
 
 ## 2. Goals, Success Criteria, and Constraints
 
@@ -22,7 +28,8 @@ The current codebase represents ~9 months of prior build (PR1-8) focused on a co
 
 ### Success Criteria
 
-- Jay Choy can look at the dashboard and understand site health in under 30 seconds without needing to know what "850ppm CO₂" means
+- Jay Choy can look at the dashboard and understand site health in under 30 seconds without needing to know what
+"850ppm CO₂" means
 - A facility manager can identify which zone needs attention and what to do about it
 - uHoo data is consumed and displayed with human-readable context, not just raw numbers
 - Dashboard supports both adhoc CSV uploads and continuous API monitoring, with clear scan-mode indicators
@@ -42,22 +49,24 @@ The current codebase represents ~9 months of prior build (PR1-8) focused on a co
 Validated against TDD decisions. No alternatives proposed — TDD is already ratified.
 
 | Component | Technology | Notes |
-|---|---|---|
+| --- | --- | --- |
 | **Frontend** | Next.js 15 (App Router), TypeScript, Tailwind CSS, Shadcn UI, Recharts | Existing investment from PR1-8. Thin client — all business logic in backend. |
 | **Backend** | FastAPI, Python 3.12+, SQLModel (SQLAlchemy 2.x) | Existing investment. Synchronous pipeline. |
 | **Database** | PostgreSQL 16 (Supabase prod / Docker Compose local) | Existing. Supports JSON columns, TEXT[] arrays. |
 | **Storage** | Supabase Storage (iaq-scans bucket) | Raw CSV uploads only. |
-| **Auth** | Supabase Auth (R1 setup, R2 enforcement) | Magic link flow for facility managers. FJ staff has no auth in R1 (D-R1-07). |
+| **Auth** | Supabase Auth (R1 setup, R2 enforcement) | Magic link for facility managers. FJ staff has no auth in R1. |
 | **Migrations** | Alembic | Existing. Migrations 001-007 exist. 008+ for refactor. |
 | **Email** | Resend API (R2) | Existing `RESEND_API_KEY` in .env. |
-| **PDF** | WeasyPrint (R3) | Existing investment from PR5/PR8, deferred to R3 (D-R1-06). |
+| **PDF** | WeasyPrint (R3) | Existing investment from PR5/PR8, deferred to R3. |
 
 ### Key Architectural Decisions (from TDD)
 
-- **D-R1-01**: Dual evaluation path — wellness index uses strict rulebook values (never modified); alert triggers use user-adjusted thresholds (within safe bounds)
+- **D-R1-01**: Dual evaluation path — wellness index uses strict rulebook values (never modified); alert triggers use
+user-adjusted thresholds (within safe bounds)
 - **D-R1-02**: Metric preferences are per-site, not per-user
 - **D-R1-03**: Configurable thresholds affect alerts only, NOT wellness index
-- **D-R1-04**: Cross-site comparison is admin-only (tenant isolation prevents facility managers from seeing other tenants)
+- **D-R1-04**: Cross-site comparison is admin-only (tenant isolation prevents facility managers from seeing other
+tenants)
 - **D-R1-05**: Email deduplication uses 4-hour cooldown per metric/zone
 - **D-R1-06**: PDF generation deferred to R3
 - **D-R1-07**: FJ staff has no auth barrier in R1 (internal laptop access)
@@ -91,7 +100,8 @@ Validated against TDD decisions. No alternatives proposed — TDD is already rat
 - Reorganize existing rules: link WELL rules to WELL source, IAQ rules to SS554 source
 - All existing rulebook entries get `rule_version` bump to `v2-refactor`
 
-**Reuse from PR1-8**: Upload pipeline, Supabase schema, dashboard endpoints, TimeSeriesChart, wellness index calculation (refactored)
+**Reuse from PR1-8**: Upload pipeline, Supabase schema, dashboard endpoints, TimeSeriesChart, wellness index
+calculation (refactored)
 
 **Deferred from R1**: PDF generation, QA gates, report approval workflow
 
@@ -134,14 +144,18 @@ The R1 phase is broken into 6 independently deployable PRs, ordered for sequenti
 
 ### PR-R1-01: Auth Foundation and Tenant Activation
 
-**Scope**: Set up Supabase Auth infrastructure, create user_tenant mapping table, assign existing sites to default tenant, wire tenant isolation middleware.
+**Scope**: Set up Supabase Auth infrastructure, create user_tenant mapping table, assign existing sites to default
+tenant, wire tenant isolation middleware.
 
 **What this PR does**:
 
 - Creates migration `014_user_tenant` for the user_tenant mapping table (supabase_user_id, tenant_id, role)
-- Creates a seed script that generates a default tenant ("FJ Internal") and assigns all existing sites (those with NULL tenant_id) to it
-- Adds Supabase Auth environment variables to config (`SUPABASE_JWT_SECRET`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`)
-- Replaces the stub `get_tenant_id()` dependency in `backend/app/api/dependencies.py` with proper JWT extraction from Supabase Auth
+- Creates a seed script that generates a default tenant ("FJ Internal") and assigns all existing sites (those with NULL
+tenant_id) to it
+- Adds Supabase Auth environment variables to config (`SUPABASE_JWT_SECRET`, `NEXT_PUBLIC_SUPABASE_URL`,
+`NEXT_PUBLIC_SUPABASE_ANON_KEY`)
+- Replaces the stub `get_tenant_id()` dependency in `backend/app/api/dependencies.py` with proper JWT extraction from
+Supabase Auth
 - Implements `get_current_tenant()` dependency that extracts tenant_id from JWT claims
 - FJ staff routes continue to work without auth (D-R1-07) — auth is additive
 
@@ -222,7 +236,8 @@ The R1 phase is broken into 6 independently deployable PRs, ordered for sequenti
 
 - Creates migration `008_site_context` — adds `context_scope` TEXT and `standard_ids` TEXT[] to site table
 - Creates migration `009_scan_type` — adds `scan_type` TEXT and `standards_evaluated` TEXT[] to upload table
-- Creates migration `010_site_metric_preferences` — new table (site_id UNIQUE, active_metrics TEXT[], alert_threshold_overrides JSONB)
+- Creates migration `010_site_metric_preferences` — new table (site_id UNIQUE, active_metrics TEXT[],
+alert_threshold_overrides JSONB)
 - Creates migration `011_site_standards` — new table (site_id, reference_source_id, is_active)
 - Adds SQLModel classes for SiteMetricPreferences and SiteStandards
 
@@ -254,14 +269,17 @@ The R1 phase is broken into 6 independently deployable PRs, ordered for sequenti
 
 ### PR-R1-04: Backend API — Enhanced Upload and New Endpoints
 
-**Scope**: Add new API endpoints for metric preferences, standards management, interpretations. Enhance upload endpoint for standard selection.
+**Scope**: Add new API endpoints for metric preferences, standards management, interpretations. Enhance upload endpoint
+for standard selection.
 
 **What this PR does**:
 
 - Enhances `POST /api/uploads` to accept `standards` parameter and store `standards_evaluated`
-- Enhances `GET /api/uploads/{id}/findings` to include `standard_id`/`standard_title` per finding, add `standard_id` query param filter
+- Enhances `GET /api/uploads/{id}/findings` to include `standard_id`/`standard_title` per finding, add `standard_id`
+query param filter
 - Adds `GET /api/sites/{id}/metric-preferences` and `PATCH /api/sites/{id}/metric-preferences`
-- Adds `GET /api/sites/{id}/standards`, `POST /api/sites/{id}/standards/{source_id}/activate`, `POST /api/sites/{id}/standards/{source_id}/deactivate`
+- Adds `GET /api/sites/{id}/standards`, `POST /api/sites/{id}/standards/{source_id}/activate`, `POST
+/api/sites/{id}/standards/{source_id}/deactivate`
 - Adds `GET /api/interpretations/{metric_name}/{threshold_band}` — interpretation layer
 - Adds validation: alert_threshold_overrides must fall within rulebook min_value/max_value bounds
 - Updates dashboard routes to apply tenant scoping via TenantIdDep
@@ -299,13 +317,15 @@ The R1 phase is broken into 6 independently deployable PRs, ordered for sequenti
 
 ### PR-R1-05: Frontend Refactor — Human-Friendly Dashboard
 
-**Scope**: Replace compliance findings panel with human-friendly metric cards, site overview cards, zone detail view, standard selector, metric selector.
+**Scope**: Replace compliance findings panel with human-friendly metric cards, site overview cards, zone detail view,
+standard selector, metric selector.
 
 **What this PR does**:
 
 - Refactors `/ops` page — Upload tab adds standard selector, Findings tab replaced with site overview + zone detail
 - Refactors `/executive` page — per-standard badges on leaderboard, filter by standard and scan mode
-- Creates new components: SiteOverviewCard, MetricCard, StandardSelector, MetricSelector, ThresholdConfigDialog, ZoneDetailView
+- Creates new components: SiteOverviewCard, MetricCard, StandardSelector, MetricSelector, ThresholdConfigDialog,
+ZoneDetailView
 - Keeps existing TimeSeriesChart (already suitable for threshold band display)
 - Simplifies UploadForm (removes PR9 customer info fields, handled by Supabase Auth)
 - Refactors WellnessIndexCard for per-standard display
@@ -395,7 +415,7 @@ The R1 phase is broken into 6 independently deployable PRs, ordered for sequenti
 
 ### PR Dependency Graph
 
-```
+```text
 PR-R1-01 (Auth + Tenant)
     ↓
 PR-R1-02 (Rulebook Reorg)
@@ -412,7 +432,7 @@ PR-R1-06 (Testing + Polish)
 ### Migration Numbering Summary
 
 | Migration | Purpose | Phase |
-|-----------|---------|-------|
+| --- | --- | --- |
 | 001-007 | Existing (core tables, QA, indexes, report_type, snapshot, zone_name, tenant customer info) | Pre-refactor |
 | 008_site_context | Add context_scope and standard_ids to site | R1 |
 | 009_scan_type | Add scan_type and standards_evaluated to upload | R1 |
@@ -428,32 +448,32 @@ PR-R1-06 (Testing + Polish)
 ### Risks
 
 | # | Risk | Impact | Mitigation |
-|---|------|--------|------------|
-| 1 | Rulebook reorganization breaks existing evaluations | High — all historical findings reference old rule_version | Bump to "v2-refactor" without deleting v1.0 entries. Legacy findings remain queryable. |
-| 2 | Tenant migration assigns sites incorrectly | Medium — facility managers see wrong data | Seed script uses deterministic logic. Manual review before production run. |
+| --- | --- | --- | --- |
+| 1 | Rulebook reorganization breaks existing evaluations | High — historical findings reference old rule_version | Bump to "v2-refactor" without deleting v1.0. Legacy queryable. |
+| 2 | Tenant migration assigns sites incorrectly | Medium — facility managers see wrong data | Deterministic seed script. Manual review before prod. |
 | 3 | Per-standard evaluation doubles query load | Medium — dashboard performance degradation | Index on (site_id, rule_version). Cache per-standard scores. |
-| 4 | SafeSpace thresholds undefined at launch | Low — shows "Coming Soon" placeholder (intentional per PSD) | Acceptable. Jay/FJ team to define later. |
-| 5 | Supabase Auth project confusion (same as existing or separate?) | **Resolved** — same project, middleware handles isolation | No action needed |
-| 6 | Solo developer bandwidth | High — sequential delivery means longer timeline | Small PRs, each independently deployable. No parallel work needed. |
+| 4 | SafeSpace thresholds undefined at launch | Low — shows "Coming Soon" placeholder | Acceptable. Jay/FJ team to define later. |
+| 5 | Supabase Auth project confusion | **Resolved** — same project, middleware handles isolation | No action needed |
+| 6 | Solo developer bandwidth | High — sequential delivery means longer timeline | Small PRs, each independently deployable. |
 
 ### Trade-offs
 
 | Decision | Trade-off | Rationale |
-|----------|-----------|-----------|
-| FJ staff no auth in R1 (D-R1-07) | Security vs. speed | Internal laptop access only. Auth added when customer portal ships. |
-| PDF deferred to R3 (D-R1-06) | Feature completeness vs. delivery speed | Dashboard insights deliver value first. PDFs are documentation layer. |
-| site_standards as separate table (D-R1-10) | Complexity vs. extensibility | Supports future metadata per standard (activation date, configured_by). |
-| Old test suite deleted (D-R1-08) | Historical coverage vs. clean slate | Old tests covered compliance model; R1 tests purpose-built. |
-| TEXT[] for active_metrics (D-R1-09) | Flexibility vs. simplicity | PostgreSQL arrays simpler than JSONB for flat enum lists. |
+| --- | --- | --- |
+| FJ staff no auth in R1 | Security vs. speed | Internal laptop access only. Auth added when customer portal ships. |
+| PDF deferred to R3 | Feature completeness vs. delivery speed | Dashboard insights deliver value first. PDFs are documentation layer. |
+| site_standards as separate table | Complexity vs. extensibility | Supports future metadata per standard. |
+| Old test suite deleted | Historical coverage vs. clean slate | Old tests covered compliance model; R1 tests purpose-built. |
+| TEXT[] for active_metrics | Flexibility vs. simplicity | PostgreSQL arrays simpler than JSONB for flat enum lists. |
 
 ### Open Questions
 
 | # | Question | Impact | Owner | Status |
-|---|----------|--------|-------|--------|
+| --- | --- | --- | --- | --- |
 | 1 | uHoo API access confirmed available? | Blocks R2 (continuous monitoring) | Jay | **Confirmed** — will proceed with R2 when ready |
 | 2 | SafeSpace thresholds — when will Jay/FJ team define them? | Affects SafeSpace "Coming Soon" status in R1 | Jay | Placeholder UX — thresholds to be defined later |
 | 3 | SS554 certification document — when will it be loaded? | Affects SS554 thresholds in R1 | Jay | Placeholder UX — cert doc to be loaded later |
-| 4 | Supabase Auth project — same as existing (`jertvmbhgehajcrfifwl`) or separate? | Affects JWT secret and frontend SDK config | Jeff | **Resolved**: Same project — simpler config, tenant middleware handles isolation |
+| 4 | Supabase Auth project — same as existing or separate? | Affects JWT secret and frontend SDK config | Jeff | **Resolved**: Same project — simpler config, tenant middleware handles isolation |
 | 5 | Email sender address for alerts (R2)? | Needs domain verification with Resend | Jay | Use default Resend sender for now |
 | 6 | How many facility managers expected in initial rollout? | Affects Supabase Auth billing tier | Jay | < 100 MAUs — free tier covers it |
 
