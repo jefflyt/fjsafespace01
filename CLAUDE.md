@@ -43,7 +43,7 @@ traceable reports for operations and executive views.
   - **PR8.5**: Utility scripts (run_qa_audit.py, preview_report.py — since deleted)
   - **PR8.6**: Frontend Vitest tests + production hardening (since deleted per D-R1-08)
 
-### R1 Refactor: PR01-02 Complete, PR03 Next
+### R1 Refactor: PR01-04 Complete, PR05 Next
 
 - **Objective**: Transform dashboard from compliance/reporting model to
   human-friendly IAQ wellness dashboard with per-standard evaluation
@@ -51,14 +51,18 @@ traceable reports for operations and executive views.
 - **Plans**: `docs/plans/epics/R1-Refactor/ROADMAP.md` + `pr01-auth-tenant.md`
   through `pr06-testing-polish.md`
 - **Sequence**: PR-R1-01 (✅ Auth + Tenant) → PR-R1-02 (✅ Rulebook Reorg)
-  → PR-R1-03 (Schema, next) → R1-04 (Backend API) → R1-05 (Frontend)
-  → R1-06 (Testing)
+  → PR-R1-03 (✅ Schema, merged) → PR-R1-04 (✅ Backend API, merged)
+  → R1-05 (Frontend) → R1-06 (Testing)
 - **Completed**:
   - PR-R1-01: user_tenant table, Supabase Auth JWT extraction, frontend login,
     default tenant seeded, sites assigned
   - PR-R1-02: 4 certification standards seeded, reference_source_id FK on
     rulebook_entry, fetch_rules_by_standard() service, all rules use
     rule_version="v2-refactor"
+  - PR-R1-03: Migrations 008-011 (site context, scan type, metric preferences,
+    site standards) — merged to main, applied to Supabase
+  - PR-R1-04: 3 new routers (preferences, standards, interpretations), enhanced
+    upload/findings, tenant scoping, per-standard aggregation. 15 tests pass.
 
 ### Simplified Architecture (2 Views)
 
@@ -69,11 +73,17 @@ traceable reports for operations and executive views.
 
 ### Existing Backend Routes
 
-- **uploads**: `POST /api/uploads`, `GET /api/uploads/{id}`, `GET /api/uploads/{id}/findings`
+- **uploads**: `POST /api/uploads`, `GET /api/uploads/{id}`, `GET /api/uploads/{id}/findings?standard_id=`
 - **reports**: `POST /api/reports`, `GET /api/reports`, `GET /api/reports/{id}`, `PATCH /api/reports/{id}/qa-checklist`, `POST /api/reports/{id}/approve`, `GET /api/reports/{id}/export`, `GET /api/reports/{id}/pdf`
 - **dashboard**: `GET /api/dashboard/sites`, `GET /api/dashboard/sites/{id}/zones`, `GET /api/dashboard/comparison`, `GET /api/dashboard/summary`, `GET /api/dashboard/executive`
 - **rulebook**: `GET /api/rulebook/rules`, `GET /api/rulebook/rules/{id}`, `GET /api/rulebook/sources`
 - **notifications**: `GET /api/notifications`, `PATCH /api/notifications/{id}/read`
+- **preferences**: `GET /api/sites/{id}/metric-preferences`,
+  `PATCH /api/sites/{id}/metric-preferences`,
+  `GET /api/sites/{id}/standards`,
+  `POST /api/sites/{id}/standards/{source_id}/activate`,
+  `POST /api/sites/{id}/standards/{source_id}/deactivate`
+- **interpretations**: `GET /api/interpretations/{metric_name}/{threshold_band}`
 
 ### Existing Frontend Pages
 
