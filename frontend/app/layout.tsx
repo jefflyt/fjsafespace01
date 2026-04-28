@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter, Montserrat } from 'next/font/google'
 import './globals.css'
 import { Navbar } from '@/components/layout/Navbar'
+import { AuthProvider } from '@/components/layout/AuthProvider'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -27,10 +28,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${montserrat.variable} font-sans antialiased`} suppressHydrationWarning>
-        <Navbar />
-        <main className="flex-1 bg-background min-h-screen bg-dot-grid">
-          {children}
-        </main>
+        <AuthProvider>
+          <Navbar />
+          <main className="flex-1 bg-background min-h-screen bg-dot-grid">
+            {children}
+          </main>
+        </AuthProvider>
       </body>
     </html>
   )

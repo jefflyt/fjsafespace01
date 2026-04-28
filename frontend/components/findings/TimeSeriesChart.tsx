@@ -207,7 +207,7 @@ export function TimeSeriesChart({
 
               <XAxis
                 dataKey="timestamp"
-                tick={<CustomTick />}
+                tick={(props: any) => <CustomTick {...props} />}
                 tickLine={false}
                 axisLine={{ stroke: "hsl(var(--muted-foreground) / 0.2)" }}
                 angle={chartData.length > 20 ? -25 : 0}

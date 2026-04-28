@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { Suspense, useCallback, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { UploadForm, UploadResult } from "@/components/UploadForm";
 import { Badge } from "@/components/ui/badge";
@@ -16,7 +16,7 @@ const TABS = [
   { id: "reports", label: "Reports", icon: FileText },
 ] as const;
 
-export default function OpsPage() {
+function OpsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const activeTab = searchParams.get("tab") || "upload";
@@ -203,5 +203,13 @@ export default function OpsPage() {
         </Card>
       )}
     </div>
+  );
+}
+
+export default function OpsPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center text-muted-foreground">Loading...</div>}>
+      <OpsContent />
+    </Suspense>
   );
 }

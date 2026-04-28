@@ -155,3 +155,9 @@ export const METRIC_CONFIGS: Record<string, MetricConfig> = {
 };
 
 export const METRIC_KEYS = Object.keys(METRIC_CONFIGS);
+
+export const BAND_COLORS: Record<string, string> = {
+  GOOD: "#22c55e",
+  WATCH: "#eab308",
+  CRITICAL: "#ef4444",
+};

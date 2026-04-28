@@ -42,8 +42,8 @@ class Settings(BaseSettings):
     SUPABASE_SERVICE_ROLE_KEY: str | None = None
     SUPABASE_STORAGE_BUCKET: str = "iaq-scans"
 
-    # ── Phase 3 — Clerk auth (optional for Phase 1/2) ─────────────────────────
-    CLERK_SECRET_KEY: str | None = None
+    # ── Supabase Auth JWT ─────────────────────────────────────────────────────
+    SUPABASE_JWT_SECRET: str | None = None
 
 
 settings = Settings()  # type: ignore[call-arg]

@@ -162,7 +162,7 @@ export function MetricChart({ metricKey, findings, onBarClick }: MetricChartProp
                 {chartData.map((entry, index) => (
                   <Cell
                     key={`cell-${index}`}
-                    fill={BAND_COLORS[entry.threshold_band as keyof typeof BAND_COLORS] || config.color}
+                    fill={BAND_COLORS[entry.threshold_band as keyof typeof BAND_COLORS] || "#94a3b8"}
                   />
                 ))}
               </Bar>
