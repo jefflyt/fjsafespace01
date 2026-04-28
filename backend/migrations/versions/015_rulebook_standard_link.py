@@ -18,14 +18,12 @@ depends_on: Sequence[str] | None = None
 
 
 def upgrade() -> None:
-    op.add_column(
-        "rulebook_entry",
-        sa.Column("reference_source_id", sa.String(36), sa.ForeignKey("reference_source.id"), nullable=True),
+    # Use raw SQL for idempotency — column may already exist from prior partial application
+    op.execute(
+        "ALTER TABLE rulebook_entry ADD COLUMN IF NOT EXISTS reference_source_id UUID"
     )
-    op.create_index(
-        "ix_rulebook_entry_reference_source_id",
-        "rulebook_entry",
-        ["reference_source_id"],
+    op.execute(
+        "CREATE INDEX IF NOT EXISTS ix_rulebook_entry_reference_source_id ON rulebook_entry (reference_source_id)"
     )
 
 

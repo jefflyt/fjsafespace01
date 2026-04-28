@@ -22,7 +22,7 @@ def upgrade() -> None:
     op.create_table(
         "site_metric_preferences",
         sa.Column("id", sa.String(36), primary_key=True),
-        sa.Column("site_id", sa.String(36), sa.ForeignKey("site.id"), nullable=False),
+        sa.Column("site_id", sa.Uuid(), sa.ForeignKey("site.id"), nullable=False),
         sa.Column(
             "active_metrics",
             sa.ARRAY(sa.Text()),

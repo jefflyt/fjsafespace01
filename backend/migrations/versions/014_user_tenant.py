@@ -21,7 +21,7 @@ def upgrade() -> None:
         "user_tenant",
         sa.Column("id", sa.String(), primary_key=True),
         sa.Column("supabase_user_id", sa.String(), nullable=False),
-        sa.Column("tenant_id", sa.String(), sa.ForeignKey("tenant.id"), nullable=False),
+        sa.Column("tenant_id", sa.Uuid(), sa.ForeignKey("tenant.id"), nullable=False),
         sa.Column("role", sa.String(), nullable=False, server_default="facility_manager"),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.func.now()),
     )
