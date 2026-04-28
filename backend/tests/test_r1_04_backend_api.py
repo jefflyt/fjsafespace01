@@ -161,13 +161,13 @@ class TestPreferencesIntegration:
     """Integration tests for preferences endpoints."""
 
     def test_get_preferences_site_not_found(self, client):
-        resp = client.get("/api/sites/nonexistent-site/metric-preferences")
+        resp = client.get("/api/sites/00000000-0000-0000-0000-000000000000/metric-preferences")
         assert resp.status_code == 404
 
     def test_patch_preferences_invalid_metric(self, client):
         """PATCH with invalid metric name should return 400."""
         resp = client.patch(
-            "/api/sites/nonexistent-site/metric-preferences",
+            "/api/sites/00000000-0000-0000-0000-000000000000/metric-preferences",
             json={"active_metrics": ["invalid_metric_name"]},
         )
         # Will 404 first since site doesn't exist — that's acceptable
@@ -179,11 +179,11 @@ class TestStandardsIntegration:
     """Integration tests for standards endpoints."""
 
     def test_list_standards_site_not_found(self, client):
-        resp = client.get("/api/sites/nonexistent-site/standards")
+        resp = client.get("/api/sites/00000000-0000-0000-0000-000000000000/standards")
         assert resp.status_code == 404
 
     def test_activate_standard_site_not_found(self, client):
-        resp = client.post("/api/sites/nonexistent-site/standards/fake-source/activate")
+        resp = client.post("/api/sites/00000000-0000-0000-0000-000000000000/standards/fake-source/activate")
         assert resp.status_code in (400, 404)
 
 
