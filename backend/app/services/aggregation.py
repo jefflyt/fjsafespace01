@@ -97,6 +97,48 @@ def calculate_site_wellness_index(
     return score, outcome
 
 
+def calculate_site_wellness_index_for_standard(
+    session: Session, site_id: str, source_id: str
+) -> tuple[float, CertificationOutcome]:
+    """
+    Calculate the Wellness Index score for a single site, filtered by a
+    specific certification standard (reference_source.id).
+
+    Returns:
+        (wellness_index_score, certification_outcome)
+        Returns (0.0, INSUFFICIENT_EVIDENCE) if no findings or weights exist
+        for the given standard.
+    """
+    # Fetch weights from rules linked to this standard
+    entries = session.exec(
+        select(RulebookEntry)
+        .where(
+            col(RulebookEntry.reference_source_id) == source_id,
+            col(RulebookEntry.index_weight_percent).isnot(None),
+            col(RulebookEntry.approval_status) == "approved",
+        )
+    ).all()
+
+    if not entries:
+        return 0.0, CertificationOutcome.INSUFFICIENT_EVIDENCE
+
+    weights = {entry.metric_name.value: entry.index_weight_percent for entry in entries}
+    if not weights:
+        return 0.0, CertificationOutcome.INSUFFICIENT_EVIDENCE
+
+    # Fetch findings and filter to metrics used by this standard
+    findings = _get_site_findings(session, site_id)
+    standard_metrics = set(weights.keys())
+    filtered_findings = [f for f in findings if f["metric_name"] in standard_metrics]
+
+    if not filtered_findings:
+        return 0.0, CertificationOutcome.INSUFFICIENT_EVIDENCE
+
+    score = calculate_wellness_index(filtered_findings, weights)
+    outcome = derive_certification_outcome(score)
+    return score, outcome
+
+
 def get_top_3_risks(session: Session, site_ids: list[str] | None = None) -> list[dict]:
     """
     Get the top 3 highest-priority risks across the specified sites.

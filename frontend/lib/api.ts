@@ -85,3 +85,62 @@ export const api = createApi();
 
 // Factory method for authenticated API calls
 export const apiWithToken = (token: string) => createApi(token);
+
+// ── R1-04: Typed API functions ──────────────────────────────────────────────
+
+export interface MetricPreferences {
+  site_id: string;
+  active_metrics: string[];
+  alert_threshold_overrides: Record<string, any>;
+}
+
+export interface MetricPreferencesUpdate {
+  active_metrics?: string[];
+  alert_threshold_overrides?: Record<string, any>;
+}
+
+export interface SiteStandard {
+  source_id: string;
+  title: string;
+  is_active: boolean;
+}
+
+export interface SiteStandards {
+  site_id: string;
+  standards: SiteStandard[];
+}
+
+export interface Interpretation {
+  metric_name: string;
+  threshold_band: string;
+  interpretation: string;
+  business_impact: string;
+  recommendation: string;
+  context_scope: string;
+}
+
+export const apiClient = {
+  // Metric Preferences
+  getSitesMetricPreferences: (siteId: string, options?: FetchOptions) =>
+    api.get<MetricPreferences>(`/api/sites/${siteId}/metric-preferences`, options),
+
+  updateSitesMetricPreferences: (siteId: string, body: MetricPreferencesUpdate, options?: FetchOptions) =>
+    api.patch<MetricPreferences>(`/api/sites/${siteId}/metric-preferences`, body, options),
+
+  // Site Standards
+  getSitesStandards: (siteId: string, options?: FetchOptions) =>
+    api.get<SiteStandards>(`/api/sites/${siteId}/standards`, options),
+
+  activateStandard: (siteId: string, sourceId: string, options?: FetchOptions) =>
+    api.post<void>(`/api/sites/${siteId}/standards/${sourceId}/activate`, {}, options),
+
+  deactivateStandard: (siteId: string, sourceId: string, options?: FetchOptions) =>
+    api.post<void>(`/api/sites/${siteId}/standards/${sourceId}/deactivate`, {}, options),
+
+  // Interpretations
+  getInterpretation: (metricName: string, thresholdBand: string, contextScope?: string, options?: FetchOptions) =>
+    api.get<Interpretation>(
+      `/api/interpretations/${metricName}/${thresholdBand}${contextScope ? `?context_scope=${contextScope}` : ''}`,
+      options,
+    ),
+};

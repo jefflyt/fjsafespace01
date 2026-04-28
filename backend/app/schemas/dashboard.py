@@ -57,3 +57,44 @@ class ExecutiveDashboardResponse(BaseModel):
     top_risks: list[TopRisk]
     top_actions: list[TopAction]
     health_ratings: SpaceHealthRating
+
+
+# ── R1-04: Site Metric Preferences ──────────────────────────────────────────
+
+class SiteMetricPreferencesResponse(BaseModel):
+    """GET /api/sites/{site_id}/metric-preferences response."""
+    site_id: str
+    active_metrics: list[str]
+    alert_threshold_overrides: dict[str, dict]
+
+
+class SiteMetricPreferencesUpdate(BaseModel):
+    """PATCH /api/sites/{site_id}/metric-preferences body."""
+    active_metrics: list[str] | None = None
+    alert_threshold_overrides: dict[str, dict] | None = None
+
+
+# ── R1-04: Site Standards ───────────────────────────────────────────────────
+
+class SiteStandardResponse(BaseModel):
+    """A single standard for a site."""
+    source_id: str
+    title: str
+    is_active: bool
+
+
+class SiteStandardsResponse(BaseModel):
+    """GET /api/sites/{site_id}/standards response."""
+    standards: list[SiteStandardResponse]
+
+
+# ── R1-04: Interpretations ──────────────────────────────────────────────────
+
+class InterpretationResponse(BaseModel):
+    """GET /api/interpretations/{metric_name}/{threshold_band} response."""
+    metric_name: str
+    threshold_band: str
+    interpretation: str
+    business_impact: str
+    recommendation: str
+    context_scope: str

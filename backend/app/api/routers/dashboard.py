@@ -36,7 +36,10 @@ async def get_sites(session: SessionDep, tenant_id: TenantIdDep):
     Fields: siteId, siteName, certificationOutcome, wellnessIndexScore,
             top3Risks[], top3Actions[], nextVerificationDate, lastScanDate
     """
-    sites = session.exec(select(Site)).all()
+    query = select(Site)
+    if tenant_id is not None:
+        query = query.where(col(Site.tenant_id) == tenant_id)
+    sites = session.exec(query).all()
 
     rows = []
     for site in sites:
@@ -114,7 +117,15 @@ async def get_cross_site_comparison(session: SessionDep, tenant_id: TenantIdDep)
 
     Fields: siteId, siteName, wellnessIndexScore, certificationOutcome, lastScanDate
     """
-    leaderboard = agg_svc.get_leaderboard(session)
+    # Build list of tenant-scoped site_ids
+    site_ids = None
+    if tenant_id is not None:
+        tenant_sites = session.exec(
+            select(Site.id).where(col(Site.tenant_id) == tenant_id)
+        ).all()
+        site_ids = list(tenant_sites) if tenant_sites else []
+
+    leaderboard = agg_svc.get_leaderboard(session, site_ids)
     return leaderboard
 
 
@@ -125,8 +136,16 @@ async def get_daily_summary(session: SessionDep, tenant_id: TenantIdDep):
 
     Fields: top3Risks[], top3Actions[], nextVerificationDate, dataAsOf
     """
-    top_risks = agg_svc.get_top_3_risks(session)
-    top_actions = agg_svc.get_top_3_actions(session)
+    # Build list of tenant-scoped site_ids
+    site_ids = None
+    if tenant_id is not None:
+        tenant_sites = session.exec(
+            select(Site.id).where(col(Site.tenant_id) == tenant_id)
+        ).all()
+        site_ids = list(tenant_sites) if tenant_sites else []
+
+    top_risks = agg_svc.get_top_3_risks(session, site_ids)
+    top_actions = agg_svc.get_top_3_actions(session, site_ids)
 
     # Get most recent finding timestamp for dataAsOf
     latest_finding = session.exec(
@@ -159,10 +178,18 @@ async def get_executive_dashboard(
     - Health ratings summary (certified / verified / improvement / insufficient)
 
     Phase 1/2: aggregates all sites globally (tenant_id is None).
-    Phase 3:   will filter by tenant_id from JWT.
+    Phase 3:   filters by tenant_id from JWT.
     """
+    # Build list of tenant-scoped site_ids
+    tenant_site_ids = site_ids  # start with explicit filter
+    if tenant_id is not None and site_ids is None:
+        tenant_sites = session.exec(
+            select(Site.id).where(col(Site.tenant_id) == tenant_id)
+        ).all()
+        tenant_site_ids = list(tenant_sites) if tenant_sites else []
+
     try:
-        data = agg_svc.get_executive_dashboard(session, site_ids)
+        data = agg_svc.get_executive_dashboard(session, tenant_site_ids)
         return ExecutiveDashboardResponse(
             leaderboard=data["leaderboard"],
             top_risks=data["top_risks"],

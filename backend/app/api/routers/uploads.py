@@ -23,8 +23,8 @@ import json
 import uuid
 from datetime import datetime
 
-from fastapi import APIRouter, HTTPException, UploadFile, status
-from sqlmodel import select, text
+from fastapi import APIRouter, HTTPException, Query, UploadFile, status
+from sqlmodel import Session, col, select, text
 
 from app.api.dependencies import SessionDep
 from app.models.enums import ParseOutcome, ParseStatus
@@ -61,6 +61,7 @@ async def create_upload(
     contact_person: str,
     specific_event: str | None = None,
     comparative_analysis: bool = False,
+    standards: str | None = None,
 ):
     """
     Accept a CSV export from uHoo, parse, validate, evaluate against the
@@ -141,6 +142,14 @@ async def create_upload(
         },
     )
 
+    # Parse optional standards parameter (JSON array of source IDs)
+    standards_evaluated = None
+    if standards:
+        try:
+            standards_evaluated = json.loads(standards)
+        except (json.JSONDecodeError, TypeError):
+            standards_evaluated = None
+
     # Create upload record with PENDING status
     upload_id = str(uuid.uuid4())
     upload = Upload(
@@ -150,6 +159,7 @@ async def create_upload(
         uploaded_by="anonymous",  # Phase 1/2: no auth; Phase 3: extract from JWT
         uploaded_at=datetime.utcnow(),
         parse_status=ParseStatus.PENDING,
+        standards_evaluated=standards_evaluated,
     )
     session.add(upload)
     session.commit()
@@ -289,6 +299,7 @@ async def create_upload(
         "finding_count": len(eval_findings),
         "wellness_score": wellness_score,
         "certification_outcome": certification,
+        "standards_evaluated": upload.standards_evaluated,
     }
 
 
@@ -337,10 +348,18 @@ async def get_upload(upload_id: str, session: SessionDep):
 
 
 @router.get("/uploads/{upload_id}/findings", status_code=status.HTTP_200_OK)
-async def get_findings(upload_id: str, session: SessionDep):
+async def get_findings(
+    upload_id: str,
+    session: SessionDep,
+    standard_id: str | None = Query(
+        default=None,
+        description="Filter findings by reference_source.id (certification standard)",
+    ),
+):
     """
     Return all findings for an upload.
     Enforces QA-G5: returns 422 if any finding is missing ruleVersion or citationUnitIds.
+    Optional ?standard_id= filters to findings from a specific certification standard.
     """
     upload = session.get(Upload, upload_id)
     if not upload:
@@ -349,9 +368,46 @@ async def get_findings(upload_id: str, session: SessionDep):
             detail=f"Upload {upload_id} not found",
         )
 
-    findings = session.exec(
-        select(Finding).where(Finding.upload_id == upload_id)
-    ).all()
+    query = select(Finding).where(Finding.upload_id == upload_id)
+    if standard_id:
+        # Filter by rulebook entries linked to this standard
+        from app.models.workflow_a import RulebookEntry
+
+        standard_rule_ids = session.exec(
+            select(RulebookEntry.id).where(
+                col(RulebookEntry.reference_source_id) == standard_id,
+                col(RulebookEntry.approval_status) == "approved",
+            )
+        ).all()
+
+        if standard_rule_ids:
+            # Map rule IDs to rule_ids used in findings via rulebook_entry
+            # Since findings store rule_id (not rulebook_entry.id), we need to
+            # match via the rulebook entries' rule_id pattern
+            # For now, filter findings that have rule_version matching entries from this standard
+            standard_entries = session.exec(
+                select(RulebookEntry).where(
+                    col(RulebookEntry.reference_source_id) == standard_id,
+                    col(RulebookEntry.approval_status) == "approved",
+                )
+            ).all()
+
+            # Get all rule versions used by this standard's entries
+            # Findings don't have a direct FK to rulebook_entry, so we match by metric_name
+            # and rule_version that corresponds to this standard
+            standard_metric_versions = {
+                (e.metric_name.value, e.rule_version) for e in standard_entries
+            }
+
+            findings = session.exec(query).all()
+            findings = [
+                f for f in findings
+                if (f.metric_name.value, f.rule_version) in standard_metric_versions
+            ]
+        else:
+            findings = []
+    else:
+        findings = session.exec(query).all()
 
     # QA-G5 enforcement: check for missing rule_version or citation_unit_ids
     for finding in findings:
@@ -380,6 +436,40 @@ async def get_findings(upload_id: str, session: SessionDep):
             "source_currency_status": f.source_currency_status.value,
             "benchmark_lane": f.benchmark_lane.value,
             "created_at": f.created_at.isoformat(),
+            "standard_id": _find_standard_id_for_finding(f, session),
+            "standard_title": _find_standard_title_for_finding(f, session),
         }
         for f in findings
     ]
+
+
+def _find_standard_id_for_finding(finding, session: Session) -> str | None:
+    """Find the reference_source.id linked to this finding's rule version."""
+    from app.models.workflow_a import RulebookEntry
+
+    entry = session.exec(
+        select(RulebookEntry).where(
+            col(RulebookEntry.metric_name) == finding.metric_name.value,
+            col(RulebookEntry.rule_version) == finding.rule_version,
+            col(RulebookEntry.approval_status) == "approved",
+        ).limit(1)
+    ).first()
+
+    return entry.reference_source_id if entry else None
+
+
+def _find_standard_title_for_finding(finding, session: Session) -> str | None:
+    """Find the standard title linked to this finding's rule version."""
+    from app.models.workflow_a import ReferenceSource, RulebookEntry
+
+    result = session.exec(
+        select(ReferenceSource.title)
+        .join(RulebookEntry, col(ReferenceSource.id) == col(RulebookEntry.reference_source_id))
+        .where(
+            col(RulebookEntry.metric_name) == finding.metric_name.value,
+            col(RulebookEntry.rule_version) == finding.rule_version,
+            col(RulebookEntry.approval_status) == "approved",
+        ).limit(1)
+    ).first()
+
+    return result

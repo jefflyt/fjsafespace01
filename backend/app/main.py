@@ -15,7 +15,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routers import (
     dashboard_router,
+    interpretations_router,
     notifications_router,
+    preferences_router,
     reports_router,
     rulebook_router,
     uploads_router,
@@ -48,6 +50,8 @@ app.include_router(dashboard_router, prefix="/api", tags=["dashboard"])
 app.include_router(reports_router, prefix="/api", tags=["reports"])
 app.include_router(rulebook_router, prefix="/api", tags=["rulebook"])
 app.include_router(notifications_router, prefix="/api", tags=["notifications"])
+app.include_router(preferences_router, prefix="/api", tags=["preferences"])
+app.include_router(interpretations_router, prefix="/api", tags=["interpretations"])
 
 
 @app.get("/health", tags=["health"])
