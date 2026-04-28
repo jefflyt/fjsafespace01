@@ -46,24 +46,24 @@ per-standard evaluation, tenant scoping.
 - **Testing**: Manual verification of rule linking, API returns correct sources
 - **Dependencies**: PR-R1-01 (sites must have tenant_id assigned)
 
-### PR-R1-03: Schema Additions (Preferences, Standards, Context)
+### PR-R1-03: Schema Additions (Preferences, Standards, Context) — ✅ COMPLETE
 
 - **Plan**: `docs/plans/epics/R1-Refactor/pr03-schema-additions.md`
 - **Goal**: New tables for metric preferences, site standards, scan tracking
 - **Scope (in)**: Migrations 008-011, SQLModel classes
 - **Scope (out)**: API endpoints, frontend UI
 - **Key Changes**: Create site_metric_preferences, site_standards tables, add columns to site/upload
-- **Testing**: Manual schema verification, SQLModel import tests
+- **Testing**: Manual schema verification, SQLModel import tests, migration column checks
 - **Dependencies**: PR-R1-02 (reference_source table must exist for FK)
 
-### PR-R1-04: Backend API (Enhanced Upload and New Endpoints)
+### PR-R1-04: Backend API (Enhanced Upload and New Endpoints) — ✅ COMPLETE
 
 - **Plan**: `docs/plans/epics/R1-Refactor/pr04-backend-api.md`
 - **Goal**: New API endpoints for preferences, standards, interpretations. Enhanced upload/findings.
 - **Scope (in)**: All new API routes, schemas, aggregation service update
 - **Scope (out)**: Frontend UI, rate limiting, uHoo API endpoints
 - **Key Changes**: preferences router, interpretations router, enhanced upload, tenant scoping
-- **Testing**: Manual API verification with curl
+- **Testing**: 15 tests pass against live Supabase (unit + integration)
 - **Dependencies**: PR-R1-03 (schema tables must exist)
 
 ### PR-R1-05: Frontend Refactor (Human-Friendly Dashboard)
@@ -93,15 +93,15 @@ PR-R1-01 (Auth + Tenant)    → ✅ Complete (2026-04-28)
     ↓
 PR-R1-02 (Rulebook Reorg)    → ✅ Complete (2026-04-28)
     ↓
-PR-R1-03 (Schema Additions)  → ⏳ Next (0.5 days)
+PR-R1-03 (Schema Additions)  → ✅ Complete (2026-04-28)
     ↓
-PR-R1-04 (Backend API)       → 2-3 days
+PR-R1-04 (Backend API)       → ✅ Complete (2026-04-28)
     ↓
-PR-R1-05 (Frontend Refactor) → 3-4 days
+PR-R1-05 (Frontend Refactor) → Next
     ↓
 PR-R1-06 (Testing + Polish)  → 2-3 days
     ↓
-Remaining estimated: 8-12 days (of original 10-14)
+Remaining estimated: 3-7 days (of original 10-14)
 ```
 
 ## 6. Risks, Trade-offs, and Open Questions
