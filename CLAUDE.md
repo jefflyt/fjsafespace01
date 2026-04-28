@@ -2,7 +2,9 @@
 
 ## Project Overview
 
-FJDashboard is the operational and reporting interface for the FJ SafeSpace Indoor Air Quality (IAQ) platform. It processes rule-based findings into traceable reports for operations and executive views.
+FJDashboard is the operational and reporting interface for the FJ SafeSpace
+Indoor Air Quality (IAQ) platform. It processes rule-based findings into
+traceable reports for operations and executive views.
 
 ### Core Architecture
 
@@ -21,7 +23,7 @@ FJDashboard is the operational and reporting interface for the FJ SafeSpace Indo
 
 ---
 
-## Project Status (as of 2026-04-26)
+## Project Status (as of 2026-04-28)
 
 ### PR1-8: Complete — UAT Ready
 
@@ -41,13 +43,22 @@ FJDashboard is the operational and reporting interface for the FJ SafeSpace Indo
   - **PR8.5**: Utility scripts (run_qa_audit.py, preview_report.py — since deleted)
   - **PR8.6**: Frontend Vitest tests + production hardening (since deleted per D-R1-08)
 
-### R1 Refactor: Planning Complete, Implementation Pending
+### R1 Refactor: PR01-02 Complete, PR03 Next
 
-- **Objective**: Transform dashboard from compliance/reporting model to human-friendly IAQ wellness dashboard with per-standard evaluation (WELL, ASHRAE, SS554, SafeSpace)
+- **Objective**: Transform dashboard from compliance/reporting model to
+  human-friendly IAQ wellness dashboard with per-standard evaluation
+  (SS 554, WELL v2, RESET Viral Index, SafeSpace)
 - **Plans**: `docs/plans/epics/R1-Refactor/ROADMAP.md` + `pr01-auth-tenant.md`
   through `pr06-testing-polish.md`
-- **Sequence**: PR-R1-01 (Auth + Tenant) → R1-02 (Rulebook Reorg) → R1-03 (Schema) → R1-04 (Backend API) → R1-05 (Frontend) → R1-06 (Testing)
-- **UserTenant SQLModel**: Already added to `backend/app/models/supporting.py`
+- **Sequence**: PR-R1-01 (✅ Auth + Tenant) → PR-R1-02 (✅ Rulebook Reorg)
+  → PR-R1-03 (Schema, next) → R1-04 (Backend API) → R1-05 (Frontend)
+  → R1-06 (Testing)
+- **Completed**:
+  - PR-R1-01: user_tenant table, Supabase Auth JWT extraction, frontend login,
+    default tenant seeded, sites assigned
+  - PR-R1-02: 4 certification standards seeded, reference_source_id FK on
+    rulebook_entry, fetch_rules_by_standard() service, all rules use
+    rule_version="v2-refactor"
 
 ### Simplified Architecture (2 Views)
 
@@ -95,8 +106,9 @@ FJDashboard is the operational and reporting interface for the FJ SafeSpace Indo
 
 ### Existing Scripts & Sample Data
 
-- `scripts/seed_rulebook.py` — Populates WHO AQG 2021 + SS554 rulebook entries
-- `scripts/seed_rulebook_v1.py` — Legacy seed script
+- `scripts/seed_rulebook_v1.py` — Seeds 4 standards: SS 554, WELL v2,
+  RESET Viral Index, SafeSpace (rule_version="v2-refactor")
+- `scripts/seed_default_tenant.py` — Seeds default tenant, assigns sites
 - `assets/sample_uploads/npe_sample.csv` — New Park Estate sample (3 zones, 24 rows, clean PASS)
 - `assets/sample_uploads/cag_sample.csv` — Changi Airport Group sample (3 zones, 30 rows, data gaps + critical CO2)
 
@@ -146,7 +158,7 @@ All variables documented in `.env.example`. Config loads via `backend/app/core/c
 | `SUPABASE_URL` | Yes | Supabase project URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Storage service role key |
 | `SUPABASE_STORAGE_BUCKET` | Yes | Storage bucket name (default: `iaq-scans`) |
-| `SUPABASE_JWT_SECRET` | R2+ | Supabase JWT secret for auth (optional in R1) |
+| `SUPABASE_JWT_SECRET` | R1+ | Supabase JWT secret (PR-R1-01 JWT extraction) |
 | `NEXT_PUBLIC_API_URL` | Yes | FastAPI backend base URL |
 | `NEXT_PUBLIC_SUPABASE_URL` | R1+ | Supabase URL for frontend auth client |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | R1+ | Supabase anon key for frontend auth |
@@ -164,8 +176,11 @@ All variables documented in `.env.example`. Config loads via `backend/app/core/c
 
 ### Traceability & Governance
 
-- **Mandatory Metadata:** Every finding **must** include a `rule_version` and `citation_id`.
-- **Read-Only Rulebook:** The dashboard (Workflow B) must **never** mutate Rulebook tables. Access is limited to `SELECT` only at the DB level. Rule changes must use `ADMIN_DATABASE_URL`.
+- **Mandatory Metadata:** Every finding **must** include a `rule_version`
+  and `citation_id`.
+- **Read-Only Rulebook:** The dashboard (Workflow B) must **never** mutate
+  Rulebook tables. Access is `SELECT` only at the DB level. Rule changes
+  must use `ADMIN_DATABASE_URL`.
 - **No Manual Overrides:** Threshold overrides in production are strictly prohibited.
 - **Source Currency:** Only `CURRENT_VERIFIED` sources can drive certification-impact rules. Others are marked "Advisory Only".
 
@@ -185,9 +200,12 @@ Historical QA gates (QA-G1 to QA-G9) from the compliance model:
 
 ### Design Principles
 
-- **Evidence Before Aesthetics:** Accuracy and traceability take precedence over visual flair.
-- **Synchronous Pipeline:** All processing (parsing and PDF generation) is currently synchronous.
-- **Surgical Updates:** When modifying schema or API contracts, ensure the TDD version is bumped and recorded in the Decision Log.
+- **Evidence Before Aesthetics:** Accuracy and traceability take precedence
+  over visual flair.
+- **Synchronous Pipeline:** All processing (parsing and PDF generation) is
+  currently synchronous.
+- **Surgical Updates:** When modifying schema or API contracts, ensure the
+  TDD version is bumped and recorded in the Decision Log.
 
 ---
 
@@ -208,10 +226,12 @@ Historical QA gates (QA-G1 to QA-G9) from the compliance model:
 - `backend/app/services/`: Core logic for CSV parsing, rule evaluation,
   aggregation.
 - `backend/app/api/routers/`: 5 route files — dashboard, notifications, reports, rulebook, uploads.
-- `backend/app/api/dependencies.py`: Auth/tenant dependencies (stub — to be replaced in R1-01).
+- `backend/app/api/dependencies.py`: Supabase JWT extraction, tenant scoping
+  (replaced stub in PR-R1-01).
 - `backend/app/templates/`: WeasyPrint HTML/CSS report templates (Jinja2 syntax).
-- `backend/migrations/versions/`: Alembic migrations (001 through 007).
-  - 001: Core tables (site, upload, reading, finding, report)
+- `backend/migrations/versions/`: Alembic migrations (001 through 015).
+  - 001: Core tables (site, upload, reading, finding, report, reference_source,
+    citation_unit, rulebook_entry)
   - 002: Report QA fields (reviewer_name, qa_checks, certification_outcome)
   - 003: Indexes for cross-site aggregation queries
   - 004: Upload report_type column (auto-detected ASSESSMENT vs
@@ -220,6 +240,11 @@ Historical QA gates (QA-G1 to QA-G9) from the compliance model:
     PDF generation)
   - 006: Reading zone_name column
   - 007: Tenant and customer info columns
+  - 008-011: Pending PR-R1-03 (site context, scan type, metric preferences,
+    site standards)
+  - 012-013: Pending R2 (device connection, alert log)
+  - 014: user_tenant table (PR-R1-01)
+  - 015: reference_source_id FK on rulebook_entry (PR-R1-02)
 - `backend/tests/`: Empty — new tests to be built in PR-R1-06.
 - `frontend/components/`: Feature components (see list above).
 - `frontend/lib/api.ts`: Centralized fetch client for backend communication.
@@ -235,14 +260,16 @@ Historical QA gates (QA-G1 to QA-G9) from the compliance model:
 | ------ | ------ | ----- |
 | Playwright E2E tests | Better suited for CI/CD | Phase 2 |
 | CI/CD pipeline | Infrastructure work, separate PR | Phase 2/3 |
-| Tenant isolation (QA-G9) | R1-01 starts foundation | R1/Phase 3 |
 | Clerk auth integration | Replaced by Supabase Auth for R1 | Deprecated |
 
 ---
 
 **Completed (previously deferred):**
 
-- ~~PDF templates~~ — Implemented in PR5 + PR8.6. Immutable snapshot architecture in place (migration 005).
+- ~~PDF templates~~ — Implemented in PR5 + PR8.6. Immutable snapshot
+  architecture in place (migration 005).
+- ~~Tenant isolation~~ — user_tenant table + JWT extraction done (PR-R1-01).
+- ~~Rulebook reorganization~~ — 4 standards seeded with v2-refactor (PR-R1-02).
 
 ---
 
@@ -288,7 +315,8 @@ snapshots. Key conventions from the original model:
 
 The R1 refactor introduces:
 
-- **Per-standard evaluation**: Independent pass/fail per WELL, ASHRAE, SS554, SafeSpace
+- **Per-standard evaluation**: Independent pass/fail per SS 554, WELL v2,
+  RESET Viral Index, SafeSpace
 - **Human-readable interpretations**: Threshold bands mapped to plain-language insights
 - **Metric preferences**: Per-site customizable visible metrics and alert thresholds
 - **Wellness scoring**: Weighted scores per standard, not single compliance outcome

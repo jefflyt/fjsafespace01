@@ -31,11 +31,13 @@ def list_rules(
     context_scope: str | None = None,
     approval_status: str | None = "approved",
     include_superseded: bool = False,
+    source_id: str | None = None,
 ):
     """Returns all RulebookEntry records matching optional filters.
 
     By default only returns approved entries. Set approval_status=None to
     include drafts. Set include_superseded=True to also return superseded entries.
+    Use source_id to filter by certification standard (reference_source.id).
     """
     query = select(RulebookEntry)
 
@@ -52,6 +54,8 @@ def list_rules(
             if approval_status is None or approval_status == "approved"
             else col(RulebookEntry.approval_status) == approval_status
         )
+    if source_id is not None:
+        query = query.where(col(RulebookEntry.reference_source_id) == source_id)
 
     results = session.exec(query).all()
     return [_rule_to_dict(rule, session) for rule in results]
@@ -101,6 +105,7 @@ def _rule_to_dict(rule: RulebookEntry, session: Session) -> dict:
         "approved_by": rule.approved_by,
         "approved_at": rule.approved_at.isoformat() if rule.approved_at else None,
         "citation_unit_ids": rule.citation_unit_ids,
+        "reference_source_id": rule.reference_source_id,
     }
 
 

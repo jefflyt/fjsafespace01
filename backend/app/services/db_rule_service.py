@@ -129,3 +129,27 @@ def get_latest_approved_version(session: Session) -> str | None:
         return None
 
     return max(entries)
+
+
+def fetch_rules_by_standard(
+    session: Session, source_id: str, rule_version: str
+) -> list[RuleDefinition]:
+    """
+    Fetch approved rules for a specific certification standard.
+
+    Args:
+        session: Database session
+        source_id: reference_source.id to filter by
+        rule_version: rule_version string (e.g., "v2-refactor")
+
+    Returns:
+        List of RuleDefinition objects for the given standard.
+    """
+    entries = session.exec(
+        select(RulebookEntry)
+        .where(col(RulebookEntry.reference_source_id) == source_id)
+        .where(col(RulebookEntry.rule_version) == rule_version)
+        .where(col(RulebookEntry.approval_status) == "approved")
+    ).all()
+
+    return [entry_to_rule_definition(e) for e in entries]

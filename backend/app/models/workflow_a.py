@@ -50,6 +50,8 @@ class ReferenceSource(SQLModel, table=True):
     last_verified_at: Optional[datetime] = None
 
     citation_units: list["CitationUnit"] = Relationship(back_populates="source")
+    entries: list["RulebookEntry"] = Relationship(back_populates="source")
+    entries: list["RulebookEntry"] = Relationship(back_populates="source")
 
 
 # ── CitationUnit ──────────────────────────────────────────────────────────────
@@ -115,3 +117,6 @@ class RulebookEntry(SQLModel, table=True):
     approved_at: Optional[datetime] = None
     # Comma-separated citation unit IDs linked to this rule
     citation_unit_ids: str
+    # FK to reference_source — links rule to its parent certification standard
+    reference_source_id: Optional[str] = Field(default=None, foreign_key="reference_source.id")
+    source: Optional[ReferenceSource] = Relationship(back_populates="entries")

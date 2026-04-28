@@ -153,3 +153,52 @@ curl http://localhost:8000/api/rulebook/sources
 - Define SafeSpace thresholds with Jay/FJ team
 - Per-standard evaluation wired into upload pipeline (PR-R1-04)
 - Per-standard wellness index scoring (PR-R1-04)
+
+## 7) Implementation Status — COMPLETE (2026-04-28)
+
+### Acceptance Criteria Verification
+
+| # | Acceptance Criteria | Status | Notes |
+| - | - | - | - |
+| 1 | 4 reference_source entries exist | ✅ | SS 554, WELL v2, RESET Viral Index, SafeSpace |
+| 2 | Existing rules linked to sources | ✅ | All 22 rules have `reference_source_id` FK |
+| 3 | SafeSpace/SS554 placeholders with status | ✅ | SafeSpace: 5 draft; SS 554: 4 approved |
+| 4 | `GET /api/rulebook/sources` returns 4 entries | ✅ | Returns `status` and `source_currency_status` |
+| 5 | Rule engine can filter by standard_id | ✅ | `fetch_rules_by_standard()` in db_rule_service |
+| 6 | Legacy rule_version preserved | ✅ | New rules use `v2-refactor` |
+| 7 | All new entries get `rule_version = v2-refactor` | ✅ | All 22 rules verified |
+
+### Implementation Steps Verification
+
+| # | Plan Step | Status | File | Notes |
+| - | - | - | - | - |
+| 1 | Migration 015 — add `reference_source_id` FK | ✅ | `015_rulebook_standard_link.py` | Used `sa.Uuid(as_uuid=True)` |
+| 2 | Model update — add FK + relationships | ✅ | `workflow_a.py:121` | FK + both relationships |
+| 3 | Refactored seed script | ✅ | `seed_rulebook_v1.py` | 4 sources, 22 rules |
+| 4 | Service update — `fetch_rules_by_standard` | ✅ | `db_rule_service.py:134` | Filters by source+version |
+| 5 | Router update — `source_id` filter | ✅ | `rulebook.py:34` | Query param added |
+| 6 | Rule engine update (optional) | ⏭️ | — | Already supports filtered rules |
+| 7 | Wellness index update (optional) | ⏭️ | — | Caller filters findings |
+
+### Deviations from Original Plan
+
+- **ASHRAE → RESET Viral Index**: User corrected the 4 standards to
+  SS 554, WELL v2, RESET Viral Index, SafeSpace (not ASHRAE).
+- **`priority` column dropped**: Legacy DB column `priority` (NOT NULL,
+  not in model, not in any migration) was dropped to unblock seed script.
+  Should be formalized in migration 016 for clean schema history.
+- **Migration type fix**: `sa.Uuid(as_uuid=True)` instead of
+  `sa.String(length=36)` — Supabase native UUID columns require this type
+  for ALTER TABLE ADD COLUMN with FK.
+
+### DB State Summary
+
+```text
+alembic_version: 015_rulebook_standard_link
+reference_source: 4 entries (3 active/CURRENT_VERIFIED, 1 draft/VERSION_UNVERIFIED)
+rulebook_entry: 22 rules (all rule_version=v2-refactor)
+  - SS 554: 4 approved rules
+  - WELL v2: 9 approved rules (3 bands per metric)
+  - RESET Viral Index: 4 approved rules
+  - SafeSpace: 5 draft rules (placeholder)
+```

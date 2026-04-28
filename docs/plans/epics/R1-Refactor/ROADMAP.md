@@ -25,7 +25,7 @@ per-standard evaluation, tenant scoping.
 
 ## 4. PR Roadmap
 
-### PR-R1-01: Auth Foundation and Tenant Activation
+### PR-R1-01: Auth Foundation and Tenant Activation — ✅ COMPLETE
 
 - **Plan**: `docs/plans/epics/R1-Refactor/pr01-auth-tenant.md`
 - **Goal**: Supabase Auth, user_tenant table, default tenant, JWT middleware
@@ -35,13 +35,14 @@ per-standard evaluation, tenant scoping.
 - **Testing**: Unit tests for JWT extraction, manual auth flow verification
 - **Dependencies**: None
 
-### PR-R1-02: Rulebook Reorganization
+### PR-R1-02: Rulebook Reorganization — ✅ COMPLETE
 
 - **Plan**: `docs/plans/epics/R1-Refactor/pr02-rulebook-reorg.md`
-- **Goal**: 4 certification standards, link rules to sources, bump rule versions
+- **Goal**: 4 certification standards (SS 554, WELL v2, RESET Viral Index,
+  SafeSpace), link rules to sources, bump rule versions
 - **Scope (in)**: Migration 015, seed script refactor, rule engine standard filter
 - **Scope (out)**: Per-standard evaluation in API, frontend standard selector
-- **Key Changes**: Add reference_source_id FK to rulebook_entry, reorganize rules
+- **Key Changes**: Add reference_source_id FK to rulebook_entry, reorganize rules by standard
 - **Testing**: Manual verification of rule linking, API returns correct sources
 - **Dependencies**: PR-R1-01 (sites must have tenant_id assigned)
 
@@ -88,11 +89,11 @@ per-standard evaluation, tenant scoping.
 ## 5. Milestones & Sequence
 
 ```text
-PR-R1-01 (Auth + Tenant)    → 1-2 days
+PR-R1-01 (Auth + Tenant)    → ✅ Complete (2026-04-28)
     ↓
-PR-R1-02 (Rulebook Reorg)    → 1 day
+PR-R1-02 (Rulebook Reorg)    → ✅ Complete (2026-04-28)
     ↓
-PR-R1-03 (Schema Additions)  → 0.5 days
+PR-R1-03 (Schema Additions)  → ⏳ Next (0.5 days)
     ↓
 PR-R1-04 (Backend API)       → 2-3 days
     ↓
@@ -100,7 +101,7 @@ PR-R1-05 (Frontend Refactor) → 3-4 days
     ↓
 PR-R1-06 (Testing + Polish)  → 2-3 days
     ↓
-Total estimated: 10-14 days
+Remaining estimated: 8-12 days (of original 10-14)
 ```
 
 ## 6. Risks, Trade-offs, and Open Questions
@@ -109,8 +110,8 @@ Total estimated: 10-14 days
 
 | # | Risk | Impact | Mitigation |
 | --- | --- | --- | --- |
-| 1 | Rulebook reorganization breaks existing evaluations | High | Bump to v2-refactor without deleting v1.0 entries |
-| 2 | Tenant migration assigns sites incorrectly | Medium | Seed script deterministic, manual review before prod |
+| 1 | ~~Rulebook reorganization breaks existing evaluations~~ | ~~High~~ | ~~Bump to v2-refactor without deleting v1.0 entries~~ — ✅ Resolved by PR-R1-02 |
+| 2 | Tenant migration assigns sites incorrectly | Medium | Seed script deterministic, manual review before prod — ✅ Resolved by PR-R1-01 |
 | 3 | Per-standard evaluation doubles query load | Medium | Index on (site_id, rule_version), cache per-standard scores |
 | 4 | Frontend refactor too large for single PR | Medium | Can split into components-first + pages-refactor if needed |
 
@@ -125,9 +126,9 @@ Total estimated: 10-14 days
 
 | | # | Question | Status | |
 | | --- | ---------- | -------- | |
-| | 1 | Supabase Auth project — same or separate? | **Resolved**: Same project | |
-| | 2 | SafeSpace thresholds | Placeholder UX — thresholds TBD | |
-| | 3 | SS554 certification document | Placeholder UX — cert doc TBD | |
-| | 4 | uHoo API access | **Confirmed** — R2 concern | |
-| | 5 | Email sender address | Use default Resend sender | |
-| | 6 | Facility manager count | < 100 MAUs — free tier covers | |
+| | 1 | Supabase Auth project — same or separate? | ✅ Same project (PR-R1-01) | |
+| | 2 | SafeSpace thresholds | ✅ Placeholder with draft status (PR-R1-02) | |
+| | 3 | SS554 certification document | ✅ 4 approved rules seeded (PR-R1-02) | |
+| | 4 | uHoo API access | ✅ Confirmed — R2 concern | |
+| | 5 | Email sender address | ✅ Use default Resend sender | |
+| | 6 | Facility manager count | ✅ < 100 MAUs — free tier covers | |

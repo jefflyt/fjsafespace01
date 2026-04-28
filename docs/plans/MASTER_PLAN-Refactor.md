@@ -1,5 +1,16 @@
 # MASTER PLAN: FJ SafeSpace Dashboard Refactor
 
+## Progress Tracker
+
+| PR | Title | Status | Date |
+| -- | ----- | ------ | ---- |
+| PR-R1-01 | Auth Foundation and Tenant Activation | ✅ Complete | 2026-04-28 |
+| PR-R1-02 | Rulebook Reorganization | ✅ Complete | 2026-04-28 |
+| PR-R1-03 | Schema Additions | ⏳ Pending | — |
+| PR-R1-04 | Backend API | ⏳ Pending | — |
+| PR-R1-05 | Frontend Refactor | ⏳ Pending | — |
+| PR-R1-06 | Testing and Polish | ⏳ Pending | — |
+
 ## 1. Product Summary
 
 The FJ SafeSpace Dashboard replaces the uHoo native dashboard as the customer-facing IAQ interface. Unlike uHoo's
@@ -90,15 +101,15 @@ tenants)
 - Configurable alert thresholds (within safe bounds)
 - Cross-site comparison leaderboard (admin-only)
 - Interpretation layer service (threshold bands → plain-language insights)
-- Supabase Auth setup + tenant isolation middleware + user_tenant mapping
+- Supabase Auth setup + tenant isolation middleware + user_tenant mapping (✅ PR-R1-01)
 - Self-service access for facility managers (login required)
 
 **Rulebook work**:
 
-- Add SafeSpace reference_source + placeholder rulebook entries
-- Add SS554 reference_source + placeholder rulebook entries
-- Reorganize existing rules: link WELL rules to WELL source, IAQ rules to SS554 source
-- All existing rulebook entries get `rule_version` bump to `v2-refactor`
+- ✅ 4 reference_source entries: SS 554, WELL v2, RESET Viral Index, SafeSpace
+- ✅ Complete per-standard rule sets (22 rules, all `rule_version = "v2-refactor"`)
+- ✅ `reference_source_id` FK on `rulebook_entry` (migration 015)
+- ✅ `fetch_rules_by_standard()` service function
 
 **Reuse from PR1-8**: Upload pipeline, Supabase schema, dashboard endpoints, TimeSeriesChart, wellness index
 calculation (refactored)
@@ -142,7 +153,7 @@ The R1 phase is broken into 6 independently deployable PRs, ordered for sequenti
 
 ---
 
-### PR-R1-01: Auth Foundation and Tenant Activation
+### PR-R1-01: Auth Foundation and Tenant Activation — ✅ COMPLETE
 
 **Scope**: Set up Supabase Auth infrastructure, create user_tenant mapping table, assign existing sites to default
 tenant, wire tenant isolation middleware.
@@ -187,20 +198,21 @@ Supabase Auth
 
 ---
 
-### PR-R1-02: Rulebook Reorganization
+### PR-R1-02: Rulebook Reorganization — ✅ COMPLETE
 
-**Scope**: Add SafeSpace and SS554 reference sources, reorganize existing rules by standard, bump rule versions.
+**Scope**: Add 4 certification standards (SS 554, WELL v2, RESET Viral Index,
+SafeSpace), reorganize existing rules by standard, bump rule versions.
 
 **What this PR does**:
 
-- Refactors `scripts/seed_rulebook_v1.py` to create 4 reference_source entries: WELL, ASHRAE, SS554, SafeSpace
-- Links existing WHO AQG 2021 rules to WELL source
-- Links existing IAQ rules to SS554 source
-- Creates placeholder entries for SafeSpace and SS554
-- Bumps all existing rulebook entries to `rule_version = "v2-refactor"`
+- Refactors `scripts/seed_rulebook_v1.py` to create 4 reference_source entries:
+  SS 554, WELL v2, RESET Viral Index, SafeSpace
+- Creates complete per-standard rule sets (22 rules total, all with
+  `rule_version = "v2-refactor"`)
 - Adds `reference_source_id` FK to RulebookEntry model
-- Rule engine gains awareness of `reference_source_id` for per-standard filtering
 - `db_rule_service.py` gains `fetch_rules_by_standard()` function
+- Rulebook router gains `source_id` query param filter
+- Legacy rule_version entries preserved — old findings still queryable
 
 **Files affected (backend)**:
 
@@ -219,12 +231,12 @@ Supabase Auth
 
 **Acceptance criteria**:
 
-- 4 reference_source entries exist (WELL, ASHRAE, SS554, SafeSpace)
-- Existing rules linked to appropriate sources
-- SafeSpace shows as "Coming Soon" in API responses
-- Rule engine can filter rules by standard
-- `GET /api/rulebook/sources` returns all 4 sources
-- Legacy rule_version entries preserved for historical data
+- ✅ 4 reference_source entries exist (SS 554, WELL v2, RESET Viral Index, SafeSpace)
+- ✅ Each standard has its own complete set of threshold rules
+- ✅ SafeSpace shows as draft in API responses
+- ✅ Rule engine can filter rules by standard via `fetch_rules_by_standard()`
+- ✅ `GET /api/rulebook/sources` returns all 4 sources
+- ✅ Legacy rule_version entries preserved for historical data
 
 ---
 
@@ -416,11 +428,11 @@ ZoneDetailView
 ### PR Dependency Graph
 
 ```text
-PR-R1-01 (Auth + Tenant)
+PR-R1-01 (Auth + Tenant)         ✅ Complete
     ↓
-PR-R1-02 (Rulebook Reorg)
+PR-R1-02 (Rulebook Reorg)        ✅ Complete
     ↓
-PR-R1-03 (Schema Additions)
+PR-R1-03 (Schema Additions)      ⏳ Next
     ↓
 PR-R1-04 (Backend API)
     ↓
@@ -449,12 +461,12 @@ PR-R1-06 (Testing + Polish)
 
 | # | Risk | Impact | Mitigation |
 | --- | --- | --- | --- |
-| 1 | Rulebook reorganization breaks existing evaluations | High — historical findings reference old rule_version | Bump to "v2-refactor" without deleting v1.0. Legacy queryable. |
-| 2 | Tenant migration assigns sites incorrectly | Medium — facility managers see wrong data | Deterministic seed script. Manual review before prod. |
-| 3 | Per-standard evaluation doubles query load | Medium — dashboard performance degradation | Index on (site_id, rule_version). Cache per-standard scores. |
-| 4 | SafeSpace thresholds undefined at launch | Low — shows "Coming Soon" placeholder | Acceptable. Jay/FJ team to define later. |
-| 5 | Supabase Auth project confusion | **Resolved** — same project, middleware handles isolation | No action needed |
-| 6 | Solo developer bandwidth | High — sequential delivery means longer timeline | Small PRs, each independently deployable. |
+| 1 | ~~Rulebook reorganization breaks existing evaluations~~ | ~~High~~ | ✅ Resolved — bumped to "v2-refactor", legacy entries preserved (PR-R1-02) |
+| 2 | ~~Tenant migration assigns sites incorrectly~~ | ~~Medium~~ | ✅ Resolved — deterministic seed script, manual review done (PR-R1-01) |
+| 3 | Per-standard evaluation doubles query load | Medium | Index on (site_id, rule_version). Cache per-standard scores. |
+| 4 | SafeSpace thresholds undefined at launch | Low | ✅ Placeholder seeded with draft status (PR-R1-02) |
+| 5 | ~~Supabase Auth project confusion~~ | ~~Medium~~ | ✅ Resolved — same project, middleware handles isolation (PR-R1-01) |
+| 6 | Solo developer bandwidth | High | Small PRs, each independently deployable. |
 
 ### Trade-offs
 
@@ -471,9 +483,9 @@ PR-R1-06 (Testing + Polish)
 | # | Question | Impact | Owner | Status |
 | --- | --- | --- | --- | --- |
 | 1 | uHoo API access confirmed available? | Blocks R2 (continuous monitoring) | Jay | **Confirmed** — will proceed with R2 when ready |
-| 2 | SafeSpace thresholds — when will Jay/FJ team define them? | Affects SafeSpace "Coming Soon" status in R1 | Jay | Placeholder UX — thresholds to be defined later |
-| 3 | SS554 certification document — when will it be loaded? | Affects SS554 thresholds in R1 | Jay | Placeholder UX — cert doc to be loaded later |
-| 4 | Supabase Auth project — same as existing or separate? | Affects JWT secret and frontend SDK config | Jeff | **Resolved**: Same project — simpler config, tenant middleware handles isolation |
+| 2 | SafeSpace thresholds — when will Jay/FJ team define them? | Affects SafeSpace "Coming Soon" status in R1 | Jay | ✅ Placeholder seeded with draft status (PR-R1-02) |
+| 3 | SS554 certification document — when will it be loaded? | Affects SS554 thresholds in R1 | Jay | ✅ 4 rules seeded from SS 554:2016 Amdt 1:2021 (PR-R1-02) |
+| 4 | Supabase Auth project — same as existing or separate? | Affects JWT secret and frontend SDK config | Jeff | ✅ Resolved: Same project (PR-R1-01) |
 | 5 | Email sender address for alerts (R2)? | Needs domain verification with Resend | Jay | Use default Resend sender for now |
 | 6 | How many facility managers expected in initial rollout? | Affects Supabase Auth billing tier | Jay | < 100 MAUs — free tier covers it |
 
@@ -482,4 +494,4 @@ PR-R1-06 (Testing + Polish)
 The minimum viable R1 consists of PR-R1-01 through PR-R1-05.
 PR-R1-06 (testing) is essential for production readiness but the dashboard
 is functional after PR-R1-05. All blocking open questions have been
-resolved — ready to begin PR-R1-01.
+resolved. PR-R1-01 and PR-R1-02 are complete — ready to begin PR-R1-03.

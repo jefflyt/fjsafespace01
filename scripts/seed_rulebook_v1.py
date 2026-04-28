@@ -2,25 +2,24 @@
 """
 scripts/seed_rulebook_v1.py
 
-Seeds the rulebook database with the initial rule set (v1.0).
+Seeds the rulebook database with rules organized by certification standard.
 
-Populates three tables:
-  1. reference_source — WELL, WHO, ASHRAE, IAQ guidelines
+Populates four tables:
+  1. reference_source — SS 554, WELL v2, RESET Viral Index, SafeSpace
   2. citation_unit — verbatim excerpts linked to each source
-  3. rulebook_entry — 20 rules covering CO2, PM2.5, TVOC, Temperature, Humidity
-     with GOOD/WATCH/CRITICAL bands and index_weight_percent
+  3. rulebook_entry — rules covering CO2, PM2.5, TVOC, Temperature, Humidity
+     with GOOD/WATCH/CRITICAL bands, organized by standard
 
 Usage:
     cd backend
     source .venv/bin/activate
     python ../scripts/seed_rulebook_v1.py
 
-Idempotent: Re-running deletes and recreates entries for v1.0 only.
-Rule version: "v1.0"
+Idempotent: Re-running deletes and recreates entries for v2-refactor only.
+Rule version: "v2-refactor"
 """
 
 import sys
-import os
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -33,8 +32,8 @@ from app.database import engine
 from app.models.workflow_a import ReferenceSource, CitationUnit, RulebookEntry
 from app.models.enums import MetricName, ConfidenceLevel, Priority, SourceCurrency
 
-RULE_VERSION = "v1.0"
-EFFECTIVE_FROM = datetime(2026, 4, 21, tzinfo=timezone.utc)
+RULE_VERSION = "v2-refactor"
+EFFECTIVE_FROM = datetime(2026, 4, 28, tzinfo=timezone.utc)
 
 
 def get_or_create_source(session: Session, **kwargs) -> ReferenceSource:
@@ -84,6 +83,7 @@ def upsert_rule(session: Session, **kwargs) -> RulebookEntry:
             col(RulebookEntry.min_value) == kwargs.get("min_value"),
             col(RulebookEntry.max_value) == kwargs.get("max_value"),
             col(RulebookEntry.rule_version) == kwargs["rule_version"],
+            col(RulebookEntry.reference_source_id) == kwargs.get("reference_source_id"),
         )
     ).first()
     if existing:
@@ -96,12 +96,27 @@ def upsert_rule(session: Session, **kwargs) -> RulebookEntry:
 
 
 def seed_rulebook(session: Session):
-    """Populate the rulebook with v1.0 rules."""
+    """Populate the rulebook with v2-refactor rules organized by standard."""
 
     # ── 1. Reference Sources ──────────────────────────────────────────────────
 
     sources = {}
 
+    # SS 554: Singapore's IAQ Code of Practice
+    sources["SS554"] = get_or_create_source(
+        session,
+        title="SS 554: Code of Practice for Indoor Air Quality in Air-Conditioned Buildings",
+        publisher="Enterprise Singapore / SPRING Singapore",
+        source_type="standard",
+        jurisdiction="SG",
+        version_label="2016 Amendment 1:2021",
+        published_date=datetime(2016, 1, 1, tzinfo=timezone.utc),
+        effective_date=datetime(2021, 8, 1, tzinfo=timezone.utc),
+        status="active",
+        source_currency_status=SourceCurrency.CURRENT_VERIFIED,
+    )
+
+    # WELL Building Standard v2
     sources["WELL"] = get_or_create_source(
         session,
         title="WELL Building Standard",
@@ -109,49 +124,39 @@ def seed_rulebook(session: Session):
         source_type="standard",
         jurisdiction="global",
         version_label="v2",
-        published_date=datetime(2019, 1, 1, tzinfo=timezone.utc),
-        effective_date=datetime(2019, 1, 1, tzinfo=timezone.utc),
+        published_date=datetime(2022, 10, 1, tzinfo=timezone.utc),
+        effective_date=datetime(2022, 10, 1, tzinfo=timezone.utc),
         status="active",
         source_currency_status=SourceCurrency.CURRENT_VERIFIED,
     )
 
-    sources["WHO"] = get_or_create_source(
+    # RESET Viral Index
+    sources["RESET"] = get_or_create_source(
         session,
-        title="WHO Global Air Quality Guidelines 2021",
-        publisher="World Health Organization",
-        source_type="guideline",
-        jurisdiction="global",
-        version_label="2021",
-        published_date=datetime(2021, 9, 1, tzinfo=timezone.utc),
-        effective_date=datetime(2021, 9, 15, tzinfo=timezone.utc),
-        status="active",
-        source_currency_status=SourceCurrency.CURRENT_VERIFIED,
-    )
-
-    sources["ASHRAE"] = get_or_create_source(
-        session,
-        title="ASHRAE Standard 62.1",
-        publisher="ASHRAE",
+        title="RESET Viral Index",
+        publisher="GAMA (Global Architecture Monitoring Alliance)",
         source_type="standard",
-        jurisdiction="US",
-        version_label="2022",
-        published_date=datetime(2022, 1, 1, tzinfo=timezone.utc),
-        effective_date=datetime(2022, 1, 1, tzinfo=timezone.utc),
+        jurisdiction="global",
+        version_label="v1.1",
+        published_date=datetime(2022, 11, 29, tzinfo=timezone.utc),
+        effective_date=datetime(2022, 11, 29, tzinfo=timezone.utc),
         status="active",
         source_currency_status=SourceCurrency.CURRENT_VERIFIED,
     )
 
-    sources["IAQ"] = get_or_create_source(
+    # SafeSpace — FJ proprietary standard (placeholder)
+    sources["SAFESPACE"] = get_or_create_source(
         session,
-        title="Indoor Air Quality Guidelines",
-        publisher="IAQ Industry Standards",
-        source_type="guideline",
+        title="SafeSpace IAQ Standard",
+        publisher="FJ SafeSpace",
+        source_type="standard",
         jurisdiction="global",
-        version_label="2016",
-        published_date=datetime(2016, 1, 1, tzinfo=timezone.utc),
-        effective_date=datetime(2016, 1, 1, tzinfo=timezone.utc),
-        status="active",
-        source_currency_status=SourceCurrency.CURRENT_VERIFIED,
+        version_label="v1",
+        published_date=datetime(2026, 4, 28, tzinfo=timezone.utc),
+        effective_date=datetime(2026, 4, 28, tzinfo=timezone.utc),
+        status="draft",
+        source_currency_status=SourceCurrency.VERSION_UNVERIFIED,
+        source_completeness_status="placeholder",
     )
 
     # ── 2. Citation Units ─────────────────────────────────────────────────────
@@ -161,363 +166,398 @@ def seed_rulebook(session: Session):
         c = get_or_create_citation(session, source_id=sources[source_key].id, page_or_section=section)
         return c.id
 
-    # WELL citations for CO2
-    cit_well_001 = cit("WELL", "WELL v2, A01: Air Quality — CO2 GOOD (< 800 ppm)")
-    cit_well_002 = cit("WELL", "WELL v2, A01: Air Quality — CO2 WATCH (800-1200 ppm)")
-    cit_well_003 = cit("WELL", "WELL v2, A01: Air Quality — CO2 CRITICAL (> 1200 ppm)")
+    # SS 554 citations
+    cit_ss554_co2 = cit("SS554", "SS 554:2016 Amdt 1:2021, Section 5.2.1 — CO2")
+    cit_ss554_pm25 = cit("SS554", "SS 554:2016 Amdt 1:2021, Section 5.2.2 — PM2.5")
+    cit_ss554_temp = cit("SS554", "SS 554:2016 Amdt 1:2021, Section 5.1 — Temperature")
+    cit_ss554_hum = cit("SS554", "SS 554:2016 Amdt 1:2021, Section 5.1 — Humidity")
 
-    # WHO citations for PM2.5
-    cit_who_001 = cit("WHO", "WHO AQG 2021, Ch.6, Table 6.1 — PM2.5 GOOD (≤ 12 μg/m³)")
-    cit_who_002 = cit("WHO", "WHO AQG 2021, Ch.6, Table 6.1 — PM2.5 WATCH (12-35 μg/m³)")
-    cit_who_003 = cit("WHO", "WHO AQG 2021, Ch.6, Table 6.1 — PM2.5 CRITICAL (> 35 μg/m³)")
+    # WELL citations
+    cit_well_co2_g = cit("WELL", "WELL v2, A01: Air Quality — CO2 GOOD (< 800 ppm)")
+    cit_well_co2_w = cit("WELL", "WELL v2, A01: Air Quality — CO2 WATCH (800-1200 ppm)")
+    cit_well_co2_c = cit("WELL", "WELL v2, A01: Air Quality — CO2 CRITICAL (> 1200 ppm)")
+    cit_well_pm25_g = cit("WELL", "WELL v2, A01: PM2.5 GOOD (< 15 ug/m3)")
+    cit_well_pm25_w = cit("WELL", "WELL v2, A01: PM2.5 WATCH (15-35 ug/m3)")
+    cit_well_pm25_c = cit("WELL", "WELL v2, A01: PM2.5 CRITICAL (> 35 ug/m3)")
+    cit_well_tvoc_g = cit("WELL", "WELL v2, Feature 01: TVOC GOOD (< 500 ug/m3)")
+    cit_well_tvoc_w = cit("WELL", "WELL v2, Feature 01: TVOC WATCH (500-660 ug/m3)")
+    cit_well_tvoc_c = cit("WELL", "WELL v2, Feature 01: TVOC CRITICAL (> 660 ug/m3)")
 
-    # IAQ citations for TVOC
-    cit_iaq_001 = cit("IAQ", "IAQ Guidelines — TVOC GOOD (< 220 ppb)")
-    cit_iaq_002 = cit("IAQ", "IAQ Guidelines — TVOC WATCH (220-660 ppb)")
-    cit_iaq_003 = cit("IAQ", "IAQ Guidelines — TVOC CRITICAL (> 660 ppb)")
+    # RESET citations
+    cit_reset_pm25 = cit("RESET", "RESET Viral Index v1.1 — PM2.5 Health Impact (ISPM)")
+    cit_reset_co2 = cit("RESET", "RESET Viral Index v1.1 — Potential Viral Dosage (PVDr)")
+    cit_reset_hum = cit("RESET", "RESET Viral Index v1.1 — Virus Survivability (VS) optimal RH")
+    cit_reset_temp = cit("RESET", "RESET Viral Index v1.1 — Virus Survivability (VS) baseline temp")
 
-    # ASHRAE citations for Temperature and Humidity
-    cit_ash_001 = cit("ASHRAE", "ASHRAE 62.1 — Temperature GOOD (20-26°C)")
-    cit_ash_002 = cit("ASHRAE", "ASHRAE 62.1 — Temperature WATCH (17-20°C or 26-30°C)")
-    cit_ash_003 = cit("ASHRAE", "ASHRAE 62.1 — Temperature CRITICAL (< 10°C or > 30°C)")
-    cit_ash_004 = cit("ASHRAE", "ASHRAE 62.1 — Humidity GOOD (30-60%RH)")
-    cit_ash_005 = cit("ASHRAE", "ASHRAE 62.1 — Humidity WATCH (20-30%RH or 60-70%RH)")
-    cit_ash_006 = cit("ASHRAE", "ASHRAE 62.1 — Humidity CRITICAL (< 20%RH or > 70%RH)")
+    # SafeSpace citations (placeholder)
+    cit_ss_co2 = cit("SAFESPACE", "SafeSpace v1 — CO2 (Coming Soon)")
+    cit_ss_pm25 = cit("SAFESPACE", "SafeSpace v1 — PM2.5 (Coming Soon)")
+    cit_ss_tvoc = cit("SAFESPACE", "SafeSpace v1 — TVOC (Coming Soon)")
+    cit_ss_temp = cit("SAFESPACE", "SafeSpace v1 — Temperature (Coming Soon)")
+    cit_ss_hum = cit("SAFESPACE", "SafeSpace v1 — Humidity (Coming Soon)")
 
-    # ── 3. Rulebook Entries (20 rules matching _DEFAULT_RULES) ────────────────
+    # ── 3. Rulebook Entries ───────────────────────────────────────────────────
 
-    # CO2
+    # ── SS 554 Rules (approved) ───────────────────────────────────────────────
+
+    # CO2: max 1000 ppm
+    upsert_rule(session,
+        metric_name=MetricName.co2_ppm,
+        threshold_type="upper_bound",
+        min_value=None, max_value=1000.0,
+        unit="ppm", context_scope="office",
+        interpretation_template="CO2 level of {value} ppm is within SS 554 acceptable limits.",
+        business_impact_template="CO2 above 1000 ppm indicates inadequate ventilation per SS 554.",
+        recommendation_template="Increase outdoor air ventilation rate per SS 554 requirements.",
+        priority_logic=Priority.P1,
+        confidence_level=ConfidenceLevel.HIGH,
+        rule_version=RULE_VERSION,
+        effective_from=EFFECTIVE_FROM,
+        approval_status="approved",
+        citation_unit_ids=cit_ss554_co2,
+        index_weight_percent=25.0,
+        reference_source_id=sources["SS554"].id,
+    )
+
+    # PM2.5: max 35 ug/m3 24-hr
+    upsert_rule(session,
+        metric_name=MetricName.pm25_ugm3,
+        threshold_type="upper_bound",
+        min_value=None, max_value=35.0,
+        unit="ug/m3", context_scope="office",
+        interpretation_template="PM2.5 level of {value} ug/m3 is within SS 554 acceptable limits.",
+        business_impact_template="PM2.5 above 35 ug/m3 exceeds SS 554 24-hour standard.",
+        recommendation_template="Install HEPA filtration per SS 554 guidelines.",
+        priority_logic=Priority.P1,
+        confidence_level=ConfidenceLevel.HIGH,
+        rule_version=RULE_VERSION,
+        effective_from=EFFECTIVE_FROM,
+        approval_status="approved",
+        citation_unit_ids=cit_ss554_pm25,
+        index_weight_percent=20.0,
+        reference_source_id=sources["SS554"].id,
+    )
+
+    # Temperature: 23-26 deg C
+    upsert_rule(session,
+        metric_name=MetricName.temperature_c,
+        threshold_type="range",
+        min_value=23.0, max_value=26.0,
+        unit="deg C", context_scope="office",
+        interpretation_template="Temperature of {value} deg C is within SS 554 thermal comfort range.",
+        business_impact_template="Temperature outside 23-26 deg C affects occupant comfort per SS 554.",
+        recommendation_template="Adjust HVAC setpoints per SS 554 guidelines.",
+        priority_logic=Priority.P2,
+        confidence_level=ConfidenceLevel.HIGH,
+        rule_version=RULE_VERSION,
+        effective_from=EFFECTIVE_FROM,
+        approval_status="approved",
+        citation_unit_ids=cit_ss554_temp,
+        index_weight_percent=10.0,
+        reference_source_id=sources["SS554"].id,
+    )
+
+    # Humidity: 40-70% RH
+    upsert_rule(session,
+        metric_name=MetricName.humidity_rh,
+        threshold_type="range",
+        min_value=40.0, max_value=70.0,
+        unit="%RH", context_scope="office",
+        interpretation_template="Humidity of {value}%RH is within SS 554 acceptable range.",
+        business_impact_template="Humidity outside 40-70% RH may cause mold or dryness per SS 554.",
+        recommendation_template="Adjust humidification/dehumidification per SS 554.",
+        priority_logic=Priority.P2,
+        confidence_level=ConfidenceLevel.HIGH,
+        rule_version=RULE_VERSION,
+        effective_from=EFFECTIVE_FROM,
+        approval_status="approved",
+        citation_unit_ids=cit_ss554_hum,
+        index_weight_percent=10.0,
+        reference_source_id=sources["SS554"].id,
+    )
+
+    # ── WELL v2 Rules (approved) ──────────────────────────────────────────────
+
+    # CO2: GOOD 300-800
     upsert_rule(session,
         metric_name=MetricName.co2_ppm,
         threshold_type="range",
         min_value=300.0, max_value=800.0,
         unit="ppm", context_scope="general",
-        interpretation_template="CO₂ level of {value} ppm is within acceptable indoor range.",
-        business_impact_template="Cognitive function is expected to be normal at this level.",
+        interpretation_template="CO2 level of {value} ppm is within WELL acceptable range.",
+        business_impact_template="Cognitive function is expected to be normal per WELL v2.",
         recommendation_template="No action required. Maintain current ventilation.",
         priority_logic=Priority.P1,
         confidence_level=ConfidenceLevel.HIGH,
         rule_version=RULE_VERSION,
         effective_from=EFFECTIVE_FROM,
         approval_status="approved",
-        citation_unit_ids=cit_well_001,
+        citation_unit_ids=cit_well_co2_g,
         index_weight_percent=25.0,
+        reference_source_id=sources["WELL"].id,
     )
 
+    # CO2: WATCH 800-1200
     upsert_rule(session,
         metric_name=MetricName.co2_ppm,
         threshold_type="range",
         min_value=800.0, max_value=1200.0,
         unit="ppm", context_scope="general",
-        interpretation_template="CO₂ level of {value} ppm is elevated. Drowsiness may increase.",
-        business_impact_template="Mild reduction in cognitive performance may occur.",
-        recommendation_template="Increase fresh air exchange rate. Monitor for sustained elevation.",
+        interpretation_template="CO2 level of {value} ppm is elevated per WELL v2.",
+        business_impact_template="Mild reduction in cognitive performance per WELL v2.",
+        recommendation_template="Increase fresh air exchange rate.",
         priority_logic=Priority.P2,
         confidence_level=ConfidenceLevel.HIGH,
         rule_version=RULE_VERSION,
         effective_from=EFFECTIVE_FROM,
         approval_status="approved",
-        citation_unit_ids=cit_well_002,
+        citation_unit_ids=cit_well_co2_w,
         index_weight_percent=25.0,
+        reference_source_id=sources["WELL"].id,
     )
 
+    # CO2: CRITICAL >1200
     upsert_rule(session,
         metric_name=MetricName.co2_ppm,
         threshold_type="upper_bound",
         min_value=1200.0, max_value=None,
         unit="ppm", context_scope="general",
-        interpretation_template="CO₂ level of {value} ppm exceeds safe indoor limits.",
-        business_impact_template="Significant cognitive impairment and drowsiness likely.",
-        recommendation_template="Immediately increase ventilation. Investigate HVAC or occupancy issues.",
+        interpretation_template="CO2 level of {value} ppm exceeds WELL v2 limits.",
+        business_impact_template="Significant cognitive impairment per WELL v2.",
+        recommendation_template="Immediately increase ventilation.",
         priority_logic=Priority.P1,
         confidence_level=ConfidenceLevel.HIGH,
         rule_version=RULE_VERSION,
         effective_from=EFFECTIVE_FROM,
         approval_status="approved",
-        citation_unit_ids=cit_well_003,
+        citation_unit_ids=cit_well_co2_c,
         index_weight_percent=25.0,
+        reference_source_id=sources["WELL"].id,
     )
 
-    # PM2.5
+    # PM2.5: GOOD 0-15
     upsert_rule(session,
         metric_name=MetricName.pm25_ugm3,
         threshold_type="range",
-        min_value=0.0, max_value=12.0,
-        unit="μg/m³", context_scope="general",
-        interpretation_template="PM2.5 level of {value} μg/m³ is within WHO guideline.",
-        business_impact_template="Respiratory health risk is low.",
+        min_value=0.0, max_value=15.0,
+        unit="ug/m3", context_scope="general",
+        interpretation_template="PM2.5 level of {value} ug/m3 is within WELL v2 guideline.",
+        business_impact_template="Respiratory health risk is low per WELL v2.",
         recommendation_template="No action required.",
         priority_logic=Priority.P1,
         confidence_level=ConfidenceLevel.HIGH,
         rule_version=RULE_VERSION,
         effective_from=EFFECTIVE_FROM,
         approval_status="approved",
-        citation_unit_ids=cit_who_001,
-        index_weight_percent=25.0,
+        citation_unit_ids=cit_well_pm25_g,
+        index_weight_percent=20.0,
+        reference_source_id=sources["WELL"].id,
     )
 
+    # PM2.5: WATCH 15-35
     upsert_rule(session,
         metric_name=MetricName.pm25_ugm3,
         threshold_type="range",
-        min_value=12.0, max_value=35.0,
-        unit="μg/m³", context_scope="general",
-        interpretation_template="PM2.5 level of {value} μg/m³ exceeds WHO annual guideline.",
-        business_impact_template="Sensitive individuals may experience mild respiratory irritation.",
-        recommendation_template="Check air filtration. Consider reducing outdoor air intake during pollution events.",
+        min_value=15.0, max_value=35.0,
+        unit="ug/m3", context_scope="general",
+        interpretation_template="PM2.5 level of {value} ug/m3 exceeds WELL v2 guideline.",
+        business_impact_template="Sensitive individuals may experience irritation per WELL v2.",
+        recommendation_template="Check air filtration.",
         priority_logic=Priority.P2,
         confidence_level=ConfidenceLevel.HIGH,
         rule_version=RULE_VERSION,
         effective_from=EFFECTIVE_FROM,
         approval_status="approved",
-        citation_unit_ids=cit_who_002,
-        index_weight_percent=25.0,
+        citation_unit_ids=cit_well_pm25_w,
+        index_weight_percent=20.0,
+        reference_source_id=sources["WELL"].id,
     )
 
+    # PM2.5: CRITICAL >35
     upsert_rule(session,
         metric_name=MetricName.pm25_ugm3,
         threshold_type="upper_bound",
         min_value=35.0, max_value=None,
-        unit="μg/m³", context_scope="general",
-        interpretation_template="PM2.5 level of {value} μg/m³ is at unhealthy levels.",
-        business_impact_template="Increased risk of respiratory symptoms for all occupants.",
-        recommendation_template="Activate HEPA filtration. Restrict outdoor air intake. Notify occupants.",
+        unit="ug/m3", context_scope="general",
+        interpretation_template="PM2.5 level of {value} ug/m3 is at unhealthy levels per WELL v2.",
+        business_impact_template="Increased risk of respiratory symptoms per WELL v2.",
+        recommendation_template="Activate HEPA filtration. Notify occupants.",
         priority_logic=Priority.P1,
         confidence_level=ConfidenceLevel.HIGH,
         rule_version=RULE_VERSION,
         effective_from=EFFECTIVE_FROM,
         approval_status="approved",
-        citation_unit_ids=cit_who_003,
-        index_weight_percent=25.0,
+        citation_unit_ids=cit_well_pm25_c,
+        index_weight_percent=20.0,
+        reference_source_id=sources["WELL"].id,
     )
 
-    # TVOC
+    # TVOC: GOOD 0-500
     upsert_rule(session,
         metric_name=MetricName.tvoc_ppb,
         threshold_type="range",
-        min_value=0.0, max_value=220.0,
+        min_value=0.0, max_value=500.0,
         unit="ppb", context_scope="general",
-        interpretation_template="TVOC level of {value} ppb is within acceptable range.",
-        business_impact_template="No immediate health effects expected.",
+        interpretation_template="TVOC level of {value} ppb is within WELL v2 acceptable range.",
+        business_impact_template="No immediate health effects expected per WELL v2.",
         recommendation_template="No action required.",
         priority_logic=Priority.P2,
         confidence_level=ConfidenceLevel.MEDIUM,
         rule_version=RULE_VERSION,
         effective_from=EFFECTIVE_FROM,
         approval_status="approved",
-        citation_unit_ids=cit_iaq_001,
-        index_weight_percent=20.0,
+        citation_unit_ids=cit_well_tvoc_g,
+        index_weight_percent=15.0,
+        reference_source_id=sources["WELL"].id,
     )
 
+    # TVOC: WATCH 500-660
     upsert_rule(session,
         metric_name=MetricName.tvoc_ppb,
         threshold_type="range",
-        min_value=220.0, max_value=660.0,
+        min_value=500.0, max_value=660.0,
         unit="ppb", context_scope="general",
-        interpretation_template="TVOC level of {value} ppb is elevated. Off-gassing or chemical sources suspected.",
-        business_impact_template="Possible headaches or irritation for sensitive occupants.",
-        recommendation_template="Identify and remove VOC sources. Increase ventilation.",
+        interpretation_template="TVOC level of {value} ppb is elevated per WELL v2.",
+        business_impact_template="Possible headaches or irritation per WELL v2.",
+        recommendation_template="Identify and remove VOC sources.",
         priority_logic=Priority.P2,
         confidence_level=ConfidenceLevel.MEDIUM,
         rule_version=RULE_VERSION,
         effective_from=EFFECTIVE_FROM,
         approval_status="approved",
-        citation_unit_ids=cit_iaq_002,
-        index_weight_percent=20.0,
+        citation_unit_ids=cit_well_tvoc_w,
+        index_weight_percent=15.0,
+        reference_source_id=sources["WELL"].id,
     )
 
+    # TVOC: CRITICAL >660
     upsert_rule(session,
         metric_name=MetricName.tvoc_ppb,
         threshold_type="upper_bound",
         min_value=660.0, max_value=None,
         unit="ppb", context_scope="general",
-        interpretation_template="TVOC level of {value} ppb exceeds safe exposure limits.",
-        business_impact_template="Significant risk of acute health symptoms.",
-        recommendation_template="Evacuate if occupants report symptoms. Conduct source investigation.",
+        interpretation_template="TVOC level of {value} ppb exceeds WELL v2 limits.",
+        business_impact_template="Significant risk of acute health symptoms per WELL v2.",
+        recommendation_template="Conduct source investigation.",
         priority_logic=Priority.P1,
         confidence_level=ConfidenceLevel.HIGH,
         rule_version=RULE_VERSION,
         effective_from=EFFECTIVE_FROM,
         approval_status="approved",
-        citation_unit_ids=cit_iaq_003,
+        citation_unit_ids=cit_well_tvoc_c,
+        index_weight_percent=15.0,
+        reference_source_id=sources["WELL"].id,
+    )
+
+    # ── RESET Viral Index Rules (approved) ────────────────────────────────────
+
+    # PM2.5: max 15 ug/m3 (ISPM formula)
+    upsert_rule(session,
+        metric_name=MetricName.pm25_ugm3,
+        threshold_type="upper_bound",
+        min_value=None, max_value=15.0,
+        unit="ug/m3", context_scope="general",
+        interpretation_template="PM2.5 level of {value} ug/m3 is within RESET Viral Index guideline.",
+        business_impact_template="PM2.5 above 15 ug/m3 increases immune system impact per RESET v1.1.",
+        recommendation_template="Reduce PM2.5 to minimize viral transmission risk.",
+        priority_logic=Priority.P1,
+        confidence_level=ConfidenceLevel.HIGH,
+        rule_version=RULE_VERSION,
+        effective_from=EFFECTIVE_FROM,
+        approval_status="approved",
+        citation_unit_ids=cit_reset_pm25,
         index_weight_percent=20.0,
+        reference_source_id=sources["RESET"].id,
     )
 
-    # Temperature
+    # CO2: max 1000 ppm (viral dosage proxy)
     upsert_rule(session,
-        metric_name=MetricName.temperature_c,
-        threshold_type="range",
-        min_value=20.0, max_value=26.0,
-        unit="°C", context_scope="general",
-        interpretation_template="Temperature of {value}°C is within thermal comfort zone.",
-        business_impact_template="Comfortable conditions for productivity.",
-        recommendation_template="No action required.",
-        priority_logic=Priority.P2,
-        confidence_level=ConfidenceLevel.HIGH,
-        rule_version=RULE_VERSION,
-        effective_from=EFFECTIVE_FROM,
-        approval_status="approved",
-        citation_unit_ids=cit_ash_001,
-        index_weight_percent=15.0,
-    )
-
-    upsert_rule(session,
-        metric_name=MetricName.temperature_c,
-        threshold_type="range",
-        min_value=17.0, max_value=20.0,
-        unit="°C", context_scope="general",
-        interpretation_template="Temperature of {value}°C is below comfort range.",
-        business_impact_template="Occupants may feel uncomfortably cool.",
-        recommendation_template="Adjust heating setpoint. Check for drafts.",
-        priority_logic=Priority.P2,
-        confidence_level=ConfidenceLevel.MEDIUM,
-        rule_version=RULE_VERSION,
-        effective_from=EFFECTIVE_FROM,
-        approval_status="approved",
-        citation_unit_ids=cit_ash_002,
-        index_weight_percent=15.0,
-    )
-
-    upsert_rule(session,
-        metric_name=MetricName.temperature_c,
-        threshold_type="range",
-        min_value=26.0, max_value=30.0,
-        unit="°C", context_scope="general",
-        interpretation_template="Temperature of {value}°C is above comfort range.",
-        business_impact_template="Mild heat stress may reduce productivity.",
-        recommendation_template="Adjust cooling setpoint. Verify HVAC operation.",
-        priority_logic=Priority.P2,
-        confidence_level=ConfidenceLevel.MEDIUM,
-        rule_version=RULE_VERSION,
-        effective_from=EFFECTIVE_FROM,
-        approval_status="approved",
-        citation_unit_ids=cit_ash_002,
-        index_weight_percent=15.0,
-    )
-
-    upsert_rule(session,
-        metric_name=MetricName.temperature_c,
+        metric_name=MetricName.co2_ppm,
         threshold_type="upper_bound",
-        min_value=30.0, max_value=None,
-        unit="°C", context_scope="general",
-        interpretation_template="Temperature of {value}°C exceeds safe workplace limits.",
-        business_impact_template="Heat stress risk. Productivity significantly impaired.",
-        recommendation_template="Activate emergency cooling. Allow remote work if conditions persist.",
+        min_value=None, max_value=1000.0,
+        unit="ppm", context_scope="general",
+        interpretation_template="CO2 level of {value} ppm is within RESET Viral Index limits.",
+        business_impact_template="CO2 above 1000 ppm indicates elevated viral dosage risk per RESET.",
+        recommendation_template="Increase ventilation to reduce potential viral dosage.",
         priority_logic=Priority.P1,
         confidence_level=ConfidenceLevel.HIGH,
         rule_version=RULE_VERSION,
         effective_from=EFFECTIVE_FROM,
         approval_status="approved",
-        citation_unit_ids=cit_ash_003,
-        index_weight_percent=15.0,
+        citation_unit_ids=cit_reset_co2,
+        index_weight_percent=25.0,
+        reference_source_id=sources["RESET"].id,
     )
 
+    # Humidity: 40-60% RH optimal
+    upsert_rule(session,
+        metric_name=MetricName.humidity_rh,
+        threshold_type="range",
+        min_value=40.0, max_value=60.0,
+        unit="%RH", context_scope="general",
+        interpretation_template="Humidity of {value}%RH is optimal for viral survivability per RESET.",
+        business_impact_template="Humidity outside 40-60% RH increases virus survivability per RESET.",
+        recommendation_template="Maintain 40-60% RH to minimize viral transmission risk.",
+        priority_logic=Priority.P2,
+        confidence_level=ConfidenceLevel.HIGH,
+        rule_version=RULE_VERSION,
+        effective_from=EFFECTIVE_FROM,
+        approval_status="approved",
+        citation_unit_ids=cit_reset_hum,
+        index_weight_percent=15.0,
+        reference_source_id=sources["RESET"].id,
+    )
+
+    # Temperature: 20-24 deg C baseline
     upsert_rule(session,
         metric_name=MetricName.temperature_c,
-        threshold_type="lower_bound",
-        min_value=None, max_value=10.0,
-        unit="°C", context_scope="general",
-        interpretation_template="Temperature of {value}°C is below safe workplace limits.",
-        business_impact_template="Cold stress risk. Dexterity and comfort significantly reduced.",
-        recommendation_template="Activate emergency heating. Inspect for heating system failure.",
-        priority_logic=Priority.P1,
-        confidence_level=ConfidenceLevel.HIGH,
-        rule_version=RULE_VERSION,
-        effective_from=EFFECTIVE_FROM,
-        approval_status="approved",
-        citation_unit_ids=cit_ash_003,
-        index_weight_percent=15.0,
-    )
-
-    # Humidity
-    upsert_rule(session,
-        metric_name=MetricName.humidity_rh,
         threshold_type="range",
-        min_value=30.0, max_value=60.0,
-        unit="%RH", context_scope="general",
-        interpretation_template="Humidity of {value}%RH is within ideal range.",
-        business_impact_template="Comfortable conditions. Low mold and mite risk.",
-        recommendation_template="No action required.",
+        min_value=20.0, max_value=24.0,
+        unit="deg C", context_scope="general",
+        interpretation_template="Temperature of {value} deg C is within RESET Viral Index baseline.",
+        business_impact_template="Temperature outside baseline affects virus survivability per RESET.",
+        recommendation_template="Maintain 20-24 deg C for optimal viral control.",
         priority_logic=Priority.P2,
         confidence_level=ConfidenceLevel.HIGH,
         rule_version=RULE_VERSION,
         effective_from=EFFECTIVE_FROM,
         approval_status="approved",
-        citation_unit_ids=cit_ash_004,
-        index_weight_percent=15.0,
+        citation_unit_ids=cit_reset_temp,
+        index_weight_percent=10.0,
+        reference_source_id=sources["RESET"].id,
     )
 
-    upsert_rule(session,
-        metric_name=MetricName.humidity_rh,
-        threshold_type="range",
-        min_value=20.0, max_value=30.0,
-        unit="%RH", context_scope="general",
-        interpretation_template="Humidity of {value}%RH is dry. Static and dryness likely.",
-        business_impact_template="Dry skin and respiratory irritation possible.",
-        recommendation_template="Consider humidification. Monitor for static-sensitive equipment.",
-        priority_logic=Priority.P2,
-        confidence_level=ConfidenceLevel.MEDIUM,
-        rule_version=RULE_VERSION,
-        effective_from=EFFECTIVE_FROM,
-        approval_status="approved",
-        citation_unit_ids=cit_ash_005,
-        index_weight_percent=15.0,
-    )
+    # ── SafeSpace Rules (draft/placeholder) ───────────────────────────────────
 
-    upsert_rule(session,
-        metric_name=MetricName.humidity_rh,
-        threshold_type="range",
-        min_value=60.0, max_value=70.0,
-        unit="%RH", context_scope="general",
-        interpretation_template="Humidity of {value}%RH is elevated. Mold growth conditions possible.",
-        business_impact_template="Allergen levels may increase.",
-        recommendation_template="Activate dehumidification. Check for moisture intrusion.",
-        priority_logic=Priority.P2,
-        confidence_level=ConfidenceLevel.MEDIUM,
-        rule_version=RULE_VERSION,
-        effective_from=EFFECTIVE_FROM,
-        approval_status="approved",
-        citation_unit_ids=cit_ash_005,
-        index_weight_percent=15.0,
-    )
-
-    upsert_rule(session,
-        metric_name=MetricName.humidity_rh,
-        threshold_type="upper_bound",
-        min_value=70.0, max_value=None,
-        unit="%RH", context_scope="general",
-        interpretation_template="Humidity of {value}%RH creates high mold and pathogen risk.",
-        business_impact_template="Significant allergen and respiratory health risk.",
-        recommendation_template="Immediate dehumidification. Inspect for water damage.",
-        priority_logic=Priority.P1,
-        confidence_level=ConfidenceLevel.HIGH,
-        rule_version=RULE_VERSION,
-        effective_from=EFFECTIVE_FROM,
-        approval_status="approved",
-        citation_unit_ids=cit_ash_006,
-        index_weight_percent=15.0,
-    )
-
-    upsert_rule(session,
-        metric_name=MetricName.humidity_rh,
-        threshold_type="lower_bound",
-        min_value=None, max_value=20.0,
-        unit="%RH", context_scope="general",
-        interpretation_template="Humidity of {value}%RH is critically low.",
-        business_impact_template="Severe dryness. Static discharge and equipment risk.",
-        recommendation_template="Emergency humidification required.",
-        priority_logic=Priority.P1,
-        confidence_level=ConfidenceLevel.HIGH,
-        rule_version=RULE_VERSION,
-        effective_from=EFFECTIVE_FROM,
-        approval_status="approved",
-        citation_unit_ids=cit_ash_006,
-        index_weight_percent=15.0,
-    )
+    for metric, cit_id in [
+        (MetricName.co2_ppm, cit_ss_co2),
+        (MetricName.pm25_ugm3, cit_ss_pm25),
+        (MetricName.tvoc_ppb, cit_ss_tvoc),
+        (MetricName.temperature_c, cit_ss_temp),
+        (MetricName.humidity_rh, cit_ss_hum),
+    ]:
+        upsert_rule(session,
+            metric_name=metric,
+            threshold_type="range",
+            min_value=0.0, max_value=None,
+            unit="TBD", context_scope="general",
+            interpretation_template="Coming Soon — SafeSpace thresholds under development.",
+            business_impact_template="Coming Soon — SafeSpace impact assessment under development.",
+            recommendation_template="Coming Soon — SafeSpace recommendations under development.",
+            priority_logic=Priority.P3,
+            confidence_level=ConfidenceLevel.LOW,
+            rule_version=RULE_VERSION,
+            effective_from=EFFECTIVE_FROM,
+            approval_status="draft",
+            citation_unit_ids=cit_id,
+            index_weight_percent=0.0,
+            reference_source_id=sources["SAFESPACE"].id,
+        )
 
 
 def main():
     print("=" * 60)
-    print("Seeding rulebook v1.0")
+    print("Seeding rulebook v2-refactor — organized by standard")
     print("=" * 60)
 
     with Session(engine) as session:
@@ -531,11 +571,13 @@ def main():
         rules = session.exec(
             select(RulebookEntry).where(
                 col(RulebookEntry.rule_version) == RULE_VERSION,
-                col(RulebookEntry.approval_status) == "approved",
             )
         ).all()
 
     print(f"Seeded: {len(sources)} sources, {len(citations)} citations, {len(rules)} rules")
+    for src in sources:
+        rule_count = len([r for r in rules if r.reference_source_id == src.id])
+        print(f"  - {src.title} ({src.status}): {rule_count} rules")
     print("=" * 60)
 
 
