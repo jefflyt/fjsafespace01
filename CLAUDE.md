@@ -10,8 +10,8 @@ traceable reports for operations and executive views.
 
 - **Backend:** FastAPI (Python 3.12+), SQLModel (SQLAlchemy), Alembic for migrations.
 - **Frontend:** Next.js 15 (App Router), TypeScript, Tailwind CSS, Shadcn UI, Recharts.
-- **Database:** PostgreSQL (local via Docker Compose, production via Supabase
-  `jertvmbhgehajcrfifwl`).
+- **Database:** PostgreSQL (local via Homebrew `postgresql@17`, production via
+  Supabase `jertvmbhgehajcrfifwl`).
 - **PDF Engine:** WeasyPrint (native Python HTML-to-PDF).
 - **File Storage:** Supabase Storage (bucket: `iaq-scans`) for raw CSV uploads
   only. PDFs are NOT stored — generated on-demand from immutable HTML snapshots
@@ -137,7 +137,8 @@ pnpm dev                      # Start dev server on port 3000
 ### Infrastructure
 
 ```bash
-docker compose up -d          # Start local PostgreSQL on port 5432
+brew services start postgresql@17  # Start local PostgreSQL on port 5432
+brew services stop postgresql@17   # Stop local PostgreSQL
 python scripts/seed_rulebook.py  # Seed rulebook data
 ```
 
@@ -250,7 +251,6 @@ Historical QA gates (QA-G1 to QA-G9) from the compliance model:
 - `frontend/lib/api.ts`: Centralized fetch client for backend communication.
 - `scripts/`: Utility scripts (seed_rulebook, seed_rulebook_v1).
 - `assets/sample_uploads/`: Sample CSV datasets for QA and testing.
-- `docker-compose.yml`: PostgreSQL 16 local dev database.
 
 ---
 
