@@ -14,6 +14,7 @@ Tests:
 Requires: PostgreSQL database with migrations 008-011 applied.
 """
 
+import json
 import pytest
 from fastapi.testclient import TestClient
 
@@ -203,4 +204,77 @@ class TestInterpretationsIntegration:
         if resp.status_code == 200:
             data = resp.json()
             assert "metric_name" in data
+            assert "threshold_band" in data
             assert "interpretation" in data
+            assert "business_impact" in data
+            assert "recommendation" in data
+
+
+@skip_no_db
+class TestUploadWithStandards:
+    """Integration test for upload with standards parameter (AC1)."""
+
+    def test_upload_standards_parameter_parsed(self, client):
+        """Upload with standards parameter should not reject the form field."""
+        # This tests the standards parameter parsing path in create_upload.
+        # We verify the route accepts the standards form field without 422 errors.
+        # The upload itself may fail (no Supabase Storage), but standards parsing
+        # should not be the cause.
+        resp = client.post(
+            "/api/uploads",
+            data={"standards": json.dumps(["fake-source-id"])},
+            files={"file": ("test.csv", b"zone,co2_ppm\nZone A,500")},
+        )
+        # Should NOT be a 422 validation error on the standards field
+        # (may be 400/500 from other failures like storage or CSV parsing)
+        if resp.status_code == 422:
+            detail = resp.json().get("detail", [])
+            # Check that the 422 is NOT about the 'standards' field
+            for error in detail:
+                loc = error.get("loc", [])
+                assert "standards" not in str(loc), f"standards field caused 422: {error}"
+
+
+@skip_no_db
+class TestStandardsListWithValidSite:
+    """Integration test for GET standards list with valid site (AC5)."""
+
+    def test_list_standards_returns_active_standards(self, client):
+        """GET /api/sites/{id}/standards should return active standards for a real site."""
+        # First get a real site ID from the database
+        from sqlmodel import Session, create_engine, text
+        engine = create_engine(_db_url())
+        with Session(engine) as session:
+            result = session.exec(text("SELECT id FROM site LIMIT 1")).first()
+            engine.dispose()
+
+        if result is None:
+            pytest.skip("No sites in database")
+
+        # result is a Row object from text() query
+        site_id = str(result[0])
+        resp = client.get(f"/api/sites/{site_id}/standards")
+        # Should return 200 with standards object
+        assert resp.status_code == 200
+        data = resp.json()
+        assert "standards" in data
+        assert isinstance(data["standards"], list)
+
+
+@skip_no_db
+class TestTenantScoping:
+    """Integration test for tenant scoping on dashboard routes (AC8)."""
+
+    def test_sites_endpoint_returns_200_without_tenant(self, client):
+        """GET /api/dashboard/sites without tenant_id should return all sites."""
+        resp = client.get("/api/dashboard/sites")
+        # Should succeed (200) — returns all sites when no tenant filter
+        assert resp.status_code == 200
+        data = resp.json()
+        assert isinstance(data, list)
+
+    def test_comparison_endpoint_returns_200_without_tenant(self, client):
+        """GET /api/dashboard/comparison without tenant_id should return comparison data."""
+        resp = client.get("/api/dashboard/comparison")
+        # Should succeed (200) even with no data
+        assert resp.status_code == 200
