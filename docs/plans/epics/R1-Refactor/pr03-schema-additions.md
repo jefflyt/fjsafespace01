@@ -141,7 +141,52 @@ cd backend && python -c "from app.models.supporting import SiteMetricPreferences
 2. Each downgrade drops its table/columns cleanly — no data loss
 3. Revert SQLModel changes in workflow_b.py and supporting.py
 
-## 6) Follow-ups
+## 7) Implementation Status: COMPLETE
+
+**Completed**: 2026-04-28
+
+### Verification Results
+
+| Check | Result |
+| - | - |
+| Migrations 008-011 created and apply cleanly | ✅ |
+| Migration chain: 007 → 008 → 009 → 010 → 011 → 014 → 015 | ✅ |
+| SQLModel classes reflect schema | ✅ |
+| ScanType enum added | ✅ |
+| All 21 tests pass | ✅ |
+| Ruff lint clean | ✅ |
+| Downgrade path verified (HEAD → 007) | ✅ |
+| Spec verification report: `docs/verification/SPECS-VERIFICATION-R1-03.md` | ✅ |
+
+### Files Changed
+
+**New files (6):**
+
+- `backend/migrations/versions/008_site_context.py` — site.context_scope, site.standard_ids
+- `backend/migrations/versions/009_scan_type.py` — upload.scan_type, upload.standards_evaluated
+- `backend/migrations/versions/010_site_metric_preferences.py` — new table
+- `backend/migrations/versions/011_site_standards.py` — new table
+- `backend/tests/conftest.py` — shared pytest fixtures
+- `backend/tests/test_r1_03_schema_additions.py` — 21 tests
+
+**Modified files (5):**
+
+- `backend/app/models/workflow_b.py` — Site + Upload new fields
+- `backend/app/models/supporting.py` — SiteMetricPreferences + SiteStandards classes
+- `backend/app/models/enums.py` — ScanType enum
+- `backend/migrations/versions/014_user_tenant.py` — down_revision threaded to 011
+- `backend/migrations/versions/015_rulebook_standard_link.py` — bug fix: UUID → VARCHAR
+
+### Spec Divergence Notes
+
+- **Migration 015 fix**: Fixed pre-existing type mismatch where `sa.Uuid(as_uuid=True)`
+  was used for a column referencing `reference_source.id` (VARCHAR). Changed to
+  `sa.String(36)` to match the FK target.
+- **JSON vs JSONB**: Migration 010 uses `sa.JSON()` which maps to PostgreSQL JSON
+  type. Plan specified JSONB — functionally equivalent for read/write operations,
+  but JSONB would be preferred for indexing performance in future.
+
+### Follow-ups (Next PR)
 
 - API endpoints for preferences (PR-R1-04)
 - Frontend UI for metric selector and threshold config (PR-R1-05)

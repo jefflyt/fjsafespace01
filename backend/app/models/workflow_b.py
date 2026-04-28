@@ -11,7 +11,9 @@ import uuid
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import Index
+import sqlalchemy as sa
+from sqlalchemy import Column, Index
+from sqlalchemy.dialects.postgresql import ARRAY
 from sqlmodel import Field, Relationship, SQLModel
 
 from app.models.enums import (
@@ -39,6 +41,12 @@ class Site(SQLModel, table=True):
     # null for Phase 1/2; required Phase 3 (enforced by application logic, not DB)
     tenant_id: Optional[str] = Field(default=None, foreign_key="tenant.id")
     created_at: datetime = Field(default_factory=datetime.utcnow)
+    # R1-03: per-site context and standard selection
+    context_scope: Optional[str] = Field(default="general")
+    standard_ids: Optional[list[str]] = Field(
+        default=None,
+        sa_column=Column(ARRAY(sa.Text())),
+    )
 
     readings: list["Reading"] = Relationship(back_populates="site")
     uploads: list["Upload"] = Relationship(back_populates="site")
@@ -62,6 +70,12 @@ class Upload(SQLModel, table=True):
     rule_version_used: Optional[str] = None
     # JSON-serialised string[]
     warnings: Optional[str] = None
+    # R1-03: scan tracking
+    scan_type: Optional[str] = Field(default="adhoc")
+    standards_evaluated: Optional[list[str]] = Field(
+        default=None,
+        sa_column=Column(ARRAY(sa.Text())),
+    )
 
     site: Site = Relationship(back_populates="uploads")
     readings: list["Reading"] = Relationship(back_populates="upload")

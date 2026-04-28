@@ -95,6 +95,12 @@ class Priority(str, enum.Enum):
     P3 = "P3"
 
 
+class ScanType(str, enum.Enum):
+    """Scan mode: ad-hoc upload or continuous monitoring."""
+    adhoc = "adhoc"
+    continuous = "continuous"
+
+
 class CertificationOutcome(str, enum.Enum):
     """
     Never null — service returns INSUFFICIENT_EVIDENCE when no applicable

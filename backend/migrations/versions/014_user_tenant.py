@@ -11,7 +11,7 @@ import sqlalchemy as sa
 from alembic import op
 
 revision = "014_user_tenant"
-down_revision = "007_tenant_customer_info"
+down_revision = "011_site_standards"
 branch_labels: Sequence[str] | None = None
 depends_on: Sequence[str] | None = None
 

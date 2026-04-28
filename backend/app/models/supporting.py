@@ -10,7 +10,10 @@ import uuid
 from datetime import datetime
 from typing import Optional
 
-from sqlmodel import Field, SQLModel
+from sqlmodel import Column, Field, SQLModel
+import sqlalchemy as sa
+from sqlalchemy import JSON
+from sqlalchemy.dialects.postgresql import ARRAY
 
 
 class Tenant(SQLModel, table=True):
@@ -63,4 +66,38 @@ class Notification(SQLModel, table=True):
     title: str
     body: str
     is_read: bool = Field(default=False)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+# ── R1-03: Site Metric Preferences & Standards ────────────────────────────────
+
+
+class SiteMetricPreferences(SQLModel, table=True):
+    """Per-site metric visibility and alert threshold customization."""
+
+    __tablename__ = "site_metric_preferences"
+
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True)
+    site_id: str = Field(foreign_key="site.id", unique=True, index=True)
+    active_metrics: list[str] = Field(
+        default_factory=list,
+        sa_column=Column(ARRAY(sa.Text())),
+    )
+    alert_threshold_overrides: dict = Field(
+        default_factory=dict,
+        sa_column=Column(JSON),
+    )
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+class SiteStandards(SQLModel, table=True):
+    """Links sites to their active certification standards."""
+
+    __tablename__ = "site_standards"
+
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True)
+    site_id: str = Field(foreign_key="site.id", index=True)
+    reference_source_id: str = Field(foreign_key="reference_source.id")
+    is_active: bool = Field(default=True)
     created_at: datetime = Field(default_factory=datetime.utcnow)

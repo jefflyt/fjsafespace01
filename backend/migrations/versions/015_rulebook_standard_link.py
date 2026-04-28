@@ -20,7 +20,7 @@ depends_on: Sequence[str] | None = None
 def upgrade() -> None:
     op.add_column(
         "rulebook_entry",
-        sa.Column("reference_source_id", sa.Uuid(as_uuid=True), sa.ForeignKey("reference_source.id"), nullable=True),
+        sa.Column("reference_source_id", sa.String(36), sa.ForeignKey("reference_source.id"), nullable=True),
     )
     op.create_index(
         "ix_rulebook_entry_reference_source_id",
