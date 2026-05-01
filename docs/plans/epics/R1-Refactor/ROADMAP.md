@@ -10,10 +10,11 @@ metrics mean
 
 ## 2. Complexity Assessment
 
-- **Classification**: Multi-PR (6 PRs, sequential)
-- **Estimated PR Count**: 6
+- **Classification**: Multi-PR (7 PRs, sequential)
+- **Estimated PR Count**: 7
 - **Rationale**: Auth/tenant infrastructure must precede schema changes, which must precede API changes, which must
-precede frontend refactor, which must precede testing. Each layer depends on the previous.
+  precede frontend refactor, which must precede testing. Customer intake builds on the upload flow. Each layer
+  depends on the previous.
 
 ## 3. Full-Stack Impact
 
@@ -66,7 +67,7 @@ per-standard evaluation, tenant scoping.
 - **Testing**: 15 tests pass against live Supabase (unit + integration)
 - **Dependencies**: PR-R1-03 (schema tables must exist)
 
-### PR-R1-05: Frontend Refactor (Human-Friendly Dashboard)
+### PR-R1-05: Frontend Refactor (Human-Friendly Dashboard) — ✅ COMPLETE
 
 - **Plan**: `docs/plans/epics/R1-Refactor/pr05-frontend-refactor.md`
 - **Goal**: New components and refactored pages for human-friendly dashboard
@@ -86,22 +87,34 @@ per-standard evaluation, tenant scoping.
 - **Testing**: pytest, Vitest, manual performance checks
 - **Dependencies**: PR-R1-05 (components must exist)
 
+### PR-R1-07: Adhoc Customer Intake
+
+- **Plan**: `docs/plans/epics/R1-Refactor/pr07-adhoc-customer-intake.md`
+- **Goal**: Capture customer info during adhoc uploads, create tenant records, enable conversion to continuous monitoring
+- **Scope (in)**: Customer info fields on upload form, tenant creation/linking, tenants listing API, admin customer page
+- **Scope (out)**: Supabase Auth continuous monitoring (R2), PDF reports (R3)
+- **Key Changes**: Restore 4 client fields to UploadForm, tenant dedup by contact_person, `GET /api/tenants`, admin page
+- **Testing**: Backend integration tests (tenant creation, dedup, listing), frontend form validation tests
+- **Dependencies**: PR-R1-05 (UploadForm must exist)
+
 ## 5. Milestones & Sequence
 
 ```text
-PR-R1-01 (Auth + Tenant)    → ✅ Complete (2026-04-28)
+PR-R1-01 (Auth + Tenant)         → ✅ Complete (2026-04-28)
     ↓
-PR-R1-02 (Rulebook Reorg)    → ✅ Complete (2026-04-28)
+PR-R1-02 (Rulebook Reorg)         → ✅ Complete (2026-04-28)
     ↓
-PR-R1-03 (Schema Additions)  → ✅ Complete (2026-04-28)
+PR-R1-03 (Schema Additions)       → ✅ Complete (2026-04-28)
     ↓
-PR-R1-04 (Backend API)       → ✅ Complete (2026-04-28)
+PR-R1-04 (Backend API)            → ✅ Complete (2026-04-28)
     ↓
-PR-R1-05 (Frontend Refactor) → Next
+PR-R1-05 (Frontend Refactor)      → ✅ Complete (2026-04-30)
     ↓
-PR-R1-06 (Testing + Polish)  → 2-3 days
+PR-R1-06 (Testing + Polish)       → In progress
     ↓
-Remaining estimated: 3-7 days (of original 10-14)
+PR-R1-07 (Adhoc Customer Intake)  → Next — capture client info on upload, tenant listing
+    ↓
+Remaining estimated: ~5 days
 ```
 
 ## 6. Risks, Trade-offs, and Open Questions
