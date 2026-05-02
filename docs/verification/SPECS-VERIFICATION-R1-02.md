@@ -69,6 +69,7 @@
 **Risk**: The interpretations router (R1-04) queries columns on `RulebookEntry` that may not exist.
 
 **Verification Result**: ✅ **RESOLVED** — All 4 columns exist on `rulebook_entry`:
+
 - `interpretation_template` ✅
 - `business_impact_template` ✅
 - `recommendation_template` ✅

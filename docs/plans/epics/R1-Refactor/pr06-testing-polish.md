@@ -170,9 +170,32 @@ time curl -X POST http://localhost:8000/api/uploads -F "file=@large_test.csv"
 1. Revert all new test files — no production impact
 2. Note: Tests are additive. No production code changes in this PR.
 
-## 6) Follow-ups
+## 7) Post-Implementation Notes
 
-- Playwright E2E tests (deferred per original plan)
-- CI/CD pipeline with automated test execution
-- Load testing for concurrent uploads
-- Performance monitoring in production (Sentry, etc.)
+### Production Bug Fixes Discovered During Testing
+
+Tests revealed and fixed the following production code issues:
+
+1. **`backend/app/api/routers/preferences.py`** — UUID-to-string conversion bug
+   - `SiteMetricPreferencesResponse` and `SiteStandardResponse` were receiving raw UUID objects
+     instead of strings, causing `ValidationError` at runtime
+   - Fixed: `site_id=str(prefs.site_id)` and `source_id=str(row[0].reference_source_id)`
+
+2. **`migrations/versions/015_rulebook_standard_link.py`** — Unused import
+   - Removed unused `import sqlalchemy as sa` (lint fix)
+
+### Test File Count
+
+- **Backend**: 9 files (7 new + 2 pre-existing from R1-03/04) — 116 tests total
+- **Frontend**: 4 new files + setup — 31 tests total
+- **Total**: 147 tests, all passing
+
+### Lint Status
+
+- Backend: `ruff check` clean (0 errors)
+- Frontend: `next lint` has pre-existing ESLint config incompatibility (not related to new code)
+
+### Deferred Items
+
+- Performance SLA verification (dashboard load < 3s, upload < 30s, API p95 < 500ms) — manual QA required
+- Coverage percentage reports — recommend `pytest --cov=app` and `pnpm test -- --coverage`

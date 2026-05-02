@@ -15,7 +15,7 @@ Connect the existing rulebook database infrastructure to the rule engine so that
 
 ## 2. Architecture
 
-```
+```text
 CSV Upload → Parse (csv_parser.py) → Readings stored in DB
                                           │
                                           ▼
@@ -165,7 +165,7 @@ Sparkline time series charts added to the Operations findings tab, showing metri
 
 Backend: New endpoint or extended existing endpoint returning readings grouped by `upload_id` + `metric_name` + `reading_timestamp`:
 
-```
+```text
 GET /api/uploads/{id}/readings/timeseries
 Returns: { metric_name: [{ timestamp, value }] }
 ```

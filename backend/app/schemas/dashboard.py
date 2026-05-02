@@ -6,14 +6,17 @@ Pydantic response schemas for the Executive Dashboard API.
 Reference: PLAN docs/plans/epics/pr6-executive-dashboard/PLAN.md § PR 6.2
 """
 
-from typing import Optional
+from typing import Annotated, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, BeforeValidator
+
+# Accept UUID objects from SQLAlchemy and auto-convert to string
+UUIDStr = Annotated[str, BeforeValidator(str)]
 
 
 class LeaderboardRow(BaseModel):
     """A single site's row in the executive leaderboard."""
-    site_id: str
+    site_id: UUIDStr
     site_name: str
     wellness_index_score: float
     certification_outcome: str
@@ -24,7 +27,7 @@ class LeaderboardRow(BaseModel):
 class TopRisk(BaseModel):
     """A high-priority risk displayed in the Top 3 Risks panel."""
     site_name: str
-    site_id: str
+    site_id: UUIDStr
     metric_name: str
     threshold_band: str
     interpretation_text: str
@@ -63,7 +66,7 @@ class ExecutiveDashboardResponse(BaseModel):
 
 class SiteMetricPreferencesResponse(BaseModel):
     """GET /api/sites/{site_id}/metric-preferences response."""
-    site_id: str
+    site_id: UUIDStr
     active_metrics: list[str]
     alert_threshold_overrides: dict[str, dict]
 
@@ -78,7 +81,7 @@ class SiteMetricPreferencesUpdate(BaseModel):
 
 class SiteStandardResponse(BaseModel):
     """A single standard for a site."""
-    source_id: str
+    source_id: UUIDStr
     title: str
     is_active: bool
 

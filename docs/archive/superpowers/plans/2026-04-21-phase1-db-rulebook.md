@@ -1154,7 +1154,7 @@ cd backend && source .venv/bin/activate && python ../scripts/seed_rulebook_v1.py
 
 Expected output:
 
-```
+```text
 ============================================================
 Seeding rulebook v1.0
 ============================================================

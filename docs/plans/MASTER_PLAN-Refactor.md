@@ -6,9 +6,9 @@
 | -- | ----- | ------ | ---- |
 | PR-R1-01 | Auth Foundation and Tenant Activation | ✅ Complete | 2026-04-28 |
 | PR-R1-02 | Rulebook Reorganization | ✅ Complete | 2026-04-28 |
-| PR-R1-03 | Schema Additions | ⏳ Pending | — |
-| PR-R1-04 | Backend API | ⏳ Pending | — |
-| PR-R1-05 | Frontend Refactor | ⏳ Pending | — |
+| PR-R1-03 | Schema Additions | ✅ Complete | 2026-04-28 |
+| PR-R1-04 | Backend API | ✅ Complete | 2026-04-28 |
+| PR-R1-05 | Frontend Refactor | ✅ Complete | 2026-04-30 |
 | PR-R1-06 | Testing and Polish | ⏳ Pending | — |
 
 ## 1. Product Summary
@@ -432,11 +432,11 @@ PR-R1-01 (Auth + Tenant)         ✅ Complete
     ↓
 PR-R1-02 (Rulebook Reorg)        ✅ Complete
     ↓
-PR-R1-03 (Schema Additions)      ⏳ Next
+PR-R1-03 (Schema Additions)      ✅ Complete
     ↓
-PR-R1-04 (Backend API)
+PR-R1-04 (Backend API)           ✅ Complete
     ↓
-PR-R1-05 (Frontend Refactor)
+PR-R1-05 (Frontend Refactor)     ✅ Complete
     ↓
 PR-R1-06 (Testing + Polish)
 ```

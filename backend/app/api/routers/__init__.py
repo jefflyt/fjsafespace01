@@ -5,6 +5,7 @@ from app.api.routers.preferences import router as preferences_router
 from app.api.routers.reports import router as reports_router
 from app.api.routers.rulebook import router as rulebook_router
 from app.api.routers.uploads import router as uploads_router
+from app.api.routers.tenants import router as tenants_router
 
 __all__ = [
     "dashboard_router",
@@ -14,4 +15,5 @@ __all__ = [
     "reports_router",
     "rulebook_router",
     "uploads_router",
+    "tenants_router",
 ]

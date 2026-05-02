@@ -1,10 +1,11 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { api } from "@/lib/api"
+import { api, apiClient } from "@/lib/api"
 import { cn } from "@/lib/utils"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Select,
   SelectContent,
@@ -12,9 +13,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { StandardSelector } from "@/components/StandardSelector"
 import { AlertTriangle, ShieldCheck, ShieldX, ShieldAlert, Loader2, Activity, ArrowUpRight } from "lucide-react"
 
 // ── Types ────────────────────────────────────────────────────────────────────
+
+interface StandardScore {
+  title: string;
+  score: number | null;
+  outcome: string;
+}
 
 interface LeaderboardRow {
   site_id: string
@@ -23,6 +31,8 @@ interface LeaderboardRow {
   certification_outcome: string
   last_scan_date: string | null
   finding_count: number
+  // R1-05: per-standard scores
+  standard_scores?: StandardScore[]
 }
 
 interface TopRisk {
@@ -66,6 +76,12 @@ interface UploadSummary {
   parse_status: string
   uploaded_at: string
   report_type: string | null
+}
+
+interface SiteStandard {
+  source_id: string;
+  title: string;
+  is_active: boolean;
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -277,6 +293,11 @@ export default function ExecutiveDashboardPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  // R1-05: Standard filtering
+  const [allStandards, setAllStandards] = useState<SiteStandard[]>([])
+  const [activeStandardId, setActiveStandardId] = useState<string>("")
+  const [showNeedsAttentionOnly, setShowNeedsAttentionOnly] = useState(false)
+
   useEffect(() => {
     Promise.all([
       api.get<ExecutiveDashboardData>("/api/dashboard/executive"),
@@ -285,10 +306,62 @@ export default function ExecutiveDashboardPage() {
       .then(([dashboardData, uploadsData]) => {
         setData(dashboardData)
         setUploads(uploadsData)
+
+        // Derive standards from leaderboard data
+        const standardTitles = new Set<string>()
+        for (const row of dashboardData.leaderboard) {
+          if (row.standard_scores) {
+            for (const s of row.standard_scores) {
+              standardTitles.add(s.title)
+            }
+          }
+        }
+        const standards: SiteStandard[] = Array.from(standardTitles).map((title, i) => ({
+          source_id: `standard-${i}`,
+          title,
+          is_active: true,
+        }))
+        setAllStandards(standards)
+        if (standards.length > 0) {
+          setActiveStandardId(standards[0].source_id)
+        }
       })
       .catch((err: Error) => setError(err.message))
       .finally(() => setLoading(false))
   }, [])
+
+  // Filter leaderboard by standard and attention
+  const filteredLeaderboard = (() => {
+    if (!data) return []
+    let rows = [...data.leaderboard]
+
+    // Filter by standard
+    if (activeStandardId) {
+      const std = allStandards.find((s) => s.source_id === activeStandardId)
+      if (std) {
+        rows = rows
+          .map((row) => ({
+            ...row,
+            standard_scores: row.standard_scores?.filter((s) => s.title === std.title),
+          }))
+          .filter((row) => row.standard_scores && row.standard_scores.length > 0)
+      }
+    }
+
+    // Filter: needs attention only
+    if (showNeedsAttentionOnly) {
+      rows = rows.filter((row) => {
+        const hasBadOutcome = row.certification_outcome?.includes("IMPROVEMENT") ||
+          row.certification_outcome?.includes("INSUFFICIENT")
+        const hasBadStandard = row.standard_scores?.some(
+          (s) => s.outcome === "FAIL" || s.outcome === "INSUFFICIENT_EVIDENCE"
+        )
+        return hasBadOutcome || hasBadStandard
+      })
+    }
+
+    return rows
+  })()
 
   if (loading) {
     return (
@@ -349,19 +422,50 @@ export default function ExecutiveDashboardPage() {
         </Select>
       </div>
 
+      {/* R1-05: Standard Selector + Attention Filter */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+        {allStandards.length > 0 && (
+          <StandardSelector
+            standards={allStandards}
+            activeStandardId={activeStandardId}
+            onStandardChange={setActiveStandardId}
+          />
+        )}
+        <div className="flex items-center gap-2">
+          <Checkbox
+            id="needs-attention"
+            checked={showNeedsAttentionOnly}
+            onCheckedChange={(checked) => setShowNeedsAttentionOnly(!!checked)}
+          />
+          <label
+            htmlFor="needs-attention"
+            className="text-sm font-medium leading-none cursor-pointer"
+          >
+            Show sites needing attention only
+          </label>
+        </div>
+      </div>
+
       <HealthSummaryCard ratings={data.health_ratings} />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">
-          {/* Leaderboard kept for now — can be replaced with per-scan results */}
-          {data.leaderboard.length > 0 && (
+          {/* Leaderboard with per-standard badges */}
+          {filteredLeaderboard.length > 0 && (
             <Card className="animate-fade-in" style={{ animationDelay: "100ms" }}>
               <CardHeader className="pb-3">
-                <CardTitle className="font-heading text-lg">Site Results</CardTitle>
+                <CardTitle className="font-heading text-lg">
+                  Site Results
+                  {showNeedsAttentionOnly && (
+                    <span className="ml-2 text-xs text-muted-foreground font-normal">
+                      (needs attention)
+                    </span>
+                  )}
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {data.leaderboard.map((row, idx) => (
+                  {filteredLeaderboard.map((row, idx) => (
                     <div
                       key={row.site_id}
                       className="flex items-center justify-between rounded-lg border p-3 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 bg-white"
@@ -372,6 +476,23 @@ export default function ExecutiveDashboardPage() {
                         <p className="text-xs text-muted-foreground mt-0.5">
                           Last scan: {formatDate(row.last_scan_date)} &middot; {row.finding_count} findings
                         </p>
+                        {/* R1-05: Per-standard badges */}
+                        {row.standard_scores && row.standard_scores.length > 0 && (
+                          <div className="flex gap-1 mt-1">
+                            {row.standard_scores.map((s) => {
+                              const sColor = s.outcome === "PASS"
+                                ? "bg-green-50 text-green-700 border-green-200"
+                                : s.outcome === "FAIL"
+                                  ? "bg-red-50 text-red-700 border-red-200"
+                                  : "bg-gray-100 text-gray-600 border-gray-200"
+                              return (
+                                <Badge key={s.title} variant="outline" className={`text-[10px] ${sColor}`}>
+                                  {s.title}: {s.score != null ? Math.round(s.score) : "N/A"}
+                                </Badge>
+                              )
+                            })}
+                          </div>
+                        )}
                       </div>
                       <div className="text-right">
                         <div className={cn("font-heading text-xl font-bold tabular-nums", getScoreColor(row.wellness_index_score))}>
@@ -385,6 +506,14 @@ export default function ExecutiveDashboardPage() {
                     </div>
                   ))}
                 </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {filteredLeaderboard.length === 0 && (
+            <Card>
+              <CardContent className="py-8 text-center text-muted-foreground">
+                <p className="text-sm">No sites match the current filter.</p>
               </CardContent>
             </Card>
           )}

@@ -9,7 +9,7 @@
 
 ### Pipeline Overview
 
-```
+```text
 CSV Upload (POST /api/uploads)
     │
     ├─ 1. Validate file type (.csv)
@@ -200,7 +200,7 @@ Rules are hardcoded in `rule_engine.py` as `_DEFAULT_RULES`. Each `RuleDefinitio
 
 The embedded rules will be replaced by live `rulebook_entry` queries from the database. The governance workflow:
 
-```
+```text
 reference_source (WHO AQG 2021, SS 554, etc.)
     │
     ▼

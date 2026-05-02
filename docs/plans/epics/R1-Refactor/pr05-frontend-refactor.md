@@ -186,3 +186,54 @@ ZoneDetailView)
 - Real-time chart streaming (R2)
 - Email alert preferences UI (R2)
 - Mobile-specific optimizations beyond responsive layout
+
+## 7) Implementation Status: COMPLETE
+
+**Completed**: 2026-04-30
+
+### Verification Results
+
+| Check | Result |
+| - | - |
+| 6 new components created | ✅ |
+| 2 Shadcn UI components added (checkbox, tabs) | ✅ |
+| UploadForm refactored (PR9 removed, standard selector added) | ✅ |
+| WellnessIndexCard updated with per-standard scores | ✅ |
+| CrossSiteComparisonTable updated with per-standard columns + filter | ✅ |
+| /ops page refactored with SiteOverviewCard + ZoneDetailView | ✅ |
+| /executive page refactored with per-standard badges + attention filter | ✅ |
+| API client updated with typed functions | ✅ |
+| Finding interface updated with standard_id/standard_title | ✅ |
+| TypeScript passes (0 errors) | ✅ |
+| Build passes (7/7 pages generated) | ✅ |
+| All 9 acceptance criteria verified | ✅ |
+
+### Files Changed
+
+**New files (8):**
+
+- `frontend/components/SiteOverviewCard.tsx` — site overview with per-standard scores
+- `frontend/components/MetricCard.tsx` — metric value + colour-coded badge + interpretation
+- `frontend/components/StandardSelector.tsx` — tab-based standard switching
+- `frontend/components/MetricSelector.tsx` — checkbox list with API persistence
+- `frontend/components/ThresholdConfigDialog.tsx` — threshold config with bounds validation
+- `frontend/components/ZoneDetailView.tsx` — zone detail with all sub-components
+- `frontend/components/ui/checkbox.tsx` — Shadcn checkbox
+- `frontend/components/ui/tabs.tsx` — Shadcn tabs
+
+**Modified files (9):**
+
+- `frontend/components/UploadForm.tsx` — removed PR9 fields, added standard selector
+- `frontend/components/WellnessIndexCard.tsx` — added per-standard scores section
+- `frontend/components/CrossSiteComparisonTable.tsx` — added per-standard columns + filter
+- `frontend/app/ops/page.tsx` — findings tab rebuilt with new components
+- `frontend/app/executive/page.tsx` — leaderboard with per-standard badges
+- `frontend/lib/api.ts` — added ReferenceSource, UploadResponse, SiteOverviewResponse types
+- `frontend/components/findings/types.ts` — added standard_id/standard_title to Finding
+- `frontend/package.json` — added @radix-ui/react-checkbox
+- `frontend/pnpm-lock.yaml` — dependency lockfile
+
+### Spec Divergence Notes
+
+- **No Vitest tests**: Tests deferred to PR-R1-06 per plan
+- **ZoneDetailView metricUnit**: Currently empty string; should be populated from MetricConfig in a follow-up

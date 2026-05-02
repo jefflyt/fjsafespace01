@@ -43,7 +43,7 @@ traceable reports for operations and executive views.
   - **PR8.5**: Utility scripts (run_qa_audit.py, preview_report.py — since deleted)
   - **PR8.6**: Frontend Vitest tests + production hardening (since deleted per D-R1-08)
 
-### R1 Refactor: PR01-04 Complete, PR05 Next
+### R1 Refactor: PR01-05 Complete, PR06 Next
 
 - **Objective**: Transform dashboard from compliance/reporting model to
   human-friendly IAQ wellness dashboard with per-standard evaluation
@@ -52,7 +52,7 @@ traceable reports for operations and executive views.
   through `pr06-testing-polish.md`
 - **Sequence**: PR-R1-01 (✅ Auth + Tenant) → PR-R1-02 (✅ Rulebook Reorg)
   → PR-R1-03 (✅ Schema, merged) → PR-R1-04 (✅ Backend API, merged)
-  → R1-05 (Frontend) → R1-06 (Testing)
+  → PR-R1-05 (✅ Frontend, merged) → R1-06 (Testing)
 - **Completed**:
   - PR-R1-01: user_tenant table, Supabase Auth JWT extraction, frontend login,
     default tenant seeded, sites assigned
@@ -63,6 +63,10 @@ traceable reports for operations and executive views.
     site standards) — merged to main, applied to Supabase
   - PR-R1-04: 3 new routers (preferences, standards, interpretations), enhanced
     upload/findings, tenant scoping, per-standard aggregation. 15 tests pass.
+  - PR-R1-05: 6 new components (SiteOverviewCard, MetricCard, StandardSelector,
+    MetricSelector, ThresholdConfigDialog, ZoneDetailView), refactored UploadForm
+    (removed PR9 fields, added standard selector), refactored /ops and /executive
+    pages, per-standard badges on executive leaderboard. TypeScript + build pass.
 
 ### Simplified Architecture (2 Views)
 

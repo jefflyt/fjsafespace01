@@ -8,7 +8,6 @@ Reference: PR-R1-02 plan
 
 from typing import Sequence
 
-import sqlalchemy as sa
 from alembic import op
 
 revision = "015_rulebook_standard_link"

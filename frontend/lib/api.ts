@@ -119,6 +119,86 @@ export interface Interpretation {
   context_scope: string;
 }
 
+// ── R1-05: Additional typed API functions ────────────────────────────────────
+
+export interface ReferenceSource {
+  id: string;
+  title: string;
+  publisher: string;
+  source_currency_status: string;
+}
+
+export interface UploadResponse {
+  upload_id: string;
+  file_name: string;
+  site_id: string;
+  parse_status: string;
+  parse_outcome: string;
+  report_type: string;
+  standards_evaluated: string[];
+  row_count: number;
+  finding_count: number;
+}
+
+export interface SiteOverviewResponse {
+  site_id: string;
+  site_name: string;
+  wellness_index: number | null;
+  standard_scores: Record<string, { score: number; outcome: string }>;
+  last_scan_date: string | null;
+  top_insight: string;
+}
+
+// ── R1-07: Tenant / Customer Management ──────────────────────────────────────
+
+export interface TenantSearchResult {
+  id: string;
+  client_name: string;
+  site_address: string | null;
+  contact_person: string | null;
+  contact_email: string;
+  match_score: number;
+}
+
+export interface TenantSummary {
+  id: string;
+  client_name: string;
+  site_address: string | null;
+  contact_person: string | null;
+  contact_email: string;
+  scan_count: number;
+  site_count: number;
+  created_at: string;
+}
+
+export interface TenantDetail {
+  id: string;
+  client_name: string;
+  site_address: string | null;
+  contact_person: string | null;
+  contact_email: string;
+  premises_type: string | null;
+  specific_event: string | null;
+  comparative_analysis: boolean;
+  scan_count: number;
+  site_count: number;
+  created_at: string;
+  uploads: Array<{
+    id: string;
+    file_name: string;
+    uploaded_at: string;
+    parse_status: string | null;
+  }>;
+}
+
+export interface TenantCreate {
+  client_name: string;
+  contact_email: string;
+  contact_person?: string;
+  site_address?: string;
+  premises_type?: string;
+}
+
 export const apiClient = {
   // Metric Preferences
   getSitesMetricPreferences: (siteId: string, options?: FetchOptions) =>
@@ -143,4 +223,28 @@ export const apiClient = {
       `/api/interpretations/${metricName}/${thresholdBand}${contextScope ? `?context_scope=${contextScope}` : ''}`,
       options,
     ),
+
+  // R1-05: New endpoints
+  getRulebookSources: (options?: FetchOptions) =>
+    api.get<ReferenceSource[]>('/api/rulebook/sources', options),
+
+  getSiteOverview: (siteId: string, options?: FetchOptions) =>
+    api.get<SiteOverviewResponse>(`/api/dashboard/sites/${siteId}`, options),
+
+  // ── R1-07: Tenant / Customer Management ────────────────────────────────────
+
+  searchTenants: (query: string, options?: FetchOptions) =>
+    api.get<TenantSearchResult[]>(`/api/tenants/search?q=${encodeURIComponent(query)}`, options),
+
+  getTenants: (options?: FetchOptions) =>
+    api.get<TenantSummary[]>('/api/tenants', options),
+
+  getTenant: (id: string, options?: FetchOptions) =>
+    api.get<TenantDetail>(`/api/tenants/${id}`, options),
+
+  createTenant: (body: TenantCreate, options?: FetchOptions) =>
+    api.post<TenantDetail>('/api/tenants', body, options),
+
+  updateTenant: (id: string, body: Partial<TenantCreate>, options?: FetchOptions) =>
+    api.patch<TenantDetail>(`/api/tenants/${id}`, body, options),
 };

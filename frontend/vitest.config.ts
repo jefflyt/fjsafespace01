@@ -7,6 +7,9 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./tests/setup.ts'],
   },
+  esbuild: {
+    jsx: 'automatic',
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, '.'),

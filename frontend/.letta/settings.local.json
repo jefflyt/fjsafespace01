@@ -7,11 +7,11 @@
   "sessionsByServer": {
     "api.letta.com": {
       "agentId": "agent-57bc9623-d651-47b9-bd3d-225f6e93dcc4",
-      "conversationId": "conv-924ff050-a11a-49bf-b1c0-fb73fcde093f"
+      "conversationId": "conv-f368d571-bdaa-4f88-b7fd-09ab739ce086"
     }
   },
   "lastSession": {
     "agentId": "agent-57bc9623-d651-47b9-bd3d-225f6e93dcc4",
-    "conversationId": "conv-924ff050-a11a-49bf-b1c0-fb73fcde093f"
+    "conversationId": "conv-f368d571-bdaa-4f88-b7fd-09ab739ce086"
   }
 }

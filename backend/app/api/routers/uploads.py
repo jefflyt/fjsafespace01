@@ -23,11 +23,12 @@ import json
 import uuid
 from datetime import datetime
 
-from fastapi import APIRouter, HTTPException, Query, UploadFile, status
+from fastapi import APIRouter, HTTPException, Query, UploadFile, status, Form
 from sqlmodel import Session, col, select, text
 
-from app.api.dependencies import SessionDep
+from app.api.dependencies import SessionDep, TenantIdDep
 from app.models.enums import ParseOutcome, ParseStatus
+from app.models.supporting import Tenant
 from app.models.workflow_b import Finding, Reading, Upload
 from app.skills.data_ingestion.csv_parser import parse_csv
 from app.skills.data_ingestion.supabase_storage import SupabaseStorage, SupabaseStorageError
@@ -37,38 +38,35 @@ from app.services.db_rule_service import fetch_rules_from_db
 
 router = APIRouter()
 
-# Phase 1 default rule version — matches seed_rulebook_v1.py
-_DEFAULT_RULE_VERSION = "v1.0"
+# R1: Default rule version — matches seed_rulebook_v1.py
+_DEFAULT_RULE_VERSION = "v2-refactor"
 
-# Interim weights for wellness index — will be sourced from DB in a future iteration.
-# These match the index_weight_percent values in rulebook_entry for v1.0.
+# Weights sourced from rulebook_entry index_weight_percent for v2-refactor.
 _DEFAULT_RULEBOOK_WEIGHTS: dict[str, float] = {
     "co2_ppm": 25.0,
-    "pm25_ugm3": 25.0,
-    "tvoc_ppb": 20.0,
-    "temperature_c": 15.0,
-    "humidity_rh": 15.0,
+    "pm25_ugm3": 20.0,
+    "tvoc_ppb": 15.0,
+    "temperature_c": 10.0,
+    "humidity_rh": 10.0,
 }
 
 
 @router.post("/uploads", status_code=status.HTTP_201_CREATED)
 async def create_upload(
     session: SessionDep,
+    jwt_tenant_id: TenantIdDep,
     file: UploadFile,
-    client_name: str,
-    site_address: str,
-    premises_type: str,
-    contact_person: str,
-    specific_event: str | None = None,
-    comparative_analysis: bool = False,
-    standards: str | None = None,
+    tenant_id: str | None = Form(default=None),
+    site_id: str | None = Form(default=None),
+    standards: str | None = Form(default=None),
 ):
     """
     Accept a CSV export from uHoo, parse, validate, evaluate against the
     active Rulebook version, store findings, and return the upload summary.
 
-    PR9: Accepts customer information instead of a manual site_id.
-    A site UUID is auto-generated behind the scenes.
+    R1-07: Accepts optional tenant_id to link upload to a customer tenant.
+    When tenant_id is provided, a site is created linked to that tenant.
+    Authenticated uploads (jwt_tenant_id) are linked to the user's tenant.
     """
     # Validate content type
     if not file.filename or not file.filename.endswith(".csv"):
@@ -77,70 +75,55 @@ async def create_upload(
             detail="File must be a CSV",
         )
 
-    # PR9: Create/find tenant with customer info, then create site linked to tenant
-    # Use contact_person as a simple deduplication key for now
-    existing_tenant = session.execute(
-        text("SELECT id FROM tenant WHERE contact_person = :cp LIMIT 1"),
-        {"cp": contact_person},
-    ).first()
+    # Determine tenant to link the upload to
+    _tenant_id = tenant_id or jwt_tenant_id
 
-    if existing_tenant:
-        tenant_id = existing_tenant[0]
-        # Update customer info on existing tenant
+    # Determine or create site
+    if site_id:
+        # Verify site exists
+        existing_site = session.exec(
+            text("SELECT id, tenant_id FROM site WHERE id = :id"),
+            {"id": site_id},
+        ).first()
+        if not existing_site:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Site {site_id} not found",
+            )
+        _site_id = site_id
+    elif _tenant_id:
+        # Create a site linked to the customer's tenant
+        _site_id = str(uuid.uuid4())
+        t = session.get(Tenant, _tenant_id)
+        site_name = (
+            f"{t.client_name} — {t.site_address}"
+            if t and t.site_address
+            else (t.client_name if t else file.filename)
+        )
         session.execute(
             text(
-                "UPDATE tenant SET client_name = :cn, site_address = :sa, "
-                "premises_type = :pt, contact_person = :cp, "
-                "specific_event = :se, comparative_analysis = :ca "
-                "WHERE id = :id"
+                "INSERT INTO site (id, name, tenant_id, created_at) "
+                "VALUES (:id, :name, :tenant_id, NOW())"
             ),
             {
-                "cn": client_name,
-                "sa": site_address,
-                "pt": premises_type,
-                "cp": contact_person,
-                "se": specific_event,
-                "ca": comparative_analysis,
-                "id": tenant_id,
+                "id": _site_id,
+                "name": site_name,
+                "tenant_id": _tenant_id,
             },
         )
     else:
-        tenant_id = str(uuid.uuid4())
+        # No tenant, no site_id — create anonymous site (backward compatible)
+        _site_id = str(uuid.uuid4())
         session.execute(
             text(
-                "INSERT INTO tenant (id, tenant_name, contact_email, client_name, "
-                "site_address, premises_type, contact_person, specific_event, "
-                "comparative_analysis, created_at) "
-                "VALUES (:id, :tn, :ce, :cn, :sa, :pt, :cp, :se, :ca, NOW())"
+                "INSERT INTO site (id, name, tenant_id, created_at) "
+                "VALUES (:id, :name, NULL, NOW())"
             ),
             {
-                "id": tenant_id,
-                "tn": client_name,
-                "ce": f"{contact_person.lower().replace(' ', '.')}@example.com",
-                "cn": client_name,
-                "sa": site_address,
-                "pt": premises_type,
-                "cp": contact_person,
-                "se": specific_event,
-                "ca": comparative_analysis,
+                "id": _site_id,
+                "name": file.filename,
             },
         )
-
-    # Auto-generate site UUID, linked to tenant
-    site_id = str(uuid.uuid4())
-    site_name = f"{client_name} — {site_address}"
-
-    session.execute(
-        text(
-            "INSERT INTO site (id, name, tenant_id, created_at) "
-            "VALUES (:id, :name, :tenant_id, NOW())"
-        ),
-        {
-            "id": site_id,
-            "name": site_name,
-            "tenant_id": tenant_id,
-        },
-    )
 
     # Parse optional standards parameter (JSON array of source IDs)
     standards_evaluated = None
@@ -154,9 +137,9 @@ async def create_upload(
     upload_id = str(uuid.uuid4())
     upload = Upload(
         id=upload_id,
-        site_id=site_id,
+        site_id=_site_id,
         file_name=file.filename,
-        uploaded_by="anonymous",  # Phase 1/2: no auth; Phase 3: extract from JWT
+        uploaded_by="anonymous",  # R1: no auth yet; Phase 3: extract from JWT
         uploaded_at=datetime.utcnow(),
         parse_status=ParseStatus.PENDING,
         standards_evaluated=standards_evaluated,
@@ -200,7 +183,7 @@ async def create_upload(
 
         parse_result = parse_csv(
             BytesIO(file_bytes),
-            site_id=site_id,
+            site_id=_site_id,
             upload_id=upload_id,
         )
     except Exception as e:
@@ -224,7 +207,7 @@ async def create_upload(
     for row in parse_result.normalised_rows:
         reading = Reading(
             upload_id=upload_id,
-            site_id=site_id,
+            site_id=_site_id,
             device_id=row["device_id"],
             zone_name=row["zone_name"],
             reading_timestamp=row["reading_timestamp"],
@@ -241,7 +224,7 @@ async def create_upload(
     db_rules = fetch_rules_from_db(session, _DEFAULT_RULE_VERSION)
     eval_findings = evaluate_readings(
         parse_result.normalised_rows,
-        site_id=site_id,
+        site_id=_site_id,
         upload_id=upload_id,
         rule_version=_DEFAULT_RULE_VERSION,
         rules=db_rules if db_rules else None,
@@ -252,7 +235,7 @@ async def create_upload(
         from app.models.workflow_b import Finding as FindingModel
         finding = FindingModel(
             upload_id=upload_id,
-            site_id=site_id,
+            site_id=_site_id,
             zone_name=ef.zone_name,
             metric_name=ef.metric_name,
             metric_value=ef.metric_value,
@@ -290,6 +273,7 @@ async def create_upload(
         "upload_id": upload.id,
         "file_name": upload.file_name,
         "site_id": upload.site_id,
+        "tenant_id": _tenant_id,
         "parse_status": upload.parse_status.value,
         "parse_outcome": upload.parse_outcome.value if upload.parse_outcome else None,
         "warnings": upload.warnings,

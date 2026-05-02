@@ -59,7 +59,7 @@ async def get_metric_preferences(site_id: str, session: SessionDep):
 
     if prefs:
         return SiteMetricPreferencesResponse(
-            site_id=prefs.site_id,
+            site_id=str(prefs.site_id),
             active_metrics=prefs.active_metrics or [],
             alert_threshold_overrides=prefs.alert_threshold_overrides or {},
         )
@@ -177,7 +177,7 @@ async def update_metric_preferences(
     session.refresh(prefs)
 
     return SiteMetricPreferencesResponse(
-        site_id=prefs.site_id,
+        site_id=str(prefs.site_id),
         active_metrics=prefs.active_metrics or [],
         alert_threshold_overrides=prefs.alert_threshold_overrides or {},
     )
@@ -215,7 +215,7 @@ async def get_site_standards(site_id: str, session: SessionDep):
 
     standards = [
         SiteStandardResponse(
-            source_id=row[0].reference_source_id,
+            source_id=str(row[0].reference_source_id),
             title=row[1],
             is_active=row[0].is_active,
         )

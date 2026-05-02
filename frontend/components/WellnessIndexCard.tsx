@@ -2,27 +2,43 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, TrendingDown, Minus, Shield, ShieldCheck, AlertTriangle, Info } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, ShieldCheck, ShieldAlert, Info } from "lucide-react";
 
-const OUTCOME_CONFIG = {
+interface StandardScore {
+  title: string;
+  score: number | null;
+  outcome: string;
+}
+
+interface WellnessIndexCardProps {
+  siteName: string;
+  wellnessIndexScore: number | null;
+  certificationOutcome: string | null;
+  lastScanDate?: string | null;
+  trend?: "up" | "down" | "stable";
+  // R1-05: per-standard scores
+  standardScores?: StandardScore[];
+}
+
+const OUTCOME_CONFIG: Record<string, { label: string; icon: React.ElementType; color: string; bg: string; border: string }> = {
   HEALTHY_WORKPLACE_CERTIFIED: {
     label: "Certified",
     icon: ShieldCheck,
-    color: "text-[#37CA37]",
+    color: "text-green-700",
     bg: "bg-green-50",
     border: "border-green-200",
   },
   HEALTHY_SPACE_VERIFIED: {
     label: "Verified",
-    icon: Shield,
-    color: "text-[#F6AD55]",
+    icon: ShieldCheck,
+    color: "text-amber-700",
     bg: "bg-amber-50",
     border: "border-amber-200",
   },
   IMPROVEMENT_REQUIRED: {
     label: "Improvement Needed",
-    icon: AlertTriangle,
-    color: "text-[#E93D3D]",
+    icon: ShieldAlert,
+    color: "text-red-700",
     bg: "bg-red-50",
     border: "border-red-200",
   },
@@ -32,6 +48,20 @@ const OUTCOME_CONFIG = {
     color: "text-muted-foreground",
     bg: "bg-gray-50",
     border: "border-gray-200",
+  },
+  PASS: {
+    label: "Pass",
+    icon: ShieldCheck,
+    color: "text-green-700",
+    bg: "bg-green-50",
+    border: "border-green-200",
+  },
+  FAIL: {
+    label: "Fail",
+    icon: ShieldAlert,
+    color: "text-red-700",
+    bg: "bg-red-50",
+    border: "border-red-200",
   },
 };
 
@@ -54,20 +84,13 @@ function getTrendIcon(trend: "up" | "down" | "stable" | undefined) {
   }
 }
 
-interface WellnessIndexCardProps {
-  siteName: string;
-  wellnessIndexScore: number | null;
-  certificationOutcome: string | null;
-  lastScanDate?: string | null;
-  trend?: "up" | "down" | "stable";
-}
-
 export function WellnessIndexCard({
   siteName,
   wellnessIndexScore,
   certificationOutcome,
   lastScanDate,
   trend = "stable",
+  standardScores,
 }: WellnessIndexCardProps) {
   const outcomeKey = certificationOutcome as keyof typeof OUTCOME_CONFIG;
   const config = OUTCOME_CONFIG[outcomeKey] ?? OUTCOME_CONFIG.INSUFFICIENT_EVIDENCE;
@@ -113,6 +136,30 @@ export function WellnessIndexCard({
                     : "linear-gradient(90deg, #c93030, #E93D3D)",
               }}
             />
+          </div>
+        )}
+
+        {/* R1-05: Per-standard scores */}
+        {standardScores && standardScores.length > 0 && (
+          <div className="mt-4 space-y-2">
+            {standardScores.map((s) => {
+              const sConfig = OUTCOME_CONFIG[s.outcome] ?? OUTCOME_CONFIG.INSUFFICIENT_EVIDENCE;
+              const SIcon = sConfig.icon;
+              return (
+                <div key={s.title} className="flex items-center justify-between rounded-md border p-2">
+                  <span className="text-sm font-medium">{s.title}</span>
+                  <div className="flex items-center gap-2">
+                    <span className={`font-heading text-lg font-bold tabular-nums ${getScoreColor(s.score)}`}>
+                      {s.score != null ? Math.round(s.score) : "N/A"}
+                    </span>
+                    <Badge variant="outline" className={`text-xs gap-0.5 ${sConfig.color} ${sConfig.border}`}>
+                      <SIcon className="h-2.5 w-2.5" />
+                      {sConfig.label}
+                    </Badge>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </CardContent>

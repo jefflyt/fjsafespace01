@@ -18,4 +18,7 @@ export interface Finding {
   source_currency_status: string;
   benchmark_lane: string;
   created_at: string;
+  // R1-05: per-standard evaluation fields
+  standard_id?: string;
+  standard_title?: string;
 }

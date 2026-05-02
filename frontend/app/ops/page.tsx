@@ -1,20 +1,32 @@
 "use client";
 
-import { Suspense, useCallback, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { UploadForm, UploadResult } from "@/components/UploadForm";
+import { SiteOverviewCard } from "@/components/SiteOverviewCard";
+import { ZoneDetailView } from "@/components/ZoneDetailView";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, UploadCloud, ListChecks, ArrowRight } from "lucide-react";
-import { api } from "@/lib/api";
+import { FileText, UploadCloud, ListChecks, ArrowRight, Loader2 } from "lucide-react";
+import { api, apiClient } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import type { Finding } from "@/components/findings/types";
+import type { SiteStandard, MetricPreferences, SiteStandard as SiteStandardType } from "@/lib/api";
 
 const TABS = [
   { id: "upload", label: "Upload", icon: UploadCloud },
   { id: "findings", label: "Findings", icon: ListChecks },
   { id: "reports", label: "Reports", icon: FileText },
 ] as const;
+
+interface Reading {
+  metric_name: string;
+  zone_name: string;
+  timestamp: string;
+  metric_value: number;
+  is_outlier: boolean;
+}
 
 function OpsContent() {
   const router = useRouter();
@@ -24,6 +36,17 @@ function OpsContent() {
 
   const [uploadResult, setUploadResult] = useState<UploadResult | null>(null);
   const [uploadWarnings, setUploadWarnings] = useState<string[]>([]);
+
+  // R1-05: Findings tab state
+  const [findings, setFindings] = useState<Finding[]>([]);
+  const [readings, setReadings] = useState<Reading[]>([]);
+  const [standards, setStandards] = useState<SiteStandard[]>([]);
+  const [metricPreferences, setMetricPreferences] = useState<MetricPreferences>({
+    site_id: "",
+    active_metrics: [],
+    alert_threshold_overrides: {},
+  });
+  const [loadingFindings, setLoadingFindings] = useState(false);
 
   const setActiveTab = (tab: string) => {
     const params = new URLSearchParams();
@@ -52,6 +75,78 @@ function OpsContent() {
     },
     [router]
   );
+
+  // R1-05: Fetch findings data when on findings tab
+  useEffect(() => {
+    if (activeTab !== "findings" || !currentUploadId) return;
+
+    setLoadingFindings(true);
+
+    Promise.all([
+      api.get<{ findings: Finding[] }>(`/api/uploads/${currentUploadId}/findings`),
+      api.get<{ readings: Reading[] }>(`/api/uploads/${currentUploadId}/readings`),
+    ])
+      .then(([findingsRes, readingsRes]) => {
+        setFindings(findingsRes.findings || []);
+        setReadings(readingsRes.readings || []);
+
+        // Get site_id from first finding
+        if (findingsRes.findings && findingsRes.findings.length > 0) {
+          const siteId = findingsRes.findings[0].site_id;
+          return Promise.all([
+            apiClient.getSitesStandards(siteId),
+            apiClient.getSitesMetricPreferences(siteId),
+          ]).then(([standardsRes, prefsRes]) => {
+            if (standardsRes) setStandards(standardsRes.standards || []);
+            if (prefsRes) setMetricPreferences(prefsRes);
+          });
+        }
+      })
+      .catch(console.error)
+      .finally(() => setLoadingFindings(false));
+  }, [activeTab, currentUploadId]);
+
+  // Group findings by zone
+  const zones = [...new Set(findings.map((f) => f.zone_name))];
+
+  // Derive site overview from findings
+  const siteOverview = (() => {
+    if (findings.length === 0) return null;
+
+    const siteName = "Site"; // Could be fetched from site API
+    const lastUpdated = findings[0]?.created_at ?? new Date().toISOString();
+
+    // Group standard scores
+    const standardScoresMap: Record<string, { scores: number[]; outcomes: string[]; title: string }> = {};
+    for (const f of findings) {
+      const stdId = f.standard_id ?? "default";
+      if (!standardScoresMap[stdId]) {
+        standardScoresMap[stdId] = { scores: [], outcomes: [], title: f.standard_title ?? "Standard" };
+      }
+      // Simple score: GOOD=100, WATCH=50, CRITICAL=0
+      const score = f.threshold_band === "GOOD" ? 100 : f.threshold_band === "WATCH" ? 50 : 0;
+      standardScoresMap[stdId].scores.push(score);
+      standardScoresMap[stdId].outcomes.push(f.threshold_band === "GOOD" ? "PASS" : f.threshold_band === "WATCH" ? "INSUFFICIENT_EVIDENCE" : "FAIL");
+    }
+
+    const standardScores = Object.entries(standardScoresMap).map(([sourceId, data]) => ({
+      sourceId,
+      title: data.title,
+      score: data.scores.length > 0 ? data.scores.reduce((a, b) => a + b, 0) / data.scores.length : null,
+      outcome: data.outcomes.includes("FAIL") ? "FAIL" : data.outcomes.every((o) => o === "PASS") ? "PASS" : "INSUFFICIENT_EVIDENCE",
+    }));
+
+    const overallWellness = standardScores.length > 0
+      ? standardScores.reduce((sum, s) => sum + (s.score ?? 0), 0) / standardScores.length
+      : null;
+
+    // Top insight: first CRITICAL finding
+    const topInsight = findings.find((f) => f.threshold_band === "CRITICAL")
+      ? `${findings.find((f) => f.threshold_band === "CRITICAL")!.metric_name} elevated in ${findings.find((f) => f.threshold_band === "CRITICAL")!.zone_name}`
+      : undefined;
+
+    return { siteName, lastUpdated, standardScores, overallWellness, topInsight };
+  })();
 
   return (
     <div className="space-y-6">
@@ -129,6 +224,20 @@ function OpsContent() {
                     {uploadResult.parse_outcome || "N/A"}
                   </Badge>
                 </div>
+                {uploadResult.standards_evaluated && uploadResult.standards_evaluated.length > 0 && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">
+                      Standards:
+                    </span>
+                    <div className="flex gap-1">
+                      {uploadResult.standards_evaluated.map((id) => (
+                        <Badge key={id} variant="outline" className="text-xs">
+                          {standards.find((s) => s.source_id === id)?.title ?? id.slice(0, 8)}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 {uploadWarnings.length > 0 && (
                   <div className="mt-2 p-3 rounded-md bg-destructive/10 border border-destructive/20">
                     <p className="text-sm font-medium text-destructive mb-1">
@@ -161,35 +270,82 @@ function OpsContent() {
         </div>
       )}
 
-      {/* Findings Tab — placeholder (to be rebuilt for PSD-R1) */}
+      {/* Findings Tab — R1-05: Human-friendly dashboard */}
       {activeTab === "findings" && (
-        <Card>
-          <CardContent className="py-12 text-center text-muted-foreground">
-            <ListChecks className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
-            <p className="text-lg font-medium">Dashboard view under construction</p>
-            <p className="text-sm mt-2">
-              The human-friendly metric card dashboard is being built for PSD-R1.
-            </p>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setActiveTab("upload")}
-              className="mt-4"
-            >
-              Go to Upload
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="space-y-6">
+          {loadingFindings ? (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <Loader2 className="mx-auto h-8 w-8 animate-spin text-muted-foreground mb-4" />
+                <p className="text-sm text-muted-foreground">Loading dashboard...</p>
+              </CardContent>
+            </Card>
+          ) : !currentUploadId ? (
+            <Card>
+              <CardContent className="py-12 text-center text-muted-foreground">
+                <ListChecks className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
+                <p className="text-lg font-medium">No scan selected</p>
+                <p className="text-sm mt-2">
+                  Upload a CSV to get started.
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setActiveTab("upload")}
+                  className="mt-4"
+                >
+                  Go to Upload
+                </Button>
+              </CardContent>
+            </Card>
+          ) : findings.length === 0 ? (
+            <Card>
+              <CardContent className="py-12 text-center text-muted-foreground">
+                <p className="text-lg font-medium">No findings for this scan</p>
+                <p className="text-sm mt-2">
+                  All metrics are within acceptable ranges.
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <>
+              {/* Site Overview */}
+              {siteOverview && (
+                <SiteOverviewCard
+                  siteName={siteOverview.siteName}
+                  lastUpdated={siteOverview.lastUpdated}
+                  scanMode="adhoc"
+                  standardScores={siteOverview.standardScores}
+                  topInsight={siteOverview.topInsight}
+                  overallWellness={siteOverview.overallWellness}
+                />
+              )}
+
+              {/* Zone Details */}
+              {zones.map((zone) => (
+                <ZoneDetailView
+                  key={zone}
+                  zoneName={zone}
+                  findings={findings}
+                  readings={readings}
+                  standards={standards}
+                  siteId={findings[0]?.site_id ?? ""}
+                  metricPreferences={metricPreferences}
+                />
+              ))}
+            </>
+          )}
+        </div>
       )}
 
-      {/* Reports Tab — placeholder (to be rebuilt for PSD-R1) */}
+      {/* Reports Tab — placeholder (planned for R3) */}
       {activeTab === "reports" && (
         <Card>
           <CardContent className="py-12 text-center text-muted-foreground">
             <FileText className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
             <p className="text-lg font-medium">Reports under construction</p>
             <p className="text-sm mt-2">
-              PDF report generation is planned for PSD-R3.
+              PDF report generation is planned for R3.
             </p>
             <Button
               variant="outline"

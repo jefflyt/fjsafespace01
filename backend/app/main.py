@@ -21,6 +21,7 @@ from app.api.routers import (
     reports_router,
     rulebook_router,
     uploads_router,
+    tenants_router,
 )
 
 app = FastAPI(
@@ -52,6 +53,7 @@ app.include_router(rulebook_router, prefix="/api", tags=["rulebook"])
 app.include_router(notifications_router, prefix="/api", tags=["notifications"])
 app.include_router(preferences_router, prefix="/api", tags=["preferences"])
 app.include_router(interpretations_router, prefix="/api", tags=["interpretations"])
+app.include_router(tenants_router, prefix="/api", tags=["tenants"])
 
 
 @app.get("/health", tags=["health"])
