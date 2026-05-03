@@ -23,9 +23,11 @@ Restructure the dashboard navigation so scan results are the primary landing exp
 ## 4. Key Changes
 
 ### Backend
+
 - Enhance `GET /api/dashboard/sites` to return: site_name, tenant_name, latest_upload_date, scan_type, wellness_score, standard_scores, status
 
 ### Frontend Routes
+
 | Route | Purpose |
 |-------|---------|
 | `/` | Scan Listing (new home) |
@@ -35,12 +37,14 @@ Restructure the dashboard navigation so scan results are the primary landing exp
 | `/ops/*` | Redirect to new routes |
 
 ### New Components
+
 - `ScanListingTable` — data table for home page
 - `ScanListingFilters` — search + scan type filter
 - `UploadModal` — dialog wrapper for UploadForm
 - `ScanHistoryTable` — historical scan list on site detail page
 
 ### Updated Components
+
 - `Navbar` — new links (Scan Results, Summary), role-aware
 - `UploadForm` — support modal embedding + redirect on complete
 

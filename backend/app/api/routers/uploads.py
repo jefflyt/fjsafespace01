@@ -334,12 +334,21 @@ async def create_upload(
 
 
 @router.get("/uploads", status_code=status.HTTP_200_OK)
-async def list_uploads(session: SessionDep):
+async def list_uploads(
+    session: SessionDep,
+    site_id: str | None = Query(default=None, description="Filter uploads by site ID"),
+):
     """
-    Return a lightweight list of all uploads for the historical scan selector.
-    Only includes fields needed by the executive dropdown.
+    Return a lightweight list of uploads for the historical scan selector
+    or site scan history.
+
+    Optional site_id filter for PR-R1-09 site scan history.
     """
-    uploads = session.exec(select(Upload).order_by(Upload.uploaded_at.desc())).all()
+    query = select(Upload)
+    if site_id:
+        query = query.where(col(Upload.site_id) == site_id)
+    query = query.order_by(Upload.uploaded_at.desc())
+    uploads = session.exec(query).all()
     return [
         {
             "id": u.id,
@@ -348,6 +357,8 @@ async def list_uploads(session: SessionDep):
             "parse_status": u.parse_status.value,
             "uploaded_at": u.uploaded_at.isoformat(),
             "report_type": u.report_type.value if u.report_type else None,
+            "scan_type": u.scan_type,
+            "standards_evaluated": u.standards_evaluated or [],
             "is_duplicate": False,
         }
         for u in uploads

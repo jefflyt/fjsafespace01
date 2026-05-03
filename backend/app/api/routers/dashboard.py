@@ -19,7 +19,8 @@ from fastapi import APIRouter, HTTPException, Query, status
 from sqlmodel import col, select
 
 from app.api.dependencies import SessionDep, TenantIdDep
-from app.models.workflow_b import Finding, Reading, Site
+from app.models.supporting import Tenant
+from app.models.workflow_b import Finding, Reading, Site, Upload
 from app.schemas.dashboard import ExecutiveDashboardResponse
 from app.services import aggregation as agg_svc
 
@@ -30,11 +31,11 @@ router = APIRouter()
 async def get_sites(session: SessionDep, tenant_id: TenantIdDep):
     """
     Returns site summary cards for all sites visible to the caller.
+    Enriched for UI Refresh (PR-R1-09): includes tenant_name, scan_type,
+    latest upload_id, and standards_evaluated.
+
     Phase 1/2: returns all sites.
     Phase 3:   scoped to tenant_id from JWT.
-
-    Fields: siteId, siteName, certificationOutcome, wellnessIndexScore,
-            top3Risks[], top3Actions[], nextVerificationDate, lastScanDate
     """
     query = select(Site)
     if tenant_id is not None:
@@ -45,7 +46,7 @@ async def get_sites(session: SessionDep, tenant_id: TenantIdDep):
     for site in sites:
         score, outcome = agg_svc.calculate_site_wellness_index(session, site.id)
 
-        # Get last scan date from most recent finding
+        # Get last scan date and upload info from most recent finding
         latest_finding = session.exec(
             select(Finding)
             .where(col(Finding.site_id) == site.id)
@@ -53,9 +54,29 @@ async def get_sites(session: SessionDep, tenant_id: TenantIdDep):
             .limit(1)
         ).first()
 
+        # Get latest upload for scan_type and upload_id
+        latest_upload = session.exec(
+            select(Upload)
+            .where(col(Upload.site_id) == site.id)
+            .order_by(col(Upload.uploaded_at).desc())
+            .limit(1)
+        ).first()
+
+        # Get tenant name
+        tenant_name = None
+        if site.tenant_id:
+            tenant = session.get(Tenant, site.tenant_id)
+            if tenant:
+                tenant_name = tenant.client_name or tenant.tenant_name
+
         rows.append({
             "site_id": site.id,
             "site_name": site.name,
+            "tenant_name": tenant_name,
+            "scan_type": latest_upload.scan_type if latest_upload else "adhoc",
+            "upload_id": latest_upload.id if latest_upload else None,
+            "uploaded_at": latest_upload.uploaded_at.isoformat() if latest_upload and latest_upload.uploaded_at else None,
+            "standards_evaluated": latest_upload.standards_evaluated if latest_upload else [],
             "certification_outcome": outcome.value,
             "wellness_index_score": score,
             "last_scan_date": latest_finding.created_at.isoformat() if latest_finding else None,

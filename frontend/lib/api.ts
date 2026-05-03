@@ -199,6 +199,33 @@ export interface TenantCreate {
   premises_type?: string;
 }
 
+// ── R1-09: UI Refresh — Scan Listing ────────────────────────────────────────
+
+export interface SiteListingRow {
+  site_id: string;
+  site_name: string;
+  tenant_name: string | null;
+  scan_type: string;
+  upload_id: string | null;
+  uploaded_at: string | null;
+  standards_evaluated: string[];
+  certification_outcome: string;
+  wellness_index_score: number | null;
+  last_scan_date: string | null;
+}
+
+export interface UploadListItem {
+  id: string;
+  file_name: string;
+  site_id: string;
+  parse_status: string;
+  uploaded_at: string;
+  report_type: string | null;
+  scan_type: string | null;
+  standards_evaluated: string[];
+  is_duplicate: boolean;
+}
+
 export const apiClient = {
   // Metric Preferences
   getSitesMetricPreferences: (siteId: string, options?: FetchOptions) =>
@@ -247,4 +274,15 @@ export const apiClient = {
 
   updateTenant: (id: string, body: Partial<TenantCreate>, options?: FetchOptions) =>
     api.patch<TenantDetail>(`/api/tenants/${id}`, body, options),
+
+  // ── R1-09: UI Refresh ────────────────────────────────────────────────────
+
+  getSiteListing: (options?: FetchOptions) =>
+    api.get<SiteListingRow[]>('/api/dashboard/sites', options),
+
+  getUploads: (siteId?: string, options?: FetchOptions) =>
+    api.get<UploadListItem[]>(
+      `/api/uploads${siteId ? `?site_id=${siteId}` : ''}`,
+      options,
+    ),
 };

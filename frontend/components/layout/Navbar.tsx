@@ -7,7 +7,7 @@ export function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-14 max-w-7xl items-center px-6">
         <div className="mr-8 flex items-center">
-          <Link href="/ops" className="mr-6 flex items-center space-x-2">
+          <Link href="/" className="mr-6 flex items-center space-x-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
               <ShieldCheck className="h-5 w-5 text-primary" />
             </div>
@@ -17,28 +17,27 @@ export function Navbar() {
           </Link>
           <nav className="flex items-center space-x-1 text-sm">
             <Link
-              href="/ops"
+              href="/"
               className="rounded-md px-3 py-1.5 font-medium text-foreground/70 transition-colors hover:bg-muted hover:text-foreground"
             >
-              Operations
+              Scan Results
             </Link>
             <Link
               href="/executive"
-              className="rounded-md px-3 py-1.5 font-medium text-foreground/40 transition-colors hover:bg-muted hover:text-foreground"
+              className="rounded-md px-3 py-1.5 font-medium text-foreground/70 transition-colors hover:bg-muted hover:text-foreground"
             >
-              Executive
+              Summary
+            </Link>
+            <Link
+              href="/admin/customers"
+              className="rounded-md px-3 py-1.5 font-medium text-foreground/70 transition-colors hover:bg-muted hover:text-foreground"
+            >
+              Customers
             </Link>
           </nav>
         </div>
         <div className="flex flex-1 items-center justify-end space-x-3">
           <NotificationBell />
-          <div className="relative overflow-hidden rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
-            <span className="relative z-10 flex items-center">
-              <span className="mr-1.5 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
-              Ops
-            </span>
-            <span className="pointer-events-none absolute inset-0 animate-scan" />
-          </div>
         </div>
       </div>
     </header>
