@@ -12,17 +12,16 @@ interface ScanListingTableProps {
 }
 
 function outcomeBadge(outcome: string) {
-  const normalized = outcome.toUpperCase();
-  switch (normalized) {
-    case 'CERTIFIED':
-      return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Certified</Badge>;
-    case 'VERIFIED':
-      return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">Verified</Badge>;
-    case 'NEEDS_WORK':
-      return <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100">Needs Work</Badge>;
-    default:
-      return <Badge variant="secondary">No Data</Badge>;
+  if (outcome.includes('CERTIFIED')) {
+    return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Certified</Badge>;
   }
+  if (outcome.includes('VERIFIED')) {
+    return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">Verified</Badge>;
+  }
+  if (outcome.includes('IMPROVEMENT')) {
+    return <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100">Needs Work</Badge>;
+  }
+  return <Badge variant="secondary">No Data</Badge>;
 }
 
 function scoreColor(score: number | null) {
