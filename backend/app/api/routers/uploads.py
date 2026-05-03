@@ -19,7 +19,9 @@ GET /api/uploads/{upload_id}/findings
 Reference: TDD §4.1
 """
 
+import hashlib
 import json
+import re
 import uuid
 from datetime import datetime
 
@@ -29,7 +31,7 @@ from sqlmodel import Session, col, select, text
 from app.api.dependencies import SessionDep, TenantIdDep
 from app.models.enums import ParseOutcome, ParseStatus
 from app.models.supporting import Tenant
-from app.models.workflow_b import Finding, Reading, Upload
+from app.models.workflow_b import Finding, Reading, Upload, Site
 from app.skills.data_ingestion.csv_parser import parse_csv
 from app.skills.data_ingestion.supabase_storage import SupabaseStorage, SupabaseStorageError
 from app.skills.iaq_rule_governor.rule_engine import evaluate_readings
@@ -59,6 +61,7 @@ async def create_upload(
     tenant_id: str | None = Form(default=None),
     site_id: str | None = Form(default=None),
     standards: str | None = Form(default=None),
+    force: bool = Form(default=False),
 ):
     """
     Accept a CSV export from uHoo, parse, validate, evaluate against the
@@ -75,16 +78,19 @@ async def create_upload(
             detail="File must be a CSV",
         )
 
+    # Read file bytes early so we can hash before creating upload
+    file_bytes = await file.read()
+
+    # Compute SHA-256 content hash
+    content_hash = hashlib.sha256(file_bytes).hexdigest()
+
     # Determine tenant to link the upload to
     _tenant_id = tenant_id or jwt_tenant_id
 
     # Determine or create site
     if site_id:
         # Verify site exists
-        existing_site = session.exec(
-            text("SELECT id, tenant_id FROM site WHERE id = :id"),
-            {"id": site_id},
-        ).first()
+        existing_site = session.get(Site, site_id)
         if not existing_site:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -125,6 +131,49 @@ async def create_upload(
             },
         )
 
+    # ── Dedup check ──────────────────────────────────────────────────────
+    # Only tenant-scoped: continuous monitoring uses API (no manual uploads).
+    # Adhoc uploads auto-create sites, so we check all sites owned by this tenant.
+    # Only match COMPLETE uploads — FAILED/PENDING should allow retries.
+    if not force and _tenant_id:
+        existing = session.exec(
+            select(Upload).where(
+                col(Upload.content_hash) == content_hash,
+                col(Upload.site_id).in_(
+                    select(col(Site.id)).where(
+                        col(Site.tenant_id) == _tenant_id
+                    )
+                ),
+                col(Upload.parse_status) == ParseStatus.COMPLETE,
+            )
+        ).first()
+
+        if existing:
+            finding_count = session.exec(
+                select(text("COUNT(*)")).select_from(Finding).where(
+                    col(Finding.upload_id) == existing.id
+                )
+            ).one()
+
+            return {
+                "upload_id": existing.id,
+                "file_name": existing.file_name,
+                "site_id": existing.site_id,
+                "tenant_id": _tenant_id,
+                "parse_status": existing.parse_status.value,
+                "parse_outcome": existing.parse_outcome.value if existing.parse_outcome else None,
+                "warnings": existing.warnings,
+                "uploaded_at": existing.uploaded_at.isoformat(),
+                "failed_row_count": 0,
+                "report_type": existing.report_type.value if existing.report_type else None,
+                "finding_count": finding_count or 0,
+                "wellness_score": None,
+                "certification_outcome": None,
+                "standards_evaluated": existing.standards_evaluated,
+                "is_duplicate": True,
+                "duplicate_of": existing.id,
+            }
+
     # Parse optional standards parameter (JSON array of source IDs)
     standards_evaluated = None
     if standards:
@@ -143,15 +192,11 @@ async def create_upload(
         uploaded_at=datetime.utcnow(),
         parse_status=ParseStatus.PENDING,
         standards_evaluated=standards_evaluated,
+        content_hash=content_hash,
     )
     session.add(upload)
     session.commit()
     session.refresh(upload)
-
-    # Read file bytes
-    import re
-
-    file_bytes = await file.read()
 
     # Sanitize filename for Supabase Storage (S3 doesn't allow brackets, etc.)
     safe_filename = re.sub(r'[\[\]{}^%`~#|\\]', '_', file.filename or "upload.csv")
@@ -284,6 +329,7 @@ async def create_upload(
         "wellness_score": wellness_score,
         "certification_outcome": certification,
         "standards_evaluated": upload.standards_evaluated,
+        "is_duplicate": False,
     }
 
 
@@ -302,6 +348,7 @@ async def list_uploads(session: SessionDep):
             "parse_status": u.parse_status.value,
             "uploaded_at": u.uploaded_at.isoformat(),
             "report_type": u.report_type.value if u.report_type else None,
+            "is_duplicate": False,
         }
         for u in uploads
     ]

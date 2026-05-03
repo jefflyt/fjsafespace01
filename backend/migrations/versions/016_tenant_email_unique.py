@@ -4,7 +4,14 @@ Add UNIQUE constraint on tenant.contact_email for dedup key.
 Handles existing duplicates by keeping the most recent tenant per email.
 """
 
+from typing import Sequence
+
 from alembic import op
+
+revision = "016_tenant_email_unique"
+down_revision = "015_rulebook_standard_link"
+branch_labels: Sequence[str] | None = None
+depends_on: Sequence[str] | None = None
 
 
 def upgrade() -> None:

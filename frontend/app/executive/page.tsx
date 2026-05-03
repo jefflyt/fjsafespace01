@@ -1,10 +1,12 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { api, apiClient } from "@/lib/api"
+import { useRouter } from "next/navigation"
+import { api } from "@/lib/api"
 import { cn } from "@/lib/utils"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   Select,
@@ -14,7 +16,8 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { StandardSelector } from "@/components/StandardSelector"
-import { AlertTriangle, ShieldCheck, ShieldX, ShieldAlert, Loader2, Activity, ArrowUpRight } from "lucide-react"
+import { AlertTriangle, ShieldCheck, ShieldX, ShieldAlert, Loader2, Activity, ArrowUpRight, X, ExternalLink } from "lucide-react"
+import type { Finding } from "@/components/findings/types"
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -76,6 +79,7 @@ interface UploadSummary {
   parse_status: string
   uploaded_at: string
   report_type: string | null
+  is_duplicate: boolean
 }
 
 interface SiteStandard {
@@ -287,6 +291,7 @@ function TopActionsPanel({ actions }: { actions: TopAction[] }) {
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ExecutiveDashboardPage() {
+  const router = useRouter()
   const [data, setData] = useState<ExecutiveDashboardData | null>(null)
   const [uploads, setUploads] = useState<UploadSummary[]>([])
   const [selectedUpload, setSelectedUpload] = useState<string>("all")
@@ -297,6 +302,11 @@ export default function ExecutiveDashboardPage() {
   const [allStandards, setAllStandards] = useState<SiteStandard[]>([])
   const [activeStandardId, setActiveStandardId] = useState<string>("")
   const [showNeedsAttentionOnly, setShowNeedsAttentionOnly] = useState(false)
+
+  // R1-08: Site findings dialog
+  const [selectedSite, setSelectedSite] = useState<{ id: string; name: string } | null>(null)
+  const [siteFindings, setSiteFindings] = useState<Finding[]>([])
+  const [loadingFindings, setLoadingFindings] = useState(false)
 
   useEffect(() => {
     Promise.all([
@@ -362,6 +372,26 @@ export default function ExecutiveDashboardPage() {
 
     return rows
   })()
+
+  // R1-08: Fetch findings when a site is clicked
+  const handleSiteClick = (siteId: string, siteName: string) => {
+    setSelectedSite({ id: siteId, name: siteName })
+    setLoadingFindings(true)
+    setSiteFindings([])
+    api.get<UploadSummary[]>("/api/uploads")
+      .then((allUploads) => {
+        const siteUploads = allUploads.filter((u) => u.site_id === siteId)
+        if (siteUploads.length > 0) {
+          return api.get<Finding[]>(`/api/uploads/${siteUploads[0].id}/findings`)
+        }
+        return []
+      })
+      .then((findings) => {
+        setSiteFindings(findings)
+      })
+      .catch(console.error)
+      .finally(() => setLoadingFindings(false))
+  }
 
   if (loading) {
     return (
@@ -468,8 +498,9 @@ export default function ExecutiveDashboardPage() {
                   {filteredLeaderboard.map((row, idx) => (
                     <div
                       key={row.site_id}
-                      className="flex items-center justify-between rounded-lg border p-3 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 bg-white"
+                      className="flex items-center justify-between rounded-lg border p-3 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 bg-white cursor-pointer"
                       style={{ animationDelay: `${idx * 50 + 150}ms` }}
+                      onClick={() => handleSiteClick(row.site_id, row.site_name)}
                     >
                       <div>
                         <p className="text-sm font-medium">{row.site_name}</p>
@@ -523,6 +554,69 @@ export default function ExecutiveDashboardPage() {
           <TopActionsPanel actions={data.top_actions} />
         </div>
       </div>
+
+      {/* R1-08: Site Findings Dialog */}
+      {selectedSite && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-background rounded-lg p-6 max-w-2xl w-full mx-4 shadow-xl border max-h-[80vh] overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">Findings: {selectedSite.name}</h3>
+              <Button variant="ghost" size="sm" onClick={() => setSelectedSite(null)}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            {loadingFindings ? (
+              <div className="py-8 text-center">
+                <Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground mb-2" />
+                <p className="text-sm text-muted-foreground">Loading findings...</p>
+              </div>
+            ) : siteFindings.length === 0 ? (
+              <div className="py-8 text-center text-muted-foreground">
+                <ShieldCheck className="mx-auto h-10 w-10 text-green-500/50 mb-3" />
+                <p className="text-sm">No findings for this site.</p>
+              </div>
+            ) : (
+              <div className="overflow-y-auto flex-1 space-y-2">
+                {siteFindings.map((finding) => (
+                  <div
+                    key={finding.id}
+                    className={cn(
+                      "rounded-lg border p-3",
+                      finding.threshold_band === "CRITICAL" ? "bg-red-50 border-red-200" :
+                      finding.threshold_band === "WATCH" ? "bg-amber-50 border-amber-200" :
+                      "bg-green-50 border-green-200"
+                    )}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-semibold">{finding.zone_name}</span>
+                      <Badge variant="outline" className={cn(
+                        "text-[10px]",
+                        finding.threshold_band === "CRITICAL" ? "bg-red-50 text-red-700 border-red-200" :
+                        finding.threshold_band === "WATCH" ? "bg-amber-50 text-amber-700 border-amber-200" :
+                        "bg-green-50 text-green-700 border-green-200"
+                      )}>
+                        {finding.threshold_band}
+                      </Badge>
+                    </div>
+                    <p className="text-xs font-mono mt-1">{finding.metric_name}: {finding.metric_value}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{finding.interpretation_text}</p>
+                    <p className="text-xs font-medium mt-1">Action: {finding.recommended_action}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="mt-4 pt-4 border-t flex justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => router.push(`/ops?tab=findings`)}
+              >
+                View in Operations <ExternalLink className="ml-2 h-3 w-3" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

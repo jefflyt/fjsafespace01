@@ -82,17 +82,16 @@ function OpsContent() {
 
     setLoadingFindings(true);
 
+    // GET /api/uploads/{id}/findings returns a plain array, not wrapped in { findings: ... }
     Promise.all([
-      api.get<{ findings: Finding[] }>(`/api/uploads/${currentUploadId}/findings`),
-      api.get<{ readings: Reading[] }>(`/api/uploads/${currentUploadId}/readings`),
+      api.get<Finding[]>(`/api/uploads/${currentUploadId}/findings`),
     ])
-      .then(([findingsRes, readingsRes]) => {
-        setFindings(findingsRes.findings || []);
-        setReadings(readingsRes.readings || []);
+      .then(([findingsRes]) => {
+        setFindings(Array.isArray(findingsRes) ? findingsRes : []);
 
         // Get site_id from first finding
-        if (findingsRes.findings && findingsRes.findings.length > 0) {
-          const siteId = findingsRes.findings[0].site_id;
+        if (findingsRes && findingsRes.length > 0) {
+          const siteId = findingsRes[0].site_id;
           return Promise.all([
             apiClient.getSitesStandards(siteId),
             apiClient.getSitesMetricPreferences(siteId),

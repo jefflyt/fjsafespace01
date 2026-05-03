@@ -24,6 +24,40 @@
 | AC2: All frontend tests pass | Plan §1 → Acceptance criterion 2 | 4 new test files | `frontend/tests/` | ✅ 31 passed |
 | AC6: No regressions | Plan §3 → Edge cases + existing tests | `test_upload_with_standards.py`, `test_tenant_isolation.py` | Existing routes unchanged | ✅ Integration tests cover existing endpoints |
 
+---
+
+## PR-R1-08: CSV Upload Deduplication
+
+**Date**: 2026-05-02
+**Verifier**: claude-flow
+**Plan**: `docs/plans/epics/R1-Refactor/pr08-upload-dedup.md`
+
+| Acceptance Criterion | Plan Task | Test | Code | Status |
+|---------------------|-----------|------|------|--------|
+| AC1: SHA-256 hash computed/stored | Task 3 | — | `uploads.py:85` (`hashlib.sha256`) | ✅ Complete |
+| AC2: Same CSV + same tenant = duplicate | Task 3 | `test_upload_dedup.py::test_same_csv_same_tenant_returns_duplicate` | `uploads.py:138-175` | ✅ Complete |
+| AC3: `force=true` bypasses dedup | Task 3 | `test_upload_dedup.py::test_force_bypass_dedup` | `uploads.py:61` (`force` param), `uploads.py:138` (`if not force`) | ✅ Complete |
+| AC4: Same CSV + different tenant ≠ duplicate | Task 3 | `test_upload_dedup.py::test_same_csv_different_tenant_not_duplicate` | `uploads.py:143-145` (tenant subquery) | ✅ Complete |
+| AC5: FAILED/PENDING allow retry | Task 3 | Implicit in query filter | `uploads.py:147` (`parse_status == COMPLETE`) | ✅ Complete |
+| AC6: Frontend dialog with 3 actions | Task 5 | — | `UploadForm.tsx` (duplicate dialog JSX) | ✅ Complete |
+| AC7: No false positives for NULL hash | Task 1 | — | Partial index + NULL != hash | ✅ Complete |
+
+### Files Changed
+
+| Action | File |
+|--------|------|
+| Create | `backend/migrations/versions/017_upload_content_hash.py` |
+| Modify | `backend/app/models/workflow_b.py` (content_hash field) |
+| Modify | `backend/app/api/routers/uploads.py` (hash, dedup, force, is_duplicate) |
+| Create | `backend/tests/test_upload_dedup.py` (5 tests) |
+| Modify | `frontend/components/UploadForm.tsx` (dialog, force upload) |
+
+### Verification Commands
+
+- `cd backend && pytest tests/test_upload_dedup.py -v` → **5 passed**
+- `cd backend && source .venv/bin/activate && ruff check` → **All checks passed**
+- `cd frontend && pnpm build` → **Compiled successfully**
+
 ## Test Coverage Breakdown
 
 ### Backend (116 tests)
@@ -67,3 +101,10 @@ This PR is test-only, **except** for the following bug fixes discovered during t
 - **Performance SLAs** (dashboard load, upload processing, API response time) require a running server and manual measurement. Deferred to manual QA.
 - **Coverage targets** (80% backend, 70% frontend) are met by test count but full coverage reports were not generated with `--cov` flag. Recommend running `pytest --cov=app` and `pnpm test -- --coverage` for precise percentages.
 - **Regression coverage**: Existing upload pipeline and readings endpoints are tested via `test_upload_with_standards.py` and `test_tenant_isolation.py` integration tests.
+
+## Bug Fixes (2026-05-03)
+
+| Issue | Root Cause | Fix | Status |
+|-------|-----------|-----|--------|
+| Duplicate popup shows on Executive without upload | `list_uploads` returned `is_duplicate: u.content_hash is not None` — flagged ALL uploads with hashes as duplicates | Changed to `is_duplicate: False`; removed duplicate popup from executive page | ✅ Verified |
+| "Dedup Test Site" in dashboard | Integration tests created real DB records that persisted | Added `_cleanup_tenant()` to test file; manually purged 25 test tenants from Supabase | ✅ Database clean |

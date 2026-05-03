@@ -7,10 +7,15 @@ Reads DATABASE_URL from environment and uses SQLModel metadata.
 
 import os
 from logging.config import fileConfig
+from pathlib import Path
 
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 from sqlmodel import SQLModel
+
+# Auto-load .env from project root (same as backend does)
+from dotenv import load_dotenv
+load_dotenv(Path(__file__).resolve().parents[2] / ".env")
 
 # Import all models so their metadata is registered
 import app.models.workflow_a  # noqa: F401

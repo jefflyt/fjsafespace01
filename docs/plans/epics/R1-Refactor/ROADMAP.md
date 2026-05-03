@@ -10,8 +10,8 @@ metrics mean
 
 ## 2. Complexity Assessment
 
-- **Classification**: Multi-PR (7 PRs, sequential)
-- **Estimated PR Count**: 7
+- **Classification**: Multi-PR (8 PRs, sequential)
+- **Estimated PR Count**: 8
 - **Rationale**: Auth/tenant infrastructure must precede schema changes, which must precede API changes, which must
   precede frontend refactor, which must precede testing. Customer intake builds on the upload flow. Each layer
   depends on the previous.
@@ -97,6 +97,16 @@ per-standard evaluation, tenant scoping.
 - **Testing**: Backend integration tests (tenant creation, dedup, listing), frontend form validation tests
 - **Dependencies**: PR-R1-05 (UploadForm must exist)
 
+### PR-R1-08: CSV Upload Deduplication — ✅ COMPLETE
+
+- **Plan**: `docs/plans/epics/R1-Refactor/pr08-upload-dedup.md`
+- **Goal**: Detect duplicate CSV uploads and suggest viewing existing findings
+- **Scope (in)**: SHA-256 content hash, tenant-scoped dedup, frontend duplicate dialog, `force=true` bypass
+- **Scope (out)**: Site-scoped dedup, fuzzy matching, continuous monitoring dedup
+- **Key Changes**: Migration 017, hash + dedup check in upload endpoint, UploadForm duplicate dialog
+- **Testing**: 5 backend integration tests (all pass), build verified
+- **Dependencies**: PR-R1-07 (tenant_id flow must be in place)
+
 ## 5. Milestones & Sequence
 
 ```text
@@ -113,6 +123,8 @@ PR-R1-05 (Frontend Refactor)      → ✅ Complete (2026-04-30)
 PR-R1-06 (Testing + Polish)       → In progress
     ↓
 PR-R1-07 (Adhoc Customer Intake)  → Next — capture client info on upload, tenant listing
+    ↓
+PR-R1-08 (Upload Dedup)           → ✅ Complete (2026-05-02)
     ↓
 Remaining estimated: ~5 days
 ```

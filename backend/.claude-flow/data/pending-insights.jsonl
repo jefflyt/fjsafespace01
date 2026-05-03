@@ -60,3 +60,17 @@
 {"type":"edit","file":"/Users/jefflee/Documents/AIProjects/fjsafespace01/backend/app/api/routers/tenants.py","timestamp":1777699358608,"sessionId":null}
 {"type":"edit","file":"/Users/jefflee/Documents/AIProjects/fjsafespace01/backend/app/api/routers/tenants.py","timestamp":1777699410726,"sessionId":null}
 {"type":"edit","file":"/Users/jefflee/Documents/AIProjects/fjsafespace01/backend/tests/test_upload_with_standards.py","timestamp":1777699494193,"sessionId":null}
+{"type":"edit","file":"/Users/jefflee/Documents/AIProjects/fjsafespace01/backend/tests/test_upload_dedup.py","timestamp":1777709189486,"sessionId":null}
+{"type":"edit","file":"/Users/jefflee/Documents/AIProjects/fjsafespace01/backend/tests/test_upload_dedup.py","timestamp":1777709218042,"sessionId":null}
+{"type":"edit","file":"/Users/jefflee/Documents/AIProjects/fjsafespace01/backend/tests/test_upload_dedup.py","timestamp":1777709238347,"sessionId":null}
+{"type":"edit","file":"/Users/jefflee/Documents/AIProjects/fjsafespace01/backend/app/api/routers/uploads.py","timestamp":1777709290585,"sessionId":null}
+{"type":"edit","file":"/Users/jefflee/Documents/AIProjects/fjsafespace01/backend/app/api/routers/uploads.py","timestamp":1777709382046,"sessionId":null}
+{"type":"edit","file":"/Users/jefflee/Documents/AIProjects/fjsafespace01/backend/tests/test_upload_dedup.py","timestamp":1777709404465,"sessionId":null}
+{"type":"edit","file":"/Users/jefflee/Documents/AIProjects/fjsafespace01/backend/app/api/routers/uploads.py","timestamp":1777709461853,"sessionId":null}
+{"type":"edit","file":"/Users/jefflee/Documents/AIProjects/fjsafespace01/backend/tests/test_upload_dedup.py","timestamp":1777739914144,"sessionId":null}
+{"type":"edit","file":"/Users/jefflee/Documents/AIProjects/fjsafespace01/backend/tests/test_upload_dedup.py","timestamp":1777739933554,"sessionId":null}
+{"type":"edit","file":"/Users/jefflee/Documents/AIProjects/fjsafespace01/backend/tests/test_upload_dedup.py","timestamp":1777739986724,"sessionId":null}
+{"type":"edit","file":"/Users/jefflee/Documents/AIProjects/fjsafespace01/backend/tests/test_upload_dedup.py","timestamp":1777740007219,"sessionId":null}
+{"type":"edit","file":"/Users/jefflee/Documents/AIProjects/fjsafespace01/docs/plans/epics/R1-Refactor/pr08-upload-dedup.md","timestamp":1777740064270,"sessionId":null}
+{"type":"edit","file":"/Users/jefflee/Documents/AIProjects/fjsafespace01/docs/plans/epics/R1-Refactor/pr08-upload-dedup.md","timestamp":1777740094332,"sessionId":null}
+{"type":"edit","file":"/Users/jefflee/Documents/AIProjects/fjsafespace01/docs/verification/SPECS-VERIFICATION.md","timestamp":1777740163968,"sessionId":null}

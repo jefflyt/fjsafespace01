@@ -76,6 +76,8 @@ class Upload(SQLModel, table=True):
         default=None,
         sa_column=Column(ARRAY(sa.Text())),
     )
+    # R1-08: SHA-256 content hash for dedup detection
+    content_hash: Optional[str] = Field(default=None)
 
     site: Site = Relationship(back_populates="uploads")
     readings: list["Reading"] = Relationship(back_populates="upload")

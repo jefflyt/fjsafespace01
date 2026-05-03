@@ -19,6 +19,9 @@ export interface UploadResult {
   failed_row_count: number;
   report_type: "ASSESSMENT" | "INTERVENTION_IMPACT";
   standards_evaluated?: string[];
+  // R1-08: Dedup fields
+  is_duplicate?: boolean;
+  duplicate_of?: string;
 }
 
 interface ReferenceSource {
@@ -53,6 +56,9 @@ export function UploadForm({ onUploadComplete }: UploadFormProps) {
   const [regClientName, setRegClientName] = useState("");
   const [regContactEmail, setRegContactEmail] = useState("");
   const [isRegistering, setIsRegistering] = useState(false);
+
+  // R1-08: Duplicate detection state
+  const [duplicateResult, setDuplicateResult] = useState<UploadResult | null>(null);
 
   useEffect(() => {
     apiClient
@@ -150,6 +156,50 @@ export function UploadForm({ onUploadComplete }: UploadFormProps) {
       const formData = new FormData();
       formData.append("file", file!);
       formData.append("standards", JSON.stringify(selectedStandards));
+      if (selectedTenantId) {
+        formData.append("tenant_id", selectedTenantId);
+      }
+
+      const response = await api.upload<UploadResult>(
+        "/api/uploads",
+        formData
+      );
+
+      if (response.is_duplicate) {
+        setDuplicateResult(response);
+        setIsUploading(false);
+        return;
+      }
+
+      onUploadComplete?.(response);
+      setFile(null);
+      setStep("lookup");
+      setSelectedTenantId(null);
+      setSelectedTenantName(null);
+      setRegClientName("");
+      setRegContactEmail("");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Upload failed";
+      setError(message);
+    } finally {
+      if (!duplicateResult) {
+        setIsUploading(false);
+      }
+    }
+  };
+
+  const handleForceUpload = async () => {
+    if (!file) return;
+
+    setIsUploading(true);
+    setDuplicateResult(null);
+    setError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("standards", JSON.stringify(selectedStandards));
+      formData.append("force", "true");
       if (selectedTenantId) {
         formData.append("tenant_id", selectedTenantId);
       }
@@ -378,6 +428,61 @@ export function UploadForm({ onUploadComplete }: UploadFormProps) {
               </>
             )}
           </Button>
+        )}
+
+        {/* R1-08: Duplicate Detection Dialog */}
+        {duplicateResult && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-background rounded-lg p-6 max-w-md w-full mx-4 shadow-xl border">
+              <div className="flex items-center gap-3 mb-4">
+                <AlertCircle className="h-6 w-6 text-amber-500" />
+                <h3 className="text-lg font-semibold">Duplicate Upload Detected</h3>
+              </div>
+              <p className="text-sm text-muted-foreground mb-2">
+                This CSV file was previously uploaded on{" "}
+                <span className="font-medium">
+                  {new Date(duplicateResult.uploaded_at).toLocaleDateString()}
+                </span>
+                {duplicateResult.file_name && (
+                  <> — <code className="text-xs bg-muted px-1 rounded">{duplicateResult.file_name}</code></>
+                )}
+                .
+              </p>
+              <p className="text-sm text-muted-foreground mb-6">
+                Would you like to view the existing findings instead?
+              </p>
+              <div className="flex gap-3 justify-end">
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setDuplicateResult(null);
+                    setFile(null);
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={handleForceUpload}
+                  disabled={isUploading}
+                >
+                  {isUploading ? "Uploading..." : "Upload Anyway"}
+                </Button>
+                <Button
+                  onClick={() => {
+                    onUploadComplete?.(duplicateResult);
+                    setDuplicateResult(null);
+                    setFile(null);
+                    setStep("lookup");
+                    setSelectedTenantId(null);
+                    setSelectedTenantName(null);
+                  }}
+                >
+                  View Existing Findings
+                </Button>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>
