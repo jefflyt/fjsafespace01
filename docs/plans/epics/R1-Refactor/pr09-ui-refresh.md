@@ -4,14 +4,14 @@
 
 Restructure the dashboard navigation so scan results are the primary landing experience. The home page becomes a site listing showing latest scan results, replacing the current Operations/Executive split.
 
-## 2. Scope (In)
+## 2. Scope (In) — ✅ COMPLETE
 
-- New route: `/` — Scan Listing (one row per site, latest scan info)
-- New route: `/sites/{siteId}` — Site Scan Results (all scans, standard selector, zone details)
-- Upload flow as modal dialog from Scan Listing
-- Role-aware "Summary" nav link (replaces separate Executive + Customers links)
-- Backward-compatible redirects for `/ops` URLs
-- Enhanced `GET /api/dashboard/sites` endpoint for site listing data
+- [x] New route: `/` — Scan Listing (one row per site, latest scan info)
+- [x] New route: `/sites/{siteId}` — Site Scan Results (all scans, standard selector, zone details)
+- [x] Upload flow as modal dialog from Scan Listing
+- [x] Role-aware "Summary" nav link (replaces separate Executive + Customers links)
+- [x] Backward-compatible redirects for `/ops` URLs
+- [x] Enhanced `GET /api/dashboard/sites` endpoint for site listing data
 
 ## 3. Scope (Out)
 
@@ -23,30 +23,29 @@ Restructure the dashboard navigation so scan results are the primary landing exp
 ## 4. Key Changes
 
 ### Backend
-
-- Enhance `GET /api/dashboard/sites` to return: site_name, tenant_name, latest_upload_date, scan_type, wellness_score, standard_scores, status
+- [x] Enhance `GET /api/dashboard/sites` to return: site_name, tenant_name, latest_upload_date, scan_type, wellness_score, standard_scores, status
+- [x] Add `site_id` query filter to `GET /api/uploads`
 
 ### Frontend Routes
-
-| Route | Purpose |
-|-------|---------|
-| `/` | Scan Listing (new home) |
-| `/sites/{siteId}` | Site Scan Results |
-| `/executive` | Unchanged (FJ Staff Summary destination) |
-| `/admin/customers` | Unchanged (accessible from Summary for FJ Staff) |
-| `/ops/*` | Redirect to new routes |
+| Route | Purpose | Status |
+|-------|---------|--------|
+| `/` | Scan Listing (new home) | ✅ |
+| `/sites/{siteId}` | Site Scan Results | ✅ |
+| `/executive` | Unchanged (FJ Staff Summary destination) | ✅ |
+| `/admin/customers` | Unchanged (accessible from nav) | ✅ |
+| `/ops/*` | Redirect to new routes | ✅ |
 
 ### New Components
-
-- `ScanListingTable` — data table for home page
-- `ScanListingFilters` — search + scan type filter
-- `UploadModal` — dialog wrapper for UploadForm
-- `ScanHistoryTable` — historical scan list on site detail page
+- [x] `ScanListingTable` — data table for home page
+- [x] `ScanListingFilters` — search + scan type filter
+- [x] `UploadModal` — dialog wrapper for UploadForm
+- [x] `ScanHistoryTable` — historical scan list on site detail page
+- [x] `RegisterCustomerModal` — customer registration dialog
 
 ### Updated Components
-
-- `Navbar` — new links (Scan Results, Summary), role-aware
-- `UploadForm` — support modal embedding + redirect on complete
+- [x] `Navbar` — new links (Scan Results, Summary, Customers), role-aware
+- [x] `UploadForm` — support modal embedding + redirect on complete
+- [x] Deleted unused `Sidebar.tsx`
 
 ## 5. Dependencies
 
@@ -55,6 +54,26 @@ Restructure the dashboard navigation so scan results are the primary landing exp
 
 ## 6. Testing
 
-- Manual verification of all navigation flows
-- `pnpm run build` passes
-- TypeScript type-check passes
+- [x] Manual verification of all navigation flows
+- [x] `pnpm run build` passes
+- [x] TypeScript type-check passes
+- [x] Backend imports verified
+
+## 7. Status
+
+**✅ COMPLETE** — 2026-05-03
+
+### Commits
+1. `92a4b07f` feat(R1-09): UI Refresh — scan results as home page
+2. `0d1d4054` fix(R1-09): outcomeBadge enum mapping to match CertificationOutcome
+
+### Files Changed (15)
+- **Backend**: `dashboard.py`, `uploads.py`
+- **Frontend**: `page.tsx`, `ops/page.tsx`, `sites/[siteId]/page.tsx`, `Navbar.tsx`, `api.ts`
+- **New**: `ScanListingTable.tsx`, `ScanListingFilters.tsx`, `UploadModal.tsx`, `ScanHistoryTable.tsx`, `RegisterCustomerModal.tsx`
+- **Deleted**: `Sidebar.tsx`
+
+### Known Notes
+- N+1 query pattern in `get_sites` (one query per site for tenant/upload lookup) — acceptable at current scale (~5 sites), should optimize if sites grow beyond ~50
+- ScanHistoryTable `onRowClick` logs to console — future enhancement to load specific upload findings
+- "Customers" nav link retained for quick access to admin customer management (deviation from original "Summary-only" concept)

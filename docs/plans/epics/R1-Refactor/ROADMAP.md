@@ -97,14 +97,14 @@ per-standard evaluation, tenant scoping.
 - **Testing**: Backend integration tests (tenant creation, dedup, listing), frontend form validation tests
 - **Dependencies**: PR-R1-05 (UploadForm must exist)
 
-### PR-R1-09: UI Refresh — Scan Results as Home
+### PR-R1-09: UI Refresh — Scan Results as Home — ✅ COMPLETE
 
 - **Plan**: `docs/plans/epics/R1-Refactor/pr09-ui-refresh.md`
 - **Goal**: Restructure navigation so scan results are the primary landing experience
 - **Scope (in)**: Scan Listing home page, site scan results page, upload modal, role-aware Summary nav, backward redirects
 - **Scope (out)**: Full auth integration, tenant user summary view, CM registration
-- **Key Changes**: New routes `/` and `/sites/{siteId}`, enhanced dashboard/sites API, 4 new components, Navbar update
-- **Testing**: Manual navigation flows, build verification, TypeScript type-check
+- **Key Changes**: New routes `/` and `/sites/{siteId}`, enhanced dashboard/sites API, 5 new components, Navbar update, Sidebar removed
+- **Testing**: Build passes, TypeScript passes, backend imports verified
 - **Dependencies**: PR-R1-05 (components exist), PR-R1-08 (upload flow stable)
 
 ## 5. Milestones & Sequence
@@ -126,7 +126,7 @@ PR-R1-07 (Adhoc Customer Intake)  → Next — capture client info on upload, te
     ↓
 PR-R1-08 (Upload Dedup)           → ✅ Complete (2026-05-02)
     ↓
-PR-R1-09 (UI Refresh)              → Next — scan results as home
+PR-R1-09 (UI Refresh)              → ✅ Complete (2026-05-03)
     ↓
 Remaining estimated: ~5 days
 ```
