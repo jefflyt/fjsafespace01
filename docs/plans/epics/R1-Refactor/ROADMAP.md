@@ -11,15 +11,15 @@ metrics mean
 ## 2. Complexity Assessment
 
 - **Classification**: Multi-PR (8 PRs, sequential)
-- **Estimated PR Count**: 8
+- **Estimated PR Count**: 9
 - **Rationale**: Auth/tenant infrastructure must precede schema changes, which must precede API changes, which must
   precede frontend refactor, which must precede testing. Customer intake builds on the upload flow. Each layer
-  depends on the previous.
+  depends on the previous. UI Refresh restructures navigation after all foundational work is complete.
 
 ## 3. Full-Stack Impact
 
 - **Frontend**: New login page, auth provider, site overview card, metric cards, standard selector, metric selector,
-threshold config dialog, zone detail view. Refactored /ops and /executive pages.
+threshold config dialog, zone detail view. Refactored /ops and /executive pages. UI Refresh: Scan Listing home, site scan results page, upload modal, role-aware Summary nav.
 - **Backend**: Auth middleware, preferences API, standards API, interpretations API, enhanced upload/findings,
 per-standard evaluation, tenant scoping.
 - **Data**: 5 new migrations (008-011, 014-015), seed scripts for default tenant and rulebook reorganization.
@@ -97,15 +97,15 @@ per-standard evaluation, tenant scoping.
 - **Testing**: Backend integration tests (tenant creation, dedup, listing), frontend form validation tests
 - **Dependencies**: PR-R1-05 (UploadForm must exist)
 
-### PR-R1-08: CSV Upload Deduplication — ✅ COMPLETE
+### PR-R1-09: UI Refresh — Scan Results as Home
 
-- **Plan**: `docs/plans/epics/R1-Refactor/pr08-upload-dedup.md`
-- **Goal**: Detect duplicate CSV uploads and suggest viewing existing findings
-- **Scope (in)**: SHA-256 content hash, tenant-scoped dedup, frontend duplicate dialog, `force=true` bypass
-- **Scope (out)**: Site-scoped dedup, fuzzy matching, continuous monitoring dedup
-- **Key Changes**: Migration 017, hash + dedup check in upload endpoint, UploadForm duplicate dialog
-- **Testing**: 5 backend integration tests (all pass), build verified
-- **Dependencies**: PR-R1-07 (tenant_id flow must be in place)
+- **Plan**: `docs/plans/epics/R1-Refactor/pr09-ui-refresh.md`
+- **Goal**: Restructure navigation so scan results are the primary landing experience
+- **Scope (in)**: Scan Listing home page, site scan results page, upload modal, role-aware Summary nav, backward redirects
+- **Scope (out)**: Full auth integration, tenant user summary view, CM registration
+- **Key Changes**: New routes `/` and `/sites/{siteId}`, enhanced dashboard/sites API, 4 new components, Navbar update
+- **Testing**: Manual navigation flows, build verification, TypeScript type-check
+- **Dependencies**: PR-R1-05 (components exist), PR-R1-08 (upload flow stable)
 
 ## 5. Milestones & Sequence
 
@@ -125,6 +125,8 @@ PR-R1-06 (Testing + Polish)       → In progress
 PR-R1-07 (Adhoc Customer Intake)  → Next — capture client info on upload, tenant listing
     ↓
 PR-R1-08 (Upload Dedup)           → ✅ Complete (2026-05-02)
+    ↓
+PR-R1-09 (UI Refresh)              → Next — scan results as home
     ↓
 Remaining estimated: ~5 days
 ```
