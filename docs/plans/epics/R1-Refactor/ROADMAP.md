@@ -11,7 +11,7 @@ metrics mean
 ## 2. Complexity Assessment
 
 - **Classification**: Multi-PR (8 PRs, sequential)
-- **Estimated PR Count**: 9
+- **Estimated PR Count**: 10 (PR-R1-01 through PR-R1-11, PR-R1-06 pending)
 - **Rationale**: Auth/tenant infrastructure must precede schema changes, which must precede API changes, which must
   precede frontend refactor, which must precede testing. Customer intake builds on the upload flow. Each layer
   depends on the previous. UI Refresh restructures navigation after all foundational work is complete.
@@ -107,6 +107,26 @@ per-standard evaluation, tenant scoping.
 - **Testing**: Build passes, TypeScript passes, backend imports verified
 - **Dependencies**: PR-R1-05 (components exist), PR-R1-08 (upload flow stable)
 
+### PR-R1-10: Multi-Site CSV Upload Split — ✅ COMPLETE
+
+- **Plan**: `docs/plans/epics/R1-Refactor/pr10-multi-site-csv.md`
+- **Goal**: One CSV → multiple Upload records (one per physical site), grouped under UploadBatch
+- **Scope (in)**: Two-phase upload (preview → zone assignment), UploadBatch table, new Site creation
+- **Scope (out)**: Real-time device splitting, continuous monitoring
+- **Key Changes**: UploadBatch model, zone extraction from CSV, zone assignment UI, split processing
+- **Testing**: 132 backend tests pass, frontend build passes, migration 018 applied
+- **Dependencies**: PR-R1-09 (upload modal exists)
+
+### PR-R1-11: uHoo API Consistency Audit — ✅ COMPLETE
+
+- **Plan**: `docs/plans/epics/R1-Refactor/pr11-api-consistency-audit.md`
+- **Goal**: Align codebase with authoritative uHoo API reference (10 API metrics + 14 CSV metrics + virusIndex)
+- **Scope (in)**: Add virus_index metric to enum + frontend config, document CO unit discrepancy (API ppm vs CSV ppb)
+- **Scope (out)**: Direct uHoo API integration (R2+), usersettings-only field support
+- **Key Changes**: `virus_index` in MetricName enum (15 total), METRIC_CONFIGS entry, UHOO_API_REFERENCE.md updated
+- **Testing**: Enum has 15 metrics (verified), build passes, ruff lint passes
+- **Dependencies**: None (documentation + config only)
+
 ## 5. Milestones & Sequence
 
 ```text
@@ -122,13 +142,17 @@ PR-R1-05 (Frontend Refactor)      → ✅ Complete (2026-04-30)
     ↓
 PR-R1-06 (Testing + Polish)       → In progress
     ↓
-PR-R1-07 (Adhoc Customer Intake)  → Next — capture client info on upload, tenant listing
+PR-R1-07 (Adhoc Customer Intake)  → ✅ Complete (merged with R1-08)
     ↓
 PR-R1-08 (Upload Dedup)           → ✅ Complete (2026-05-02)
     ↓
 PR-R1-09 (UI Refresh)              → ✅ Complete (2026-05-03)
     ↓
-Remaining estimated: ~5 days
+PR-R1-10 (Multi-Site CSV Split)    → ✅ Complete (2026-05-04)
+    ↓
+PR-R1-11 (API Consistency Audit)   → ✅ Complete (2026-05-04)
+    ↓
+Remaining estimated: R1-06 (Testing) + R2 (Continuous Monitoring)
 ```
 
 ## 6. Risks, Trade-offs, and Open Questions

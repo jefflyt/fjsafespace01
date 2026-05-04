@@ -10,6 +10,9 @@
 | PR-R1-04 | Backend API | ✅ Complete | 2026-04-28 |
 | PR-R1-05 | Frontend Refactor | ✅ Complete | 2026-04-30 |
 | PR-R1-06 | Testing and Polish | ⏳ Pending | — |
+| PR-R1-09 | UI Refresh — Scan Results as Home | ✅ Complete (committed) | 2026-05-03 |
+| PR-R1-10 | Multi-Site CSV Upload Split | 📋 Plan ready | — |
+| PR-R1-11 | uHoo API Consistency Audit | 📋 Plan ready | — |
 
 ## 1. Product Summary
 

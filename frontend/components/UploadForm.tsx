@@ -3,9 +3,10 @@
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { UploadCloud, FileText, X, AlertCircle } from "lucide-react";
-import { api, apiClient } from "@/lib/api";
+import { UploadCloud, FileText, X, AlertCircle, Loader2 } from "lucide-react";
+import { api, apiClient, PreviewUploadResponse, ConfirmUploadResponse, ConfirmUploadChild, SiteListingRow } from "@/lib/api";
 import { CustomerLookup } from "@/components/CustomerLookup";
+import { ZoneAssignment } from "@/components/ZoneAssignment";
 
 export interface UploadResult {
   upload_id: string;
@@ -24,6 +25,11 @@ export interface UploadResult {
   duplicate_of?: string;
 }
 
+export interface BatchUploadResult {
+  batch_id: string;
+  children: ConfirmUploadChild[];
+}
+
 interface ReferenceSource {
   id: string;
   title: string;
@@ -32,10 +38,10 @@ interface ReferenceSource {
 }
 
 interface UploadFormProps {
-  onUploadComplete?: (result: UploadResult) => void;
+  onUploadComplete?: (result: UploadResult | BatchUploadResult) => void;
 }
 
-type UploadStep = "lookup" | "register" | "upload" | "complete";
+type UploadStep = "lookup" | "register" | "file-select" | "preview" | "zone-assignment" | "uploading" | "complete";
 
 export function UploadForm({ onUploadComplete }: UploadFormProps) {
   const [file, setFile] = useState<File | null>(null);
@@ -60,6 +66,11 @@ export function UploadForm({ onUploadComplete }: UploadFormProps) {
   // R1-08: Duplicate detection state
   const [duplicateResult, setDuplicateResult] = useState<UploadResult | null>(null);
 
+  // R1-10: Preview and zone assignment state
+  const [previewResult, setPreviewResult] = useState<PreviewUploadResponse | null>(null);
+  const [isPreviewing, setIsPreviewing] = useState(false);
+  const [existingSites, setExistingSites] = useState<{ id: string; name: string }[]>([]);
+
   useEffect(() => {
     apiClient
       .getRulebookSources()
@@ -75,6 +86,18 @@ export function UploadForm({ onUploadComplete }: UploadFormProps) {
       })
       .catch(console.error);
   }, []);
+
+  // Fetch existing sites for zone assignment dropdown
+  useEffect(() => {
+    if (step === "preview" || step === "zone-assignment") {
+      apiClient.getSiteListing()
+        .then((rows) => {
+          const sites = rows.map((r) => ({ id: r.site_id, name: r.site_name }));
+          setExistingSites(sites);
+        })
+        .catch(console.error);
+    }
+  }, [step]);
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -119,7 +142,7 @@ export function UploadForm({ onUploadComplete }: UploadFormProps) {
   const handleTenantSelected = (tenantId: string, clientName: string) => {
     setSelectedTenantId(tenantId);
     setSelectedTenantName(clientName);
-    setStep("upload");
+    setStep("file-select");
   };
 
   const handleRegisterNew = () => {
@@ -138,7 +161,7 @@ export function UploadForm({ onUploadComplete }: UploadFormProps) {
       });
       setSelectedTenantId(result.id);
       setSelectedTenantName(result.client_name);
-      setStep("upload");
+      setStep("file-select");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to register customer");
     } finally {
@@ -146,24 +169,64 @@ export function UploadForm({ onUploadComplete }: UploadFormProps) {
     }
   };
 
-  const handleUpload = async () => {
-    if (!isFormValid) return;
+  // R1-10: Preview zones from selected file
+  const handlePreview = async () => {
+    if (!file || !selectedTenantId) return;
+
+    setIsPreviewing(true);
+    setError(null);
+    try {
+      const result = await apiClient.previewUpload(file, selectedTenantId);
+      setPreviewResult(result);
+
+      if (result.is_duplicate) {
+        setError("This CSV has been uploaded before.");
+        setDuplicateResult({
+          upload_id: "",
+          file_name: result.file_name,
+          site_id: "",
+          tenant_id: selectedTenantId,
+          parse_status: "COMPLETE",
+          parse_outcome: null,
+          warnings: null,
+          uploaded_at: new Date().toISOString(),
+          failed_row_count: 0,
+          report_type: "ASSESSMENT",
+          is_duplicate: true,
+        });
+        setIsPreviewing(false);
+        return;
+      }
+
+      // Single zone → skip zone assignment, proceed to direct upload
+      if (result.zones.length === 1) {
+        handleDirectUpload();
+      } else {
+        // Multiple zones → show zone assignment
+        setStep("zone-assignment");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Preview failed");
+    } finally {
+      setIsPreviewing(false);
+    }
+  };
+
+  // R1-10: Direct upload for single-zone CSVs
+  const handleDirectUpload = async () => {
+    if (!file) return;
 
     setIsUploading(true);
     setError(null);
-
     try {
       const formData = new FormData();
-      formData.append("file", file!);
+      formData.append("file", file);
       formData.append("standards", JSON.stringify(selectedStandards));
       if (selectedTenantId) {
         formData.append("tenant_id", selectedTenantId);
       }
 
-      const response = await api.upload<UploadResult>(
-        "/api/uploads",
-        formData
-      );
+      const response = await api.upload<UploadResult>("/api/uploads", formData);
 
       if (response.is_duplicate) {
         setDuplicateResult(response);
@@ -172,12 +235,7 @@ export function UploadForm({ onUploadComplete }: UploadFormProps) {
       }
 
       onUploadComplete?.(response);
-      setFile(null);
-      setStep("lookup");
-      setSelectedTenantId(null);
-      setSelectedTenantName(null);
-      setRegClientName("");
-      setRegContactEmail("");
+      resetForm();
     } catch (err) {
       const message = err instanceof Error ? err.message : "Upload failed";
       setError(message);
@@ -185,6 +243,30 @@ export function UploadForm({ onUploadComplete }: UploadFormProps) {
       if (!duplicateResult) {
         setIsUploading(false);
       }
+    }
+  };
+
+  // R1-10: Confirm multi-zone upload
+  const handleZoneAssignmentSubmit = async (zoneMapping: Record<string, string>) => {
+    if (!file) return;
+
+    setIsUploading(true);
+    setError(null);
+    try {
+      const result = await apiClient.confirmUpload(
+        file,
+        selectedTenantId,
+        zoneMapping,
+        selectedStandards,
+      );
+
+      onUploadComplete?.(result);
+      resetForm();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Upload failed";
+      setError(message);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -204,24 +286,27 @@ export function UploadForm({ onUploadComplete }: UploadFormProps) {
         formData.append("tenant_id", selectedTenantId);
       }
 
-      const response = await api.upload<UploadResult>(
-        "/api/uploads",
-        formData
-      );
+      const response = await api.upload<UploadResult>("/api/uploads", formData);
 
       onUploadComplete?.(response);
-      setFile(null);
-      setStep("lookup");
-      setSelectedTenantId(null);
-      setSelectedTenantName(null);
-      setRegClientName("");
-      setRegContactEmail("");
+      resetForm();
     } catch (err) {
       const message = err instanceof Error ? err.message : "Upload failed";
       setError(message);
     } finally {
       setIsUploading(false);
     }
+  };
+
+  const resetForm = () => {
+    setFile(null);
+    setStep("lookup");
+    setSelectedTenantId(null);
+    setSelectedTenantName(null);
+    setRegClientName("");
+    setRegContactEmail("");
+    setPreviewResult(null);
+    setDuplicateResult(null);
   };
 
   return (
@@ -290,8 +375,8 @@ export function UploadForm({ onUploadComplete }: UploadFormProps) {
           </div>
         )}
 
-        {/* Step: Upload */}
-        {step === "upload" && (
+        {/* Step: File Select + Standards */}
+        {step === "file-select" && (
           <div className="space-y-4">
             {selectedTenantName && (
               <div className="p-3 bg-primary/5 rounded-md border border-primary/20">
@@ -398,36 +483,62 @@ export function UploadForm({ onUploadComplete }: UploadFormProps) {
                 </label>
               )}
             </div>
-          </div>
-        )}
 
-        {/* Error Message (for upload step) */}
-        {step !== "register" && error && (
-          <div className="mt-4 flex items-center gap-2 text-sm text-destructive">
-            <AlertCircle className="h-4 w-4" />
-            <span>{error}</span>
-          </div>
-        )}
-
-        {/* Upload Button (only in upload step) */}
-        {step === "upload" && (
-          <Button
-            onClick={handleUpload}
-            disabled={!isFormValid || isUploading}
-            className="w-full mt-4"
-          >
-            {isUploading ? (
-              <>
-                <span className="animate-spin mr-2">&#8987;</span>
-                Uploading & Parsing...
-              </>
-            ) : (
-              <>
-                <UploadCloud className="mr-2 h-4 w-4" />
-                Upload & Parse
-              </>
+            {/* Error Message */}
+            {error && (
+              <div className="flex items-center gap-2 text-sm text-destructive">
+                <AlertCircle className="h-4 w-4" />
+                <span>{error}</span>
+              </div>
             )}
-          </Button>
+
+            <Button
+              onClick={handlePreview}
+              disabled={!isFormValid || isPreviewing}
+              className="w-full mt-4"
+            >
+              {isPreviewing ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Analyzing CSV...
+                </>
+              ) : (
+                <>
+                  <UploadCloud className="mr-2 h-4 w-4" />
+                  Upload & Analyze
+                </>
+              )}
+            </Button>
+          </div>
+        )}
+
+        {/* Step: Zone Assignment (multi-zone) */}
+        {step === "zone-assignment" && previewResult && (
+          <ZoneAssignment
+            zones={previewResult.zones}
+            existingSites={existingSites}
+            onSubmit={handleZoneAssignmentSubmit}
+            onCancel={() => {
+              setStep("file-select");
+              setPreviewResult(null);
+              setError(null);
+            }}
+          />
+        )}
+
+        {/* Step: Uploading */}
+        {step === "uploading" && (
+          <div className="flex flex-col items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+            <p className="text-sm text-muted-foreground">Processing CSV...</p>
+          </div>
+        )}
+
+        {/* Step: Complete */}
+        {step === "complete" && (
+          <div className="text-center py-8">
+            <p className="text-lg font-medium text-green-600">Upload complete!</p>
+          </div>
         )}
 
         {/* R1-08: Duplicate Detection Dialog */}
@@ -471,11 +582,7 @@ export function UploadForm({ onUploadComplete }: UploadFormProps) {
                 <Button
                   onClick={() => {
                     onUploadComplete?.(duplicateResult);
-                    setDuplicateResult(null);
-                    setFile(null);
-                    setStep("lookup");
-                    setSelectedTenantId(null);
-                    setSelectedTenantName(null);
+                    resetForm();
                   }}
                 >
                   View Existing Findings

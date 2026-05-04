@@ -265,6 +265,45 @@ export interface UploadListItem {
   is_duplicate: boolean;
 }
 
+// ── R1-10: Multi-Site Upload Split ──────────────────────────────────────────
+
+export interface PreviewUploadResponse {
+  zones: string[];
+  file_name: string;
+  content_hash: string;
+  is_duplicate: boolean;
+}
+
+export interface SiteOption {
+  id: string;
+  name: string;
+}
+
+export interface ConfirmUploadChild {
+  upload_id: string;
+  file_name: string;
+  site_id: string;
+  site_name: string;
+  tenant_id: string | null;
+  parse_status: string;
+  parse_outcome: string | null;
+  warnings: string | null;
+  uploaded_at: string;
+  failed_row_count: number;
+  report_type: string;
+  finding_count: number;
+  wellness_score: number | null;
+  certification_outcome: string | null;
+  standards_evaluated: string[] | null;
+  is_duplicate: boolean;
+}
+
+export interface ConfirmUploadResponse {
+  batch_id: string;
+  file_name: string;
+  children: ConfirmUploadChild[];
+}
+
 export const apiClient = {
   // Metric Preferences
   getSitesMetricPreferences: (siteId: string, options?: FetchOptions) =>
@@ -343,4 +382,28 @@ export const apiClient = {
           options,
         )
       : Promise.resolve([]),
+
+  // ── R1-10: Multi-Site Upload Split ─────────────────────────────────────────
+
+  previewUpload: (file: File, tenantId?: string, options?: FetchOptions) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (tenantId) {
+      formData.append('tenant_id', tenantId);
+    }
+    return api.upload<PreviewUploadResponse>('/api/uploads/preview', formData, options);
+  },
+
+  confirmUpload: (file: File, tenantId: string | null, zoneMapping: Record<string, string>, standards: string[] | null, options?: FetchOptions) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (tenantId) {
+      formData.append('tenant_id', tenantId);
+    }
+    formData.append('zone_mapping', JSON.stringify(zoneMapping));
+    if (standards) {
+      formData.append('standards', JSON.stringify(standards));
+    }
+    return api.upload<ConfirmUploadResponse>('/api/uploads/confirm', formData, options);
+  },
 };

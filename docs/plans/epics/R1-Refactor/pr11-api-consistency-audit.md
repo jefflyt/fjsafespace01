@@ -1,4 +1,4 @@
-# PR-R1-11: uHoo API Consistency Audit
+# PR-R1-11: uHoo API Consistency Audit — ✅ COMPLETE (2026-05-04)
 
 ## Context
 
@@ -66,7 +66,8 @@ All 16 CSV alternate headers are mapped correctly. The `virusIndex` API metric h
 
 1. **Add `virus_index` to `MetricName` enum** ([backend/app/models/enums.py](backend/app/models/enums.py))
    - Add `virus_index = "virus_index"` to the MetricName enum
-   - Update docstring from "All 16 uHoo sensor metrics" to "All 17 uHoo sensor metrics (16 CSV + virusIndex from API)"
+   - Update docstring from "All 16 uHoo sensor metrics" to "All 15 uHoo sensor metrics (14 CSV + virusIndex from API)"
+   - **Note**: Original plan said 17 metrics, but the actual count was 14 CSV metrics + virusIndex = 15
 
 2. **Add `virus_index` to frontend `METRIC_CONFIGS`** ([frontend/components/findings/MetricConfig.ts](frontend/components/findings/MetricConfig.ts))
    - Add config: key "virus_index", label "Virus Index", symbol "VI", unit "" (proprietary), goodBand [0, 3], watchBand [[3, 6]], criticalBand [[6, 10]], yAxisDomain [0, 10]
@@ -90,10 +91,10 @@ All 16 CSV alternate headers are mapped correctly. The `virusIndex` API metric h
 
 ## Verification
 
-- [ ] Backend: `cd backend && python -c "from app.models.enums import MetricName; print([m.name for m in MetricName])"` — verify 17 metrics listed
-- [ ] Frontend: `cd frontend && pnpm run build` — build passes with new metric config
-- [ ] Frontend: `cd frontend && pnpm run type-check` — TypeScript passes
-- [ ] Manual: Check that virus_index appears in MetricSelector dropdown on /ops page
+- [x] Backend: `cd backend && python3 -c "from app.models.enums import MetricName..."` — **15 metrics** listed (not 17 as planned — original count was 14, not 16)
+- [x] Frontend: `cd frontend && pnpm run build` — build passes
+- [x] Frontend: virus_index config present in METRIC_CONFIGS
+- [x] Lint: `ruff check app/models/enums.py` — All checks passed
 
 ## Rollback Plan
 

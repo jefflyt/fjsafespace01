@@ -108,3 +108,88 @@ This PR is test-only, **except** for the following bug fixes discovered during t
 |-------|-----------|-----|--------|
 | Duplicate popup shows on Executive without upload | `list_uploads` returned `is_duplicate: u.content_hash is not None` — flagged ALL uploads with hashes as duplicates | Changed to `is_duplicate: False`; removed duplicate popup from executive page | ✅ Verified |
 | "Dedup Test Site" in dashboard | Integration tests created real DB records that persisted | Added `_cleanup_tenant()` to test file; manually purged 25 test tenants from Supabase | ✅ Database clean |
+
+---
+
+## PR-R1-10: Multi-Site CSV Upload Split
+
+**Date**: 2026-05-04
+**Verifier**: claude-flow
+**Plan**: `docs/plans/epics/R1-Refactor/pr10-multi-site-csv.md`
+
+| Acceptance Criterion | Plan Item | Test | Code | Status |
+|---------------------|-----------|------|------|--------|
+| AC1: Single-zone CSV → one upload, one site | Plan Step 5 | `test_upload_dedup.py` (existing tests still pass) | `create_upload` creates UploadBatch + 1 child upload | ✅ Complete |
+| AC2: Multi-zone + existing sites → batch with N children | Plan Step 6 | Manual verification needed | `confirm_upload` + zone mapping | ✅ Implemented |
+| AC3: Multi-zone + new sites → batch, new sites, N children | Plan Step 6 | Manual verification needed | `confirm_upload` handles `__new__:` prefix | ✅ Implemented |
+| AC4: Re-upload same CSV → dedup warning at preview | Plan Step 4 | `test_upload_dedup.py` (still passes) | `preview_upload` calls `_check_dedup_with_session` | ✅ Implemented |
+| AC5: Both CSV formats work identically | Plan Step 3 | `extract_zones` unit test | `csv_parser.py:extract_zones` uses `COLUMN_ALIASES` | ✅ Verified (NPE sample: 3 zones) |
+| AC6: Frontend build + TypeScript pass | Plan Verification | `pnpm tsc --noEmit`, `pnpm build` | UploadForm, ZoneAssignment, api.ts, UploadModal | ✅ Verified (exit 0) |
+| AC7: Backend tests pass | Plan Verification | `pytest` (132/132 pass) | uploads.py, workflow_b.py, csv_parser.py | ✅ 132 passed |
+
+### PR-R1-10 Files Changed
+
+| Action | File |
+|--------|------|
+| Create | `backend/migrations/versions/018_upload_batch_multi_site.py` |
+| Modify | `backend/app/models/workflow_b.py` (UploadBatch model, Upload batch_id/zone_list) |
+| Modify | `backend/app/skills/data_ingestion/csv_parser.py` (extract_zones function) |
+| Modify | `backend/app/api/routers/uploads.py` (preview, confirm, refactored create_upload) |
+| Create | `frontend/components/ZoneAssignment.tsx` |
+| Modify | `frontend/components/UploadForm.tsx` (multi-step flow with preview/zone-assignment) |
+| Modify | `frontend/lib/api.ts` (previewUpload, confirmUpload typed methods) |
+| Modify | `frontend/components/UploadModal.tsx` (batch result handling) |
+
+### PR-R1-10 Verification Commands
+
+- `cd backend && source .venv/bin/activate && ruff check app/api/routers/uploads.py app/models/workflow_b.py app/skills/data_ingestion/csv_parser.py` → **All checks passed**
+- `cd frontend && pnpm tsc --noEmit` → **EXIT_CODE: 0**
+- `cd frontend && pnpm build` → **Compiled successfully**
+- `cd backend && source .venv/bin/activate && python -m pytest -v` → **132 passed, 0 failures**
+- `cd backend && source .venv/bin/activate && alembic upgrade 018_upload_batch_multi_site` → **Migration applied**
+- DB verification: upload_batch table exists, Upload has batch_id/zone_list, FK constraint present
+
+### Key Design Decisions
+
+- **Universal batch model**: ALL uploads (single-zone and multi-zone) create UploadBatch + child Upload(s)
+- **Shared processing pipeline**: `_process_single_upload()` used by both single-zone and multi-zone paths
+- **Zone filtering**: Multi-zone child uploads store only readings for their assigned zones
+- **Dedup at preview**: Content hash checked in preview endpoint, not just upload endpoint
+
+---
+
+## PR-R1-11: uHoo API Consistency Audit
+
+**Date**: 2026-05-04
+**Verifier**: claude-flow
+**Plan**: `docs/plans/epics/R1-Refactor/pr11-api-consistency-audit.md`
+**Source of Truth**: `docs/UHOO_API_REFERENCE.md`
+
+| PSD Requirement | Plan Item | Code | Status |
+|-----------------|-----------|------|--------|
+| PSD §1: uHoo data ingested and displayed with human-readable context | Plan: API Fields → Internal Names audit | [enums.py](backend/app/models/enums.py#L25-L41), [csv_parser.py](backend/app/skills/data_ingestion/csv_parser.py#L26-L94) | ✅ All 10 API field→internal name mappings verified correct |
+| PSD §15.3: Acceptable ranges for metrics | Plan: OUTLIER_BOUNDS vs API Ranges | [csv_parser.py:61-76](backend/app/skills/data_ingestion/csv_parser.py#L61-L76) | ✅ All 9 metric bounds match API reference ranges |
+| PSD §7: Human-readable interpretation layer (virusIndex not yet evaluated) | Plan: Add virus_index as stub | [enums.py:41](backend/app/models/enums.py#L41), [MetricConfig.ts:155-164](frontend/components/findings/MetricConfig.ts#L155-L164) | ✅ Added to enum + frontend config (no rulebook entries yet) |
+| R2 Prerequisite: uHoo API field mapping for future polling service | Plan: API reference documentation | [UHOO_API_REFERENCE.md](docs/UHOO_API_REFERENCE.md) | ✅ CO unit discrepancy documented, virusIndex classified as API-only |
+
+### PR-R1-11 Files Changed
+
+| Action | File | Change |
+|--------|------|--------|
+| Modify | `backend/app/models/enums.py` | Added `virus_index` to MetricName enum (15 total), fixed docstring count |
+| Modify | `frontend/components/findings/MetricConfig.ts` | Added `virus_index` config (0-10 scale, good/watch/critical bands) |
+| Modify | `docs/UHOO_API_REFERENCE.md` | Added CO unit discrepancy note, virusIndex classification |
+
+### PR-R1-11 Verification Commands
+
+- `cd backend && python3 -c "from app.models.enums import MetricName; print(len([m for m in MetricName]))"` → **15** (14 CSV + virus_index)
+- `cd frontend && pnpm build` → **Compiled successfully**
+- `cd backend && ruff check app/models/enums.py` → **All checks passed**
+
+### Audit Summary
+
+- **10 API metrics**: 9 mapped to existing internal names + 1 new (`virus_index`)
+- **5 CSV-only metrics**: `no_ppb`, `voc_ppb`, `noise_dba`, `pm10_ugm3`, `aqi_index` — correctly absent from API
+- **3-name bridge**: `pm2_5_ugm3` (CSV) → `pm25_ugm3` (enum) → `pm25` (API) — working correctly
+- **OUTLIER_BOUNDS**: All 9 metric bounds match API reference ranges
+- **CO unit discrepancy**: API docs report ppm, CSV exports use ppb (×1000 conversion noted for R2+)

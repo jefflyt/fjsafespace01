@@ -253,3 +253,27 @@ def parse_csv(file: IO[bytes], site_id: str, upload_id: str) -> ParseResult:
         normalised_rows=normalised_rows,
         report_type=report_type,
     )
+
+
+def extract_zones(file: IO[bytes]) -> list[str]:
+    """
+    Extract distinct zone names from a uHoo CSV export.
+
+    Uses the same column normalization as parse_csv to handle both
+    Hourly Averages and Min-by-Min formats with alternate headers.
+
+    Returns sorted list of distinct zone_name values.
+    """
+    try:
+        df = pd.read_csv(file)
+    except Exception:
+        return []
+
+    # Normalize column headers
+    df.rename(columns=COLUMN_ALIASES, inplace=True)
+
+    if "zone_name" not in df.columns:
+        return []
+
+    zones = df["zone_name"].dropna().unique().tolist()
+    return sorted([str(z) for z in zones])

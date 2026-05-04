@@ -8,6 +8,14 @@ POST /api/uploads
     normalise → rule evaluate → write findings to DB.
     Returns upload summary with findingCount and any warnings.
 
+POST /api/uploads/preview
+    Parse CSV to extract zone names without creating any DB records.
+    Returns list of zones and dedup status.
+
+POST /api/uploads/confirm
+    Create UploadBatch + child uploads based on zone mapping.
+    Returns batch_id and list of child upload results.
+
 GET /api/uploads/{upload_id}
     Returns upload metadata and parse status.
 
@@ -24,15 +32,16 @@ import json
 import re
 import uuid
 from datetime import datetime
+from io import BytesIO
 
 from fastapi import APIRouter, HTTPException, Query, UploadFile, status, Form
 from sqlmodel import Session, col, select, text
 
 from app.api.dependencies import SessionDep, TenantIdDep
-from app.models.enums import ParseOutcome, ParseStatus
+from app.models.enums import ParseStatus
 from app.models.supporting import Tenant
-from app.models.workflow_b import Finding, Reading, Upload, Site
-from app.skills.data_ingestion.csv_parser import parse_csv
+from app.models.workflow_b import Finding, Reading, Upload, UploadBatch, Site
+from app.skills.data_ingestion.csv_parser import parse_csv, extract_zones
 from app.skills.data_ingestion.supabase_storage import SupabaseStorage, SupabaseStorageError
 from app.skills.iaq_rule_governor.rule_engine import evaluate_readings
 from app.skills.iaq_rule_governor.wellness_index import calculate_wellness_index, derive_certification_outcome
@@ -53,206 +62,82 @@ _DEFAULT_RULEBOOK_WEIGHTS: dict[str, float] = {
 }
 
 
-@router.post("/uploads", status_code=status.HTTP_201_CREATED)
-async def create_upload(
-    session: SessionDep,
-    jwt_tenant_id: TenantIdDep,
-    file: UploadFile,
-    tenant_id: str | None = Form(default=None),
-    site_id: str | None = Form(default=None),
-    standards: str | None = Form(default=None),
-    force: bool = Form(default=False),
-):
+def _upload_file_to_storage(file_bytes: bytes, upload_id: str, filename: str) -> str:
+    """Upload file bytes to Supabase Storage. Returns storage path."""
+    safe_filename = re.sub(r'[\[\]{}^%`~#|\\]', '_', filename)
+    storage_path = f"uploads/{upload_id}/{safe_filename}"
+    storage = SupabaseStorage()
+    storage.upload_file(file_bytes, storage_path)
+    return storage_path
+
+
+def _process_single_upload(
+    session: Session,
+    file_bytes: bytes,
+    site_id: str,
+    upload_id: str,
+    batch_id: str | None = None,
+    zone_list: list[str] | None = None,
+    standards_evaluated: list[str] | None = None,
+    tenant_id: str | None = None,
+    file_name: str = "upload.csv",
+) -> dict:
     """
-    Accept a CSV export from uHoo, parse, validate, evaluate against the
-    active Rulebook version, store findings, and return the upload summary.
+    Shared processing pipeline: upload to storage → parse → evaluate → persist.
+    Used by both POST /uploads (single-zone) and POST /uploads/confirm (multi-zone).
 
-    R1-07: Accepts optional tenant_id to link upload to a customer tenant.
-    When tenant_id is provided, a site is created linked to that tenant.
-    Authenticated uploads (jwt_tenant_id) are linked to the user's tenant.
+    Returns upload result dict.
     """
-    # Validate content type
-    if not file.filename or not file.filename.endswith(".csv"):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="File must be a CSV",
-        )
-
-    # Read file bytes early so we can hash before creating upload
-    file_bytes = await file.read()
-
-    # Compute SHA-256 content hash
-    content_hash = hashlib.sha256(file_bytes).hexdigest()
-
-    # Determine tenant to link the upload to
-    _tenant_id = tenant_id or jwt_tenant_id
-
-    # Determine or create site
-    if site_id:
-        # Verify site exists
-        existing_site = session.get(Site, site_id)
-        if not existing_site:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Site {site_id} not found",
-            )
-        _site_id = site_id
-    elif _tenant_id:
-        # Create a site linked to the customer's tenant
-        _site_id = str(uuid.uuid4())
-        t = session.get(Tenant, _tenant_id)
-        site_name = (
-            f"{t.client_name} — {t.site_address}"
-            if t and t.site_address
-            else (t.client_name if t else file.filename)
-        )
-        session.execute(
-            text(
-                "INSERT INTO site (id, name, tenant_id, created_at) "
-                "VALUES (:id, :name, :tenant_id, NOW())"
-            ),
-            {
-                "id": _site_id,
-                "name": site_name,
-                "tenant_id": _tenant_id,
-            },
-        )
-    else:
-        # No tenant, no site_id — create anonymous site (backward compatible)
-        _site_id = str(uuid.uuid4())
-        session.execute(
-            text(
-                "INSERT INTO site (id, name, tenant_id, created_at) "
-                "VALUES (:id, :name, NULL, NOW())"
-            ),
-            {
-                "id": _site_id,
-                "name": file.filename,
-            },
-        )
-
-    # ── Dedup check ──────────────────────────────────────────────────────
-    # Only tenant-scoped: continuous monitoring uses API (no manual uploads).
-    # Adhoc uploads auto-create sites, so we check all sites owned by this tenant.
-    # Only match COMPLETE uploads — FAILED/PENDING should allow retries.
-    if not force and _tenant_id:
-        existing = session.exec(
-            select(Upload).where(
-                col(Upload.content_hash) == content_hash,
-                col(Upload.site_id).in_(
-                    select(col(Site.id)).where(
-                        col(Site.tenant_id) == _tenant_id
-                    )
-                ),
-                col(Upload.parse_status) == ParseStatus.COMPLETE,
-            )
-        ).first()
-
-        if existing:
-            finding_count = session.exec(
-                select(text("COUNT(*)")).select_from(Finding).where(
-                    col(Finding.upload_id) == existing.id
-                )
-            ).one()
-
-            return {
-                "upload_id": existing.id,
-                "file_name": existing.file_name,
-                "site_id": existing.site_id,
-                "tenant_id": _tenant_id,
-                "parse_status": existing.parse_status.value,
-                "parse_outcome": existing.parse_outcome.value if existing.parse_outcome else None,
-                "warnings": existing.warnings,
-                "uploaded_at": existing.uploaded_at.isoformat(),
-                "failed_row_count": 0,
-                "report_type": existing.report_type.value if existing.report_type else None,
-                "finding_count": finding_count or 0,
-                "wellness_score": None,
-                "certification_outcome": None,
-                "standards_evaluated": existing.standards_evaluated,
-                "is_duplicate": True,
-                "duplicate_of": existing.id,
-            }
-
-    # Parse optional standards parameter (JSON array of source IDs)
-    standards_evaluated = None
-    if standards:
-        try:
-            standards_evaluated = json.loads(standards)
-        except (json.JSONDecodeError, TypeError):
-            standards_evaluated = None
-
-    # Create upload record with PENDING status
-    upload_id = str(uuid.uuid4())
-    upload = Upload(
-        id=upload_id,
-        site_id=_site_id,
-        file_name=file.filename,
-        uploaded_by="anonymous",  # R1: no auth yet; Phase 3: extract from JWT
-        uploaded_at=datetime.utcnow(),
-        parse_status=ParseStatus.PENDING,
-        standards_evaluated=standards_evaluated,
-        content_hash=content_hash,
-    )
-    session.add(upload)
-    session.commit()
-    session.refresh(upload)
-
-    # Sanitize filename for Supabase Storage (S3 doesn't allow brackets, etc.)
-    safe_filename = re.sub(r'[\[\]{}^%`~#|\\]', '_', file.filename or "upload.csv")
-
     # Upload to Supabase Storage
     try:
-        storage = SupabaseStorage()
-        storage_path = f"uploads/{upload_id}/{safe_filename}"
-        _ = storage.upload_file(file_bytes, storage_path)
+        _upload_file_to_storage(file_bytes, upload_id, file_name)
     except SupabaseStorageError as e:
-        upload.parse_status = ParseStatus.FAILED
-        upload.parse_outcome = ParseOutcome.FAIL
-        upload.warnings = f"Storage upload failed: {str(e)}"
-        session.add(upload)
-        session.commit()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to store file: {str(e)}",
         )
 
-    # Update status to PROCESSING
-    upload.parse_status = ParseStatus.PROCESSING
-    session.add(upload)
-    session.commit()
-
     # Parse CSV
     try:
-        from io import BytesIO
-
         parse_result = parse_csv(
             BytesIO(file_bytes),
-            site_id=_site_id,
+            site_id=site_id,
             upload_id=upload_id,
         )
     except Exception as e:
-        upload.parse_status = ParseStatus.FAILED
-        upload.parse_outcome = ParseOutcome.FAIL
-        upload.warnings = f"CSV parsing failed: {str(e)}"
-        session.add(upload)
-        session.commit()
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=f"CSV parsing failed: {str(e)}",
         )
 
-    # Update upload with parse results
-    upload.parse_status = ParseStatus.COMPLETE
-    upload.parse_outcome = parse_result.parse_outcome
-    upload.warnings = ", ".join(parse_result.warnings) if parse_result.warnings else None
-    upload.report_type = parse_result.report_type
+    # Filter rows by zone_list if specified (multi-zone split)
+    rows_to_persist = parse_result.normalised_rows
+    if zone_list:
+        rows_to_persist = [r for r in rows_to_persist if r.get("zone_name") in zone_list]
 
-    # Persist readings to DB (one row per metric per CSV row)
-    for row in parse_result.normalised_rows:
+    # Create upload record
+    upload = Upload(
+        id=upload_id,
+        site_id=site_id,
+        file_name=file_name,
+        uploaded_by="anonymous",
+        uploaded_at=datetime.utcnow(),
+        parse_status=ParseStatus.COMPLETE,
+        parse_outcome=parse_result.parse_outcome,
+        report_type=parse_result.report_type,
+        standards_evaluated=standards_evaluated,
+        content_hash=hashlib.sha256(file_bytes).hexdigest(),
+        batch_id=batch_id,
+        zone_list=zone_list,
+        warnings=", ".join(parse_result.warnings) if parse_result.warnings else None,
+    )
+    session.add(upload)
+
+    # Persist readings
+    for row in rows_to_persist:
         reading = Reading(
             upload_id=upload_id,
-            site_id=_site_id,
+            site_id=site_id,
             device_id=row["device_id"],
             zone_name=row["zone_name"],
             reading_timestamp=row["reading_timestamp"],
@@ -262,25 +147,23 @@ async def create_upload(
             is_outlier=row.get("is_outlier", False),
         )
         session.add(reading)
-    session.commit()
 
-    # Evaluate readings against rulebook to generate findings
-    # Fetch rules from DB; fall back to hardcoded rules if DB is empty
+    # Fetch rules and evaluate
     db_rules = fetch_rules_from_db(session, _DEFAULT_RULE_VERSION)
     eval_findings = evaluate_readings(
-        parse_result.normalised_rows,
-        site_id=_site_id,
+        rows_to_persist,
+        site_id=site_id,
         upload_id=upload_id,
         rule_version=_DEFAULT_RULE_VERSION,
         rules=db_rules if db_rules else None,
     )
 
-    # Persist findings to DB
+    # Persist findings
+    from app.models.workflow_b import Finding as FindingModel
     for ef in eval_findings:
-        from app.models.workflow_b import Finding as FindingModel
         finding = FindingModel(
             upload_id=upload_id,
-            site_id=_site_id,
+            site_id=site_id,
             zone_name=ef.zone_name,
             metric_name=ef.metric_name,
             metric_value=ef.metric_value,
@@ -297,7 +180,7 @@ async def create_upload(
         )
         session.add(finding)
 
-    # Calculate wellness index from findings
+    # Calculate wellness index
     finding_dicts = [
         {
             "metric_name": f.metric_name.value if hasattr(f.metric_name, "value") else str(f.metric_name),
@@ -310,15 +193,19 @@ async def create_upload(
 
     upload.rule_version_used = _DEFAULT_RULE_VERSION
 
-    session.add(upload)
     session.commit()
     session.refresh(upload)
+
+    # Get site name
+    site = session.get(Site, site_id)
+    site_name = site.name if site else "Unknown"
 
     return {
         "upload_id": upload.id,
         "file_name": upload.file_name,
         "site_id": upload.site_id,
-        "tenant_id": _tenant_id,
+        "site_name": site_name,
+        "tenant_id": tenant_id,
         "parse_status": upload.parse_status.value,
         "parse_outcome": upload.parse_outcome.value if upload.parse_outcome else None,
         "warnings": upload.warnings,
@@ -330,6 +217,368 @@ async def create_upload(
         "certification_outcome": certification,
         "standards_evaluated": upload.standards_evaluated,
         "is_duplicate": False,
+    }
+
+
+@router.post("/uploads/preview", status_code=status.HTTP_200_OK)
+async def preview_upload(
+    session: SessionDep,
+    file: UploadFile,
+    tenant_id: str | None = Form(default=None),
+):
+    """
+    Parse CSV to extract zone names without creating any DB records.
+    Checks content hash for dedup at tenant level.
+
+    Response: { zones: ["Lobby", "Outside", ...], is_duplicate: bool }
+    """
+    if not file.filename or not file.filename.endswith(".csv"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="File must be a CSV",
+        )
+
+    file_bytes = await file.read()
+    zones = extract_zones(BytesIO(file_bytes))
+
+    if not zones:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No zone names found in CSV. Ensure 'zone_name' or 'Sampling Location' column exists.",
+        )
+
+    # Check for duplicate at tenant level
+    content_hash = hashlib.sha256(file_bytes).hexdigest()
+    is_duplicate = False
+
+    if tenant_id:
+        existing = _check_dedup_with_session(session, tenant_id, content_hash)
+        if existing:
+            is_duplicate = True
+
+    return {
+        "zones": zones,
+        "file_name": file.filename,
+        "content_hash": content_hash,
+        "is_duplicate": is_duplicate,
+    }
+
+
+@router.post("/uploads", status_code=status.HTTP_201_CREATED)
+async def create_upload(
+    session: SessionDep,
+    jwt_tenant_id: TenantIdDep,
+    file: UploadFile,
+    tenant_id: str | None = Form(default=None),
+    site_id: str | None = Form(default=None),
+    standards: str | None = Form(default=None),
+    force: bool = Form(default=False),
+):
+    """
+    Accept a CSV export from uHoo, parse, validate, evaluate against the
+    active Rulebook version, store findings, and return the upload summary.
+
+    R1-10: Always creates an UploadBatch + single child Upload (universal batch model).
+    """
+    # Validate content type
+    if not file.filename or not file.filename.endswith(".csv"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="File must be a CSV",
+        )
+
+    # Read file bytes
+    file_bytes = await file.read()
+
+    # Determine tenant
+    _tenant_id = tenant_id or jwt_tenant_id
+
+    # Determine or create site
+    _site_id = _resolve_site(session, _tenant_id, site_id, file.filename)
+
+    # Dedup check
+    content_hash = hashlib.sha256(file_bytes).hexdigest()
+    if not force and _tenant_id:
+        existing = _check_dedup_with_session(session, _tenant_id, content_hash)
+        if existing:
+            return _build_duplicate_response(existing, _tenant_id, session)
+
+    # Parse optional standards
+    standards_evaluated = None
+    if standards:
+        try:
+            standards_evaluated = json.loads(standards)
+        except (json.JSONDecodeError, TypeError):
+            standards_evaluated = None
+
+    # Create batch + child upload
+    batch_id = str(uuid.uuid4())
+    batch = UploadBatch(
+        id=batch_id,
+        file_name=file.filename,
+        tenant_id=_tenant_id,
+        content_hash=content_hash,
+    )
+    session.add(batch)
+    session.commit()
+
+    upload_id = str(uuid.uuid4())
+    result = _process_single_upload(
+        session=session,
+        file_bytes=file_bytes,
+        site_id=_site_id,
+        upload_id=upload_id,
+        batch_id=batch_id,
+        zone_list=None,  # Will be set after zone extraction
+        standards_evaluated=standards_evaluated,
+        tenant_id=_tenant_id,
+        file_name=file.filename,
+    )
+
+    # Update batch with child upload id and zone list
+    _ = extract_zones(BytesIO(file_bytes))
+    batch.child_upload_ids = [upload_id]
+    session.add(batch)
+    session.commit()
+
+    return result
+
+
+@router.post("/uploads/confirm", status_code=status.HTTP_201_CREATED)
+async def confirm_upload(
+    session: SessionDep,
+    jwt_tenant_id: TenantIdDep,
+    file: UploadFile,
+    tenant_id: str | None = Form(default=None),
+    zone_mapping: str | None = Form(default=None),
+    standards: str | None = Form(default=None),
+):
+    """
+    Create UploadBatch + child uploads based on zone mapping.
+
+    zone_mapping: JSON string, e.g.
+      {"Lobby": "existing-site-uuid", "Outside": "__new__:Outside POD"}
+
+    Response: { batch_id, children: [{ upload_id, site_id, site_name, ... }] }
+    """
+    if not file.filename or not file.filename.endswith(".csv"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="File must be a CSV",
+        )
+
+    if not zone_mapping:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="zone_mapping is required for confirm upload",
+        )
+
+    file_bytes = await file.read()
+    content_hash = hashlib.sha256(file_bytes).hexdigest()
+
+    _tenant_id = tenant_id or jwt_tenant_id
+
+    try:
+        mapping = json.loads(zone_mapping)
+    except (json.JSONDecodeError, TypeError):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="zone_mapping must be valid JSON",
+        )
+
+    # Parse optional standards
+    standards_evaluated = None
+    if standards:
+        try:
+            standards_evaluated = json.loads(standards)
+        except (json.JSONDecodeError, TypeError):
+            standards_evaluated = None
+
+    # Group zones by target site
+    site_groups: dict[str, list[str]] = {}
+    new_sites: dict[str, str] = {}  # zone_name -> new site name
+
+    for zone_name, target in mapping.items():
+        if target.startswith("__new__:"):
+            new_site_name = target[len("__new__:"):]
+            site_key = f"__new__:{new_site_name}"
+            if site_key not in site_groups:
+                site_groups[site_key] = []
+                new_sites[site_key] = new_site_name
+            site_groups[site_key].append(zone_name)
+        else:
+            # Verify site exists
+            existing_site = session.get(Site, target)
+            if not existing_site:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"Site {target} not found",
+                )
+            if target not in site_groups:
+                site_groups[target] = []
+            site_groups[target].append(zone_name)
+
+    # Create batch
+    batch_id = str(uuid.uuid4())
+    batch = UploadBatch(
+        id=batch_id,
+        file_name=file.filename,
+        tenant_id=_tenant_id,
+        content_hash=content_hash,
+    )
+    session.add(batch)
+    session.commit()
+
+    # Process each site group
+    children = []
+    child_ids = []
+
+    for site_key, zones in site_groups.items():
+        if site_key.startswith("__new__:"):
+            # Create new site
+            new_site_name = new_sites[site_key]
+            new_site_id = str(uuid.uuid4())
+            session.execute(
+                text(
+                    "INSERT INTO site (id, name, tenant_id, created_at) "
+                    "VALUES (:id, :name, :tenant_id, NOW())"
+                ),
+                {
+                    "id": new_site_id,
+                    "name": new_site_name,
+                    "tenant_id": _tenant_id,
+                },
+            )
+            _site_id = new_site_id
+        else:
+            _site_id = site_key
+
+        upload_id = str(uuid.uuid4())
+        result = _process_single_upload(
+            session=session,
+            file_bytes=file_bytes,
+            site_id=_site_id,
+            upload_id=upload_id,
+            batch_id=batch_id,
+            zone_list=zones,
+            standards_evaluated=standards_evaluated,
+            tenant_id=_tenant_id,
+            file_name=file.filename,
+        )
+        children.append(result)
+        child_ids.append(upload_id)
+
+    # Update batch
+    batch.child_upload_ids = child_ids
+    session.add(batch)
+    session.commit()
+
+    return {
+        "batch_id": batch_id,
+        "file_name": file.filename,
+        "children": children,
+    }
+
+
+def _resolve_site(
+    session: Session,
+    tenant_id: str | None,
+    site_id: str | None,
+    fallback_name: str,
+) -> str:
+    """Determine or create a site for the upload."""
+    if site_id:
+        existing_site = session.get(Site, site_id)
+        if not existing_site:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Site {site_id} not found",
+            )
+        return site_id
+    elif tenant_id:
+        t = session.get(Tenant, tenant_id)
+        site_name = (
+            f"{t.client_name} — {t.site_address}"
+            if t and t.site_address
+            else (t.client_name if t else fallback_name)
+        )
+        new_site_id = str(uuid.uuid4())
+        session.execute(
+            text(
+                "INSERT INTO site (id, name, tenant_id, created_at) "
+                "VALUES (:id, :name, :tenant_id, NOW())"
+            ),
+            {
+                "id": new_site_id,
+                "name": site_name,
+                "tenant_id": tenant_id,
+            },
+        )
+        return new_site_id
+    else:
+        new_site_id = str(uuid.uuid4())
+        session.execute(
+            text(
+                "INSERT INTO site (id, name, tenant_id, created_at) "
+                "VALUES (:id, :name, NULL, NOW())"
+            ),
+            {
+                "id": new_site_id,
+                "name": fallback_name,
+            },
+        )
+        return new_site_id
+
+
+def _check_dedup_with_session(
+    session: Session,
+    tenant_id: str,
+    content_hash: str,
+) -> Upload | None:
+    """Check if a tenant already has an upload with this content hash."""
+    existing = session.exec(
+        select(Upload).where(
+            col(Upload.content_hash) == content_hash,
+            col(Upload.site_id).in_(
+                select(col(Site.id)).where(
+                    col(Site.tenant_id) == tenant_id
+                )
+            ),
+            col(Upload.parse_status) == ParseStatus.COMPLETE,
+        )
+    ).first()
+    return existing
+
+
+def _build_duplicate_response(
+    existing: Upload,
+    tenant_id: str,
+    session: Session,
+) -> dict:
+    """Build response for a duplicate upload."""
+    finding_count = session.exec(
+        select(text("COUNT(*)")).select_from(Finding).where(
+            col(Finding.upload_id) == existing.id
+        )
+    ).one()
+
+    return {
+        "upload_id": existing.id,
+        "file_name": existing.file_name,
+        "site_id": existing.site_id,
+        "tenant_id": tenant_id,
+        "parse_status": existing.parse_status.value,
+        "parse_outcome": existing.parse_outcome.value if existing.parse_outcome else None,
+        "warnings": existing.warnings,
+        "uploaded_at": existing.uploaded_at.isoformat(),
+        "failed_row_count": 0,
+        "report_type": existing.report_type.value if existing.report_type else None,
+        "finding_count": finding_count or 0,
+        "wellness_score": None,
+        "certification_outcome": None,
+        "standards_evaluated": existing.standards_evaluated,
+        "is_duplicate": True,
+        "duplicate_of": existing.id,
     }
 
 
@@ -417,7 +666,6 @@ async def get_findings(
 
     query = select(Finding).where(Finding.upload_id == upload_id)
     if standard_id:
-        # Filter by rulebook entries linked to this standard
         from app.models.workflow_a import RulebookEntry
 
         standard_rule_ids = session.exec(
@@ -428,10 +676,6 @@ async def get_findings(
         ).all()
 
         if standard_rule_ids:
-            # Map rule IDs to rule_ids used in findings via rulebook_entry
-            # Since findings store rule_id (not rulebook_entry.id), we need to
-            # match via the rulebook entries' rule_id pattern
-            # For now, filter findings that have rule_version matching entries from this standard
             standard_entries = session.exec(
                 select(RulebookEntry).where(
                     col(RulebookEntry.reference_source_id) == standard_id,
@@ -439,9 +683,6 @@ async def get_findings(
                 )
             ).all()
 
-            # Get all rule versions used by this standard's entries
-            # Findings don't have a direct FK to rulebook_entry, so we match by metric_name
-            # and rule_version that corresponds to this standard
             standard_metric_versions = {
                 (e.metric_name.value, e.rule_version) for e in standard_entries
             }
@@ -456,7 +697,7 @@ async def get_findings(
     else:
         findings = session.exec(query).all()
 
-    # QA-G5 enforcement: check for missing rule_version or citation_unit_ids
+    # QA-G5 enforcement
     for finding in findings:
         if not finding.rule_version or not finding.citation_unit_ids:
             raise HTTPException(

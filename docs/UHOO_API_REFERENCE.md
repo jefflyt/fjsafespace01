@@ -179,9 +179,14 @@ The uHoo API returns **10 sensor metrics** in each `data` array entry:
 | `airPressure` | `pressure_hpa` | mbar | 870–1085 | Atmospheric pressure |
 | `ozone` | `o3_ppb` | ppb | 0–300 | Ozone |
 | `no2` | `no2_ppb` | ppb | 0–500 | Nitrogen dioxide |
-| `virusIndex` | *(proprietary)* | — | 0–10 | uHoo Virus Index score |
+| `virusIndex` | `virus_index` | — | 0–10 | uHoo Virus Index score |
 
 Plus: `timestamp` (Unix epoch seconds)
+
+> **Unit Notes:**
+>
+> - **CO**: The API `usersettings` object reports `co` in **ppm**, but CSV exports provide CO in **ppb** (values like 120-130 confirm ppb range — 120 ppm would be lethal). The codebase uses `co_ppb` with range 0-1000 ppb. For future R2+ API integration, a unit conversion factor of ×1000 (ppm → ppb) will be needed.
+> - **virusIndex**: This metric is returned by the `/v1/devicedata` API but does **not** appear in uHoo CSV exports. It is API-only and will be available when direct API integration is implemented (R2+). It is added to the `MetricName` enum and frontend config as a stub for future use.
 
 ### Response Objects
 

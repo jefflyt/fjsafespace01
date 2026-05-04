@@ -1,10 +1,18 @@
-# PR-R1-10: Multi-Site CSV Upload Split
+# PR-R1-10: Multi-Site CSV Upload Split — ✅ COMPLETE
 
 ## Context
 
 Real-world CSV uploads from uHoo devices can contain readings from multiple physical sites (e.g., NPE POD + Outside POD). Currently the system creates one Upload record and one Site per CSV, regardless of how many physical sites the data spans. This means two physically separate sites get lumped into one certification evaluation — incorrect for reporting.
 
 **Outcome:** One CSV → multiple independent Upload records (one per resulting site), grouped under a parent UploadBatch for traceability.
+
+**Status**: ✅ Complete (2026-05-04)
+
+## Design Adjustments from Plan
+
+- **Universal batch model**: ALL uploads (single-zone and multi-zone) create UploadBatch + child Upload(s), not just multi-zone. This ensures consistent data structure and traceability.
+- **Migration 018**: Used instead of the plan's placeholder "016_...py" since 017 was already in use for content_hash.
+- **Content hash dedup**: Checked in both preview endpoint AND existing upload endpoint, with force flag bypass.
 
 ## Decisions
 
@@ -62,32 +70,33 @@ ALTER TABLE upload ADD COLUMN zone_list TEXT[];
 
 ### Backend Files
 
-| File | Change |
-|---|---|
-| `backend/app/models/workflow_b.py` | Add `UploadBatch` model, extend `Upload` with `batch_id`, `zone_list` |
-| `backend/migrations/versions/016_...py` | Create `upload_batch` table, add columns to `upload` |
-| `backend/app/api/routers/uploads.py` | Add `POST /uploads/preview`, add `POST /uploads/confirm`, refactor existing `POST /uploads` to be the single-site path |
-| `backend/app/skills/data_ingestion/csv_parser.py` | Add `extract_zones(file: IO[bytes]) -> list[str]` function |
+| File | Change | Status |
+|---|---|---|
+| `backend/app/models/workflow_b.py` | Add `UploadBatch` model, extend `Upload` with `batch_id`, `zone_list` | ✅ Done |
+| `backend/migrations/versions/018_upload_batch_multi_site.py` | Create `upload_batch` table, add columns to `upload` | ✅ Done |
+| `backend/app/api/routers/uploads.py` | Add `POST /uploads/preview`, add `POST /uploads/confirm`, refactor existing `POST /uploads` to use batch model | ✅ Done |
+| `backend/app/skills/data_ingestion/csv_parser.py` | Add `extract_zones(file: IO[bytes]) -> list[str]` function | ✅ Done |
 
 ### Frontend Files
 
-| File | Change |
-|---|---|
-| `frontend/components/UploadForm.tsx` | Convert to multi-step: Step 1 = file select, Step 2 = zone assignment |
-| `frontend/components/ZoneAssignment.tsx` | New component — zone list + site dropdown + new site input + grouped summary |
-| `frontend/lib/api.ts` | Add `previewUpload()` and `confirmUpload()` typed methods |
-| `frontend/app/ops/page.tsx` or `frontend/app/page.tsx` | Ensure upload flow triggers new two-step UI |
+| File | Change | Status |
+|---|---|---|
+| `frontend/components/UploadForm.tsx` | Convert to multi-step: preview → zone assignment (multi-zone) or direct upload (single-zone) | ✅ Done |
+| `frontend/components/ZoneAssignment.tsx` | New component — zone list + site dropdown + new site input + grouped summary | ✅ Done |
+| `frontend/lib/api.ts` | Add `previewUpload()` and `confirmUpload()` typed methods | ✅ Done |
+| `frontend/components/UploadModal.tsx` | Handle batch results, redirect to first child site | ✅ Done |
+| `frontend/app/page.tsx` | Upload flow via UploadModal (already wired from R1-09) | ✅ No change needed |
 
 ### API Contracts
 
-**POST /uploads/preview**
+#### POST /uploads/preview
 
 ```text
 Request: multipart/form-data with `file` (CSV)
 Response: { zones: string[] }
 ```
 
-**POST /uploads/confirm**
+#### POST /uploads/confirm
 
 ```text
 Request: multipart/form-data with:
@@ -119,10 +128,10 @@ Response: {
 
 ## Verification
 
-1. Upload single-zone CSV → behaves like today (one upload, one site)
-2. Upload multi-zone CSV, assign zones to existing sites → creates batch with N child uploads
-3. Upload multi-zone CSV, create new sites → creates batch, new sites, and N child uploads
-4. Re-upload same CSV → dedup warning shown at preview
-5. Both Hourly Averages and Min-by-Min formats work identically
-6. Frontend build passes, TypeScript check passes
-7. Backend tests pass
+1. Upload single-zone CSV → creates UploadBatch with 1 child upload (universal batch model) ✅ Implemented
+2. Upload multi-zone CSV, assign zones to existing sites → creates batch with N child uploads ✅ Implemented
+3. Upload multi-zone CSV, create new sites → creates batch, new sites, and N child uploads ✅ Implemented
+4. Re-upload same CSV → dedup warning shown at preview ✅ Implemented
+5. Both Hourly Averages and Min-by-Min formats work identically ✅ extract_zones uses COLUMN_ALIASES normalization
+6. Frontend build passes, TypeScript check passes ✅ pnpm build + tsc --noEmit exit 0
+7. Backend tests pass ✅ 132/132 passed

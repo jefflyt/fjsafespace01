@@ -78,11 +78,42 @@ class Upload(SQLModel, table=True):
     )
     # R1-08: SHA-256 content hash for dedup detection
     content_hash: Optional[str] = Field(default=None)
+    # R1-10: batch membership and zone coverage
+    batch_id: Optional[str] = Field(default=None, foreign_key="upload_batch.id")
+    zone_list: Optional[list[str]] = Field(
+        default=None,
+        sa_column=Column(ARRAY(sa.Text())),
+    )
 
     site: Site = Relationship(back_populates="uploads")
     readings: list["Reading"] = Relationship(back_populates="upload")
     findings: list["Finding"] = Relationship(back_populates="upload")
     report: Optional["Report"] = Relationship(back_populates="upload")
+
+
+# ── Upload Batch ──────────────────────────────────────────────────────────────
+
+
+class UploadBatch(SQLModel, table=True):
+    """
+    Parent record grouping multiple child Upload records from a single CSV.
+
+    All uploads use this model:
+    - Single-zone CSV → batch with 1 child upload
+    - Multi-zone CSV → batch with N child uploads (one per assigned site)
+    """
+
+    __tablename__ = "upload_batch"
+
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True)
+    file_name: str
+    uploaded_at: datetime = Field(default_factory=datetime.utcnow)
+    tenant_id: Optional[str] = Field(default=None)
+    content_hash: str
+    child_upload_ids: Optional[list[str]] = Field(
+        default=None,
+        sa_column=Column(ARRAY(sa.Text())),
+    )
 
 
 # ── Reading ───────────────────────────────────────────────────────────────────

@@ -43,16 +43,18 @@ traceable reports for operations and executive views.
   - **PR8.5**: Utility scripts (run_qa_audit.py, preview_report.py — since deleted)
   - **PR8.6**: Frontend Vitest tests + production hardening (since deleted per D-R1-08)
 
-### R1 Refactor: PR01-05 Complete, PR06 Next
+### R1 Refactor: PR01-05, PR09-10 Complete, PR11 Next
 
 - **Objective**: Transform dashboard from compliance/reporting model to
   human-friendly IAQ wellness dashboard with per-standard evaluation
   (SS 554, WELL v2, RESET Viral Index, SafeSpace)
 - **Plans**: `docs/plans/epics/R1-Refactor/ROADMAP.md` + `pr01-auth-tenant.md`
-  through `pr06-testing-polish.md`
+  through `pr10-multi-site-csv.md`
 - **Sequence**: PR-R1-01 (✅ Auth + Tenant) → PR-R1-02 (✅ Rulebook Reorg)
   → PR-R1-03 (✅ Schema, merged) → PR-R1-04 (✅ Backend API, merged)
-  → PR-R1-05 (✅ Frontend, merged) → R1-06 (Testing)
+  → PR-R1-05 (✅ Frontend, merged) → PR-R1-09 (✅ UI Refresh, committed)
+  → PR-R1-10 (✅ Multi-site CSV, committed)
+  → R1-06 (Testing), R1-11 (API Consistency)
 - **Completed**:
   - PR-R1-01: user_tenant table, Supabase Auth JWT extraction, frontend login,
     default tenant seeded, sites assigned
@@ -67,13 +69,20 @@ traceable reports for operations and executive views.
     MetricSelector, ThresholdConfigDialog, ZoneDetailView), refactored UploadForm
     (removed PR9 fields, added standard selector), refactored /ops and /executive
     pages, per-standard badges on executive leaderboard. TypeScript + build pass.
+  - PR-R1-08: CSV upload deduplication (content hash, dialog, force flag)
+  - PR-R1-09: UI Refresh — Scan Listing as home page, site scan results, upload modal
+  - PR-R1-10: Multi-Site CSV Upload Split — UploadBatch model, zone extraction, zone
+    assignment UI, preview/confirm endpoints, migration 018
 
-### Simplified Architecture (2 Views)
+### Simplified Architecture (3 Views)
 
 | View | Route | Purpose |
 | --- | --- | --- |
-| **Operations** | `/ops` | Upload CSV, review findings, generate reports (3 tabs) |
+| **Scan Listing** | `/` | Site listing with latest scan results (new home page) |
+| **Site Detail** | `/sites/{siteId}` | All scans, standard selector, zone details, scan history |
+| **Operations** | `/ops` | Upload CSV, review findings, generate reports (3 tabs) — redirect to `/` |
 | **Executive** | `/executive` | Results summary, top risks/actions, historical scan selector |
+| **Admin** | `/admin/customers` | Customer management (FJ staff) |
 
 ### Existing Backend Routes
 
@@ -91,8 +100,11 @@ traceable reports for operations and executive views.
 
 ### Existing Frontend Pages
 
-- `/ops/` — Operations view (Upload, Findings, Reports tabs)
+- `/` — Scan Listing (new home, PR-R1-09)
+- `/sites/[siteId]` — Site Scan Results (PR-R1-09)
+- `/ops/` — Operations view (Upload, Findings, Reports tabs) — redirects to `/`
 - `/executive/` — Executive dashboard
+- `/admin/customers` — Customer management (PR-R1-09)
 
 ### Existing Backend Services
 
@@ -108,8 +120,9 @@ traceable reports for operations and executive views.
 
 - **UI** (Shadcn): button, input, card, dialog, label, select, table, badge, dropdown-menu, textarea, checkbox
 - **Feature**: UploadForm, UploadQueueTable, WellnessIndexCard, CrossSiteComparisonTable, DailySummaryCard, TrendChart, NotificationBell
+- **PR-R1-09**: ScanListingTable, ScanListingFilters, UploadModal, ScanHistoryTable, RegisterCustomerModal, CustomerDetailsCard, StandardsTable
 - **Findings**: MetricChart, TimeSeriesChart, MetricConfig, types
-- **Layout**: Navbar, Sidebar
+- **Layout**: Navbar (updated PR-R1-09)
 
 ### Test Coverage
 
@@ -230,7 +243,7 @@ Historical QA gates (QA-G1 to QA-G9) from the compliance model:
 - `docs/setup/`: Setup guides (Supabase, etc.)
 - `docs/plans/MASTER_PLAN.md`: Original master plan with 4 phases, PR breakdown.
 - `docs/plans/MASTER_PLAN-Refactor.md`: Refactor master plan with R1-R4 phases.
-- `docs/plans/epics/R1-Refactor/`: R1 epic plans (ROADMAP.md + pr01 through pr06).
+- `docs/plans/epics/R1-Refactor/`: R1 epic plans (ROADMAP.md + pr01 through pr06, pr09 through pr11).
 - `docs/PSD-Refactor.md`: Product Specification for refactor.
 - `docs/TDD-Refactor.md`: Technical Design Document for refactor.
 - `.env`: Single environment file at project root for both backend and frontend.
@@ -260,6 +273,8 @@ Historical QA gates (QA-G1 to QA-G9) from the compliance model:
   - 012-013: Pending R2 (device connection, alert log)
   - 014: user_tenant table (PR-R1-01)
   - 015: reference_source_id FK on rulebook_entry (PR-R1-02)
+  - 016: tenant email unique constraint
+  - 017: upload content hash (dedup support)
 - `backend/tests/`: Empty — new tests to be built in PR-R1-06.
 - `frontend/components/`: Feature components (see list above).
 - `frontend/lib/api.ts`: Centralized fetch client for backend communication.

@@ -152,6 +152,16 @@ export const METRIC_CONFIGS: Record<string, MetricConfig> = {
     criticalBand: [[100, 500]],
     yAxisDomain: [0, 150],
   },
+  virus_index: {
+    key: "virus_index",
+    label: "Virus Index",
+    symbol: "VI",
+    unit: "",
+    goodBand: [0, 3],
+    watchBand: [[3, 6]],
+    criticalBand: [[6, 10]],
+    yAxisDomain: [0, 10],
+  },
 };
 
 export const METRIC_KEYS = Object.keys(METRIC_CONFIGS);
