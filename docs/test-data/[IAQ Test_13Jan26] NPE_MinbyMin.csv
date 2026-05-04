@@ -1,4 +1,4 @@
-Sampling Location,Date and Time,Temperature,Relative Humidity,PM2.5,TVOC,CO2,CO,Air Pressure,Ozone,PM1,PM4,PM10,Formaldehyde,Light,Sound,Virus Index,Mold Index
+Site,Date and Time,Temperature,Relative Humidity,PM2.5,TVOC,CO2,CO,Air Pressure,Ozone,PM1,PM4,PM10,Formaldehyde,Light,Sound,Virus Index,Mold Index
 POD,13/1/26 15:49,28.3,58.7,7,1,730,3,1012,0,6,7,7,0,289,39,2,3
 POD,13/1/26 15:50,28.4,58.6,7,2,697,2.7,1012.1,0,7,7,7,0,287,40,2,3
 POD,13/1/26 15:51,28.4,58,7,5,678,2.7,1012.1,0,7,7,7,0,295,42,2,3

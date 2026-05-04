@@ -24,7 +24,7 @@ from sqlmodel import col, select
 from app.api.dependencies import SessionDep, TenantIdDep
 from app.models.supporting import Tenant
 from app.models.workflow_a import RulebookEntry
-from app.models.workflow_b import Finding, Reading, Report, Site, Upload
+from app.models.workflow_b import Finding, Reading, Site, Upload
 from app.schemas.dashboard import ExecutiveDashboardResponse
 from app.services import aggregation as agg_svc
 
@@ -69,17 +69,6 @@ async def get_sites(session: SessionDep, tenant_id: TenantIdDep):
         if u.site_id not in latest_upload_by_site:
             latest_upload_by_site[u.site_id] = u
 
-    # ── Batch fetch latest report per site (for rule_version) ────────────
-    reports = session.exec(
-        select(Report)
-        .where(col(Report.site_id).in_(site_ids))
-        .order_by(col(Report.generated_at).desc())
-    ).all()
-    latest_report_by_site: dict[str, Report] = {}
-    for r in reports:
-        if r.site_id not in latest_report_by_site:
-            latest_report_by_site[r.site_id] = r
-
     # ── Batch fetch findings per site ──────────────────────────────────
     findings = session.exec(
         select(Finding)
@@ -113,50 +102,40 @@ async def get_sites(session: SessionDep, tenant_id: TenantIdDep):
     ).all()
     first_scan_by_site: dict[str, datetime] = {row[0]: row[1] for row in earliest_readings}
 
-    # ── Batch fetch rulebook weights per rule_version ─────────────────────
-    rule_versions = set()
-    for report in latest_report_by_site.values():
-        if report.rule_version_used:
-            rule_versions.add(report.rule_version_used)
-
-    weights_by_version: dict[str, dict[str, float]] = {}
-    if rule_versions:
-        entries = session.exec(
-            select(RulebookEntry)
-            .where(
-                col(RulebookEntry.rule_version).in_(rule_versions),
-                col(RulebookEntry.index_weight_percent).isnot(None),
-                col(RulebookEntry.approval_status) == "approved",
-            )
-        ).all()
-        for entry in entries:
-            version = entry.rule_version
-            if version not in weights_by_version:
-                weights_by_version[version] = {}
-            weights_by_version[version][entry.metric_name.value] = entry.index_weight_percent
-
     # ── Import wellness calculator (local to avoid circular imports) ─────
     from app.skills.iaq_rule_governor.wellness_index import (
         calculate_wellness_index,
         derive_certification_outcome,
     )
 
+    # ── Fetch rulebook weights for active rule_version ──────────────────
+    # Fall back to v2-refactor if no reports exist
+    default_rule_version = "v2-refactor"
+    weights_entries = session.exec(
+        select(RulebookEntry)
+        .where(
+            col(RulebookEntry.rule_version) == default_rule_version,
+            col(RulebookEntry.index_weight_percent).isnot(None),
+            col(RulebookEntry.approval_status) == "approved",
+        )
+    ).all()
+    default_weights: dict[str, float] = {}
+    for entry in weights_entries:
+        default_weights[entry.metric_name.value] = entry.index_weight_percent
+
     rows = []
     for site in sites:
         tenant_name = tenants.get(site.tenant_id) if site.tenant_id else None
         latest_upload = latest_upload_by_site.get(site.id)
         latest_finding = latest_finding_by_site.get(site.id)
-        latest_report = latest_report_by_site.get(site.id)
 
-        # Compute wellness index using batched data
+        # Compute wellness index from findings
         score = 0.0
         outcome = "INSUFFICIENT_EVIDENCE"
-        if latest_report and latest_report.rule_version_used:
-            weights = weights_by_version.get(latest_report.rule_version_used)
-            site_findings = findings_by_site.get(site.id, [])
-            if weights and site_findings:
-                score = calculate_wellness_index(site_findings, weights)
-                outcome = derive_certification_outcome(score).value
+        site_findings = findings_by_site.get(site.id, [])
+        if site_findings and default_weights:
+            score = calculate_wellness_index(site_findings, default_weights)
+            outcome = derive_certification_outcome(score).value
 
         rows.append({
             "site_id": site.id,

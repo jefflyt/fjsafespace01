@@ -3,9 +3,10 @@ backend/app/services/csv_parser.py
 
 CSV parsing and validation service for uHoo IAQ data exports.
 
-Reference format (NPE table header — canonical):
-  device_id, timestamp, zone_name, co2_ppm, pm2_5_ugm3, tvoc_ppb,
-  temperature_c, humidity_rh
+Reference format (canonical uHoo export):
+  Site, Date and Time, Temperature, Relative Humidity, PM2.5, TVOC, CO2, ...
+
+Zone name is read from the "Site" column (also supports "Location" for alternate exports).
 
 Also supports alternate uHoo export headers via COLUMN_ALIASES.
 
@@ -32,7 +33,8 @@ SENSOR_COLUMNS = {
 # Map alternate uHoo export headers to standard column names
 COLUMN_ALIASES = {
     # Metadata
-    "Sampling Location": "zone_name",
+    "Site": "zone_name",
+    "Location": "zone_name",
     "Date and Time": "timestamp",
     # Sensor metrics
     "CO2": "co2_ppm",

@@ -48,13 +48,40 @@ def extract_band_from_rule_id(rule_id: str) -> ThresholdBand | None:
 
 def _infer_band(entry: RulebookEntry) -> ThresholdBand:
     """
-    Infer the ThresholdBand from a RulebookEntry's min/max values.
+    Infer the ThresholdBand from a RulebookEntry's threshold_type and min/max values.
 
-    Heuristic:
-    - min_value == 0 with finite max_value -> GOOD
-    - Both min and max finite, min > 0 -> WATCH
-    - max_value is None or min_value is None -> CRITICAL
+    Heuristic based on threshold_type:
+    - upper_bound:  min=None, max=fine  -> GOOD (anything below max is acceptable)
+                    min=fine, max=None  -> CRITICAL (exceeds the limit)
+    - lower_bound:  max=None, min=fine  -> GOOD (anything above min is acceptable)
+                    max=fine, min=None  -> CRITICAL (below the minimum)
+    - range:        min=0, max=fine     -> GOOD
+                    min>0, max=fine     -> WATCH
+                    min=fine, max=None  -> CRITICAL
     """
+    threshold_type = entry.threshold_type if hasattr(entry, "threshold_type") else None
+
+    if threshold_type == "upper_bound":
+        # upper_bound: value must stay below max_value
+        if entry.max_value is not None and entry.min_value is None:
+            return ThresholdBand.GOOD
+        if entry.min_value is not None and entry.max_value is None:
+            return ThresholdBand.CRITICAL
+    elif threshold_type == "lower_bound":
+        # lower_bound: value must stay above min_value
+        if entry.min_value is not None and entry.max_value is None:
+            return ThresholdBand.GOOD
+        if entry.max_value is not None and entry.min_value is None:
+            return ThresholdBand.CRITICAL
+    elif threshold_type == "range":
+        if entry.min_value is not None and entry.max_value is None:
+            return ThresholdBand.CRITICAL
+        if entry.min_value == 0:
+            return ThresholdBand.GOOD
+        if entry.min_value is not None and entry.max_value is not None:
+            return ThresholdBand.WATCH
+
+    # Fallback for entries without threshold_type (legacy)
     if entry.max_value is None or entry.min_value is None:
         return ThresholdBand.CRITICAL
     if entry.min_value == 0:
@@ -95,6 +122,7 @@ def entry_to_rule_definition(entry: RulebookEntry) -> RuleDefinition:
         rule_id=_build_rule_id(metric_name, band),
         citation_unit_ids=[cid.strip() for cid in entry.citation_unit_ids.split(",") if cid.strip()],
         confidence_level=entry.confidence_level,
+        reference_source_id=entry.reference_source_id,
     )
 
 

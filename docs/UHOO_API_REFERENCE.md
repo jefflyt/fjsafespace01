@@ -276,7 +276,7 @@ The parser maps these alternate uHoo headers to internal names:
 
 | Alternate Header | Internal Name |
 |---|---|
-| `Sampling Location` | `zone_name` |
+| `Site` (primary) / `Location` | `zone_name` |
 | `Date and Time` | `timestamp` |
 | `CO2` | `co2_ppm` |
 | `CO` | `co_ppb` |

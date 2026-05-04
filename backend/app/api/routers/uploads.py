@@ -45,7 +45,7 @@ from app.skills.data_ingestion.csv_parser import parse_csv, extract_zones
 from app.skills.data_ingestion.supabase_storage import SupabaseStorage, SupabaseStorageError
 from app.skills.iaq_rule_governor.rule_engine import evaluate_readings
 from app.skills.iaq_rule_governor.wellness_index import calculate_wellness_index, derive_certification_outcome
-from app.services.db_rule_service import fetch_rules_from_db
+from app.services.db_rule_service import fetch_rules_by_standard
 
 router = APIRouter()
 
@@ -148,15 +148,30 @@ def _process_single_upload(
         )
         session.add(reading)
 
-    # Fetch rules and evaluate
-    db_rules = fetch_rules_from_db(session, _DEFAULT_RULE_VERSION)
-    eval_findings = evaluate_readings(
-        rows_to_persist,
-        site_id=site_id,
-        upload_id=upload_id,
-        rule_version=_DEFAULT_RULE_VERSION,
-        rules=db_rules if db_rules else None,
-    )
+    # Fetch active standards and evaluate per-standard
+    from app.models.workflow_a import ReferenceSource
+    active_sources = session.exec(
+        select(ReferenceSource).where(
+            col(ReferenceSource.source_currency_status) == "CURRENT_VERIFIED"
+        )
+    ).all()
+
+    eval_findings: list = []
+    standards_evaluated: list[str] = []
+
+    for source in active_sources:
+        std_rules = fetch_rules_by_standard(session, source.id, _DEFAULT_RULE_VERSION)
+        if not std_rules:
+            continue
+        std_findings = evaluate_readings(
+            rows_to_persist,
+            site_id=site_id,
+            upload_id=upload_id,
+            rule_version=_DEFAULT_RULE_VERSION,
+            rules=std_rules,
+        )
+        eval_findings.extend(std_findings)
+        standards_evaluated.append(source.id)
 
     # Persist findings
     from app.models.workflow_b import Finding as FindingModel
@@ -177,6 +192,7 @@ def _process_single_upload(
             confidence_level=ef.confidence_level,
             source_currency_status=ef.source_currency_status,
             benchmark_lane=ef.benchmark_lane,
+            reference_source_id=ef.reference_source_id,
         )
         session.add(finding)
 
@@ -192,6 +208,7 @@ def _process_single_upload(
     certification = derive_certification_outcome(wellness_score).value
 
     upload.rule_version_used = _DEFAULT_RULE_VERSION
+    upload.standards_evaluated = standards_evaluated
 
     session.commit()
     session.refresh(upload)
@@ -244,7 +261,7 @@ async def preview_upload(
     if not zones:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No zone names found in CSV. Ensure 'zone_name' or 'Sampling Location' column exists.",
+            detail="No zone names found in CSV. Ensure the 'Site' column exists with zone/site names.",
         )
 
     # Check for duplicate at tenant level
@@ -732,32 +749,50 @@ async def get_findings(
 
 
 def _find_standard_id_for_finding(finding, session: Session) -> str | None:
-    """Find the reference_source.id linked to this finding's rule version."""
-    from app.models.workflow_a import RulebookEntry
+    """Find the reference_source.id linked to this finding.
 
-    entry = session.exec(
+    Uses finding.reference_source_id directly (set at evaluation time).
+    Falls back to a best-effort lookup for legacy findings without it.
+    """
+    if finding.reference_source_id:
+        return finding.reference_source_id
+
+    from app.models.workflow_a import RulebookEntry
+    from app.services.db_rule_service import extract_band_from_rule_id
+
+    band = extract_band_from_rule_id(finding.rule_id)
+
+    entries = session.exec(
         select(RulebookEntry).where(
             col(RulebookEntry.metric_name) == finding.metric_name.value,
             col(RulebookEntry.rule_version) == finding.rule_version,
             col(RulebookEntry.approval_status) == "approved",
-        ).limit(1)
-    ).first()
+        )
+    ).all()
 
-    return entry.reference_source_id if entry else None
+    # Try to match by band for more precise attribution
+    for entry in entries:
+        from app.services.db_rule_service import _infer_band
+        if band and _infer_band(entry) == band:
+            return entry.reference_source_id
+
+    # Last resort: return first match
+    return entries[0].reference_source_id if entries else None
 
 
 def _find_standard_title_for_finding(finding, session: Session) -> str | None:
-    """Find the standard title linked to this finding's rule version."""
-    from app.models.workflow_a import ReferenceSource, RulebookEntry
+    """Find the standard title linked to this finding.
 
+    Uses finding.reference_source_id directly, with fallback for legacy data.
+    """
+    source_id = _find_standard_id_for_finding(finding, session)
+    if not source_id:
+        return None
+
+    from app.models.workflow_a import ReferenceSource
     result = session.exec(
         select(ReferenceSource.title)
-        .join(RulebookEntry, col(ReferenceSource.id) == col(RulebookEntry.reference_source_id))
-        .where(
-            col(RulebookEntry.metric_name) == finding.metric_name.value,
-            col(RulebookEntry.rule_version) == finding.rule_version,
-            col(RulebookEntry.approval_status) == "approved",
-        ).limit(1)
+        .where(col(ReferenceSource.id) == source_id)
     ).first()
 
     return result

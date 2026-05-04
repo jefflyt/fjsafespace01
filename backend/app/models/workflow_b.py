@@ -171,6 +171,8 @@ class Finding(SQLModel, table=True):
     # NOT NULL enforced — must always be present (TDD §3.5)
     source_currency_status: SourceCurrency
     benchmark_lane: BenchmarkLane
+    # FK to reference_source — certification standard that produced this finding
+    reference_source_id: str | None = Field(default=None, foreign_key="reference_source.id")
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
     __table_args__ = (
@@ -179,6 +181,7 @@ class Finding(SQLModel, table=True):
         Index("ix_finding_created_at", "created_at"),
         Index("ix_finding_rule_version", "rule_version"),
         Index("ix_finding_site_created", "site_id", "created_at"),
+        Index("ix_finding_reference_source_id", "reference_source_id"),
     )
 
     upload: Upload = Relationship(back_populates="findings")

@@ -1,4 +1,4 @@
-Location,Date and Time,Temperature,Relative Humidity,PM2.5,TVOC,CO2,CO,Air Pressure,Ozone,PM1,PM4,PM10,Formaldehyde,Light,Sound
+Site,Date and Time,Temperature,Relative Humidity,PM2.5,TVOC,CO2,CO,Air Pressure,Ozone,PM1,PM4,PM10,Formaldehyde,Light,Sound
 AIH S1,20/1/26 0:00,21.9,62.5,0,220,675,0.2,1012.3,0,0,0,0,0,98,37
 AIH S1,20/1/26 1:00,21.9,62.5,0,209,645,0.1,1011.9,0,0,0,0,0,97,37
 AIH S1,20/1/26 2:00,21.8,62.5,0,170,610,0.1,1011.4,0,0,0,0,0,99,37

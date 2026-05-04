@@ -86,7 +86,7 @@ These are how the physical uHoo device exports the same metrics:
 
 | uHoo Export Header | Maps To | Notes |
 | --- | --- | --- |
-| `Sampling Location` | zone_name | Metadata |
+| `Site` (primary) / `Location` | zone_name | Metadata |
 | `Date and Time` | timestamp | Metadata |
 | `CO2` | co2_ppm | |
 | `CO` | co_ppb | |

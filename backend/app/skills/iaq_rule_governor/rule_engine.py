@@ -50,6 +50,7 @@ class RuleDefinition:
     rule_id: str
     citation_unit_ids: list[str]
     confidence_level: ConfidenceLevel
+    reference_source_id: str | None = None
 
 
 # Deterministic rulebook — sorted so GOOD checks before WATCH before CRITICAL
@@ -385,6 +386,7 @@ def evaluate_readings(
                     ),
                     source_currency_status=SourceCurrency.CURRENT_VERIFIED,
                     benchmark_lane=BenchmarkLane.FJ_SAFESPACE,
+                    reference_source_id=rule.reference_source_id,
                 )
             )
 
@@ -410,3 +412,4 @@ class EvaluatedFinding:
     confidence_level: ConfidenceLevel
     source_currency_status: SourceCurrency  # NOT NULL
     benchmark_lane: BenchmarkLane
+    reference_source_id: str | None = None
