@@ -21,7 +21,7 @@ interface ZoneDetailViewProps {
     metric_value: number;
     is_outlier: boolean;
   }>;
-  standards: SiteStandard[];
+  standards?: SiteStandard[];
   siteId: string;
   metricPreferences: MetricPreferences;
 }
@@ -36,7 +36,7 @@ export function ZoneDetailView({
   zoneName,
   findings,
   readings,
-  standards,
+  standards = [],
   siteId,
   metricPreferences,
 }: ZoneDetailViewProps) {
@@ -107,11 +107,11 @@ export function ZoneDetailView({
         />
 
         {/* Metric Selector */}
-        <details className="rounded-md border p-2">
-          <summary className="text-sm font-medium cursor-pointer">
-            Show/Hide Metrics
+        <details className="rounded-md border p-3">
+          <summary className="text-sm font-medium cursor-pointer select-none">
+            Configure Metrics
           </summary>
-          <div className="mt-2">
+          <div className="mt-3">
             <MetricSelector
               availableMetrics={METRIC_KEYS}
               activeMetrics={activeMetrics}

@@ -53,7 +53,7 @@ export function RegisterCustomerModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Register Continuous Monitoring Customer</DialogTitle>
+          <DialogTitle>Register Customer</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">

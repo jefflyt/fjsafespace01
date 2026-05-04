@@ -20,13 +20,13 @@ export function Navbar() {
               href="/"
               className="rounded-md px-3 py-1.5 font-medium text-foreground/70 transition-colors hover:bg-muted hover:text-foreground"
             >
-              Scan Results
+              Scan Listings
             </Link>
             <Link
               href="/executive"
               className="rounded-md px-3 py-1.5 font-medium text-foreground/70 transition-colors hover:bg-muted hover:text-foreground"
             >
-              Summary
+              Executive Summary
             </Link>
             <Link
               href="/admin/customers"

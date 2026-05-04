@@ -27,14 +27,14 @@ export function ScanHistoryTable({ uploads, onRowClick }: ScanHistoryTableProps)
 
   return (
     <div className="rounded-md border">
-      <Table>
+      <div style={{ maxHeight: '9.75rem', overflowY: 'auto' }}>
+        <Table>
         <TableHeader>
           <TableRow>
             <TableHead>Date</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Standards</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead />
+            <TableHead className="w-[100px]">Type</TableHead>
+            <TableHead className="w-[100px]">Status</TableHead>
+            <TableHead className="w-[32px]" />
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -44,7 +44,7 @@ export function ScanHistoryTable({ uploads, onRowClick }: ScanHistoryTableProps)
               className="cursor-pointer hover:bg-muted/50"
               onClick={() => onRowClick(upload.id)}
             >
-              <TableCell className="text-sm">
+              <TableCell className="text-sm text-muted-foreground">
                 {new Date(upload.uploaded_at).toLocaleDateString('en-GB', {
                   day: '2-digit',
                   month: 'short',
@@ -55,15 +55,6 @@ export function ScanHistoryTable({ uploads, onRowClick }: ScanHistoryTableProps)
                 <Badge variant={upload.scan_type === 'continuous' ? 'default' : 'outline'} className="text-xs">
                   {upload.scan_type === 'continuous' ? 'Continuous' : 'Adhoc'}
                 </Badge>
-              </TableCell>
-              <TableCell>
-                <div className="flex gap-1 flex-wrap">
-                  {upload.standards_evaluated.map((s) => (
-                    <Badge key={s} variant="secondary" className="text-xs">
-                      {s}
-                    </Badge>
-                  ))}
-                </div>
               </TableCell>
               <TableCell>
                 <Badge
@@ -80,6 +71,7 @@ export function ScanHistoryTable({ uploads, onRowClick }: ScanHistoryTableProps)
           ))}
         </TableBody>
       </Table>
+      </div>
     </div>
   );
 }

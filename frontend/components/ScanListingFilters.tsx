@@ -20,7 +20,7 @@ export function ScanListingFilters({
     <div className="flex flex-wrap gap-3 items-center">
       <div className="flex-1 min-w-[200px]">
         <Input
-          placeholder="Search sites or customers..."
+          placeholder="Search sites..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           className="max-w-sm"

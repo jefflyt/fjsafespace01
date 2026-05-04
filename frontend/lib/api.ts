@@ -126,6 +126,20 @@ export interface ReferenceSource {
   title: string;
   publisher: string;
   source_currency_status: string;
+  status: string;
+  source_completeness_status: string | null;
+}
+
+export interface RulebookRule {
+  id: string;
+  metric_name: string;
+  threshold_type: string;
+  min_value: number | null;
+  max_value: number | null;
+  unit: string;
+  context_scope: string;
+  index_weight_percent: number | null;
+  rule_version: string;
 }
 
 export interface UploadResponse {
@@ -199,6 +213,28 @@ export interface TenantCreate {
   premises_type?: string;
 }
 
+export interface TenantUpdate {
+  client_name?: string;
+  contact_email?: string;
+  contact_person?: string;
+  site_address?: string;
+  premises_type?: string;
+  specific_event?: string;
+}
+
+export interface SiteDetail {
+  site_id: string;
+  site_name: string;
+  tenant_id: string | null;
+  tenant_name: string | null;
+  contact_person: string | null;
+  contact_email: string | null;
+  site_address: string | null;
+  premises_type: string | null;
+  specific_event: string | null;
+  comparative_analysis: boolean;
+}
+
 // ── R1-09: UI Refresh — Scan Listing ────────────────────────────────────────
 
 export interface SiteListingRow {
@@ -212,6 +248,9 @@ export interface SiteListingRow {
   certification_outcome: string;
   wellness_index_score: number | null;
   last_scan_date: string | null;
+  all_site_ids: string[];
+  scan_count: number;
+  first_scan_date: string | null;
 }
 
 export interface UploadListItem {
@@ -255,6 +294,12 @@ export const apiClient = {
   getRulebookSources: (options?: FetchOptions) =>
     api.get<ReferenceSource[]>('/api/rulebook/sources', options),
 
+  getRulebookRulesBySource: (sourceId: string, options?: FetchOptions) =>
+    api.get<RulebookRule[]>(`/api/rulebook/rules?source_id=${sourceId}&approval_status=approved`, options),
+
+  getAllActiveSources: (options?: FetchOptions) =>
+    api.get<ReferenceSource[]>('/api/rulebook/sources', options),
+
   getSiteOverview: (siteId: string, options?: FetchOptions) =>
     api.get<SiteOverviewResponse>(`/api/dashboard/sites/${siteId}`, options),
 
@@ -275,6 +320,11 @@ export const apiClient = {
   updateTenant: (id: string, body: Partial<TenantCreate>, options?: FetchOptions) =>
     api.patch<TenantDetail>(`/api/tenants/${id}`, body, options),
 
+  // ── Site Detail ──────────────────────────────────────────────────────────
+
+  getSiteDetail: (siteId: string, options?: FetchOptions) =>
+    api.get<SiteDetail>(`/api/sites/${siteId}`, options),
+
   // ── R1-09: UI Refresh ────────────────────────────────────────────────────
 
   getSiteListing: (options?: FetchOptions) =>
@@ -285,4 +335,12 @@ export const apiClient = {
       `/api/uploads${siteId ? `?site_id=${siteId}` : ''}`,
       options,
     ),
+
+  getUploadsBySiteIds: (siteIds: string[], options?: FetchOptions) =>
+    siteIds.length
+      ? api.get<UploadListItem[]>(
+          `/api/uploads?site_ids=${siteIds.join(',')}`,
+          options,
+        )
+      : Promise.resolve([]),
 };

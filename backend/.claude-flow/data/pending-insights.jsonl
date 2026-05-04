@@ -74,3 +74,5 @@
 {"type":"edit","file":"/Users/jefflee/Documents/AIProjects/fjsafespace01/docs/plans/epics/R1-Refactor/pr08-upload-dedup.md","timestamp":1777740064270,"sessionId":null}
 {"type":"edit","file":"/Users/jefflee/Documents/AIProjects/fjsafespace01/docs/plans/epics/R1-Refactor/pr08-upload-dedup.md","timestamp":1777740094332,"sessionId":null}
 {"type":"edit","file":"/Users/jefflee/Documents/AIProjects/fjsafespace01/docs/verification/SPECS-VERIFICATION.md","timestamp":1777740163968,"sessionId":null}
+{"type":"edit","file":"/Users/jefflee/Documents/AIProjects/fjsafespace01/backend/app/api/routers/dashboard.py","timestamp":1777805440826,"sessionId":null}
+{"type":"edit","file":"/Users/jefflee/Documents/AIProjects/fjsafespace01/frontend/components/StandardsTable.tsx","timestamp":1777809113836,"sessionId":null}

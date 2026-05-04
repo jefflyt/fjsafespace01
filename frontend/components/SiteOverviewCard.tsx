@@ -86,15 +86,15 @@ export function SiteOverviewCard({
   return (
     <Card className="transition-all hover:shadow-md">
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center justify-between">
+        <div className="flex items-start justify-between">
           <div>
             <span className="text-lg font-heading font-bold">{siteName}</span>
             <p className="text-xs text-muted-foreground mt-0.5">
-              {scanModeLabel} &middot; Updated{" "}
-              {new Date(lastUpdated).toLocaleDateString()}
+              {scanModeLabel} · Updated{" "}
+              {new Date(lastUpdated).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 shrink-0 ml-4">
             {overallWellness != null && (
               <span
                 className={`font-heading text-3xl font-bold tabular-nums ${getScoreColor(overallWellness)}`}
@@ -110,7 +110,7 @@ export function SiteOverviewCard({
               {overallBadge.label}
             </Badge>
           </div>
-        </CardTitle>
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Per-standard scores */}
@@ -153,8 +153,8 @@ export function SiteOverviewCard({
         {/* Top insight */}
         {topInsight && (
           <div className="rounded-md bg-amber-50 border border-amber-200 p-3">
-            <p className="text-sm font-semibold text-amber-800">
-              Top Insight
+            <p className="text-xs font-semibold uppercase tracking-wide text-amber-800">
+              Key Finding
             </p>
             <p className="text-sm text-amber-700 mt-0.5">{topInsight}</p>
           </div>

@@ -23,10 +23,12 @@ Restructure the dashboard navigation so scan results are the primary landing exp
 ## 4. Key Changes
 
 ### Backend
+
 - [x] Enhance `GET /api/dashboard/sites` to return: site_name, tenant_name, latest_upload_date, scan_type, wellness_score, standard_scores, status
 - [x] Add `site_id` query filter to `GET /api/uploads`
 
 ### Frontend Routes
+
 | Route | Purpose | Status |
 |-------|---------|--------|
 | `/` | Scan Listing (new home) | ✅ |
@@ -36,6 +38,7 @@ Restructure the dashboard navigation so scan results are the primary landing exp
 | `/ops/*` | Redirect to new routes | ✅ |
 
 ### New Components
+
 - [x] `ScanListingTable` — data table for home page
 - [x] `ScanListingFilters` — search + scan type filter
 - [x] `UploadModal` — dialog wrapper for UploadForm
@@ -43,6 +46,7 @@ Restructure the dashboard navigation so scan results are the primary landing exp
 - [x] `RegisterCustomerModal` — customer registration dialog
 
 ### Updated Components
+
 - [x] `Navbar` — new links (Scan Results, Summary, Customers), role-aware
 - [x] `UploadForm` — support modal embedding + redirect on complete
 - [x] Deleted unused `Sidebar.tsx`
@@ -64,16 +68,19 @@ Restructure the dashboard navigation so scan results are the primary landing exp
 **✅ COMPLETE** — 2026-05-03
 
 ### Commits
+
 1. `92a4b07f` feat(R1-09): UI Refresh — scan results as home page
 2. `0d1d4054` fix(R1-09): outcomeBadge enum mapping to match CertificationOutcome
 
 ### Files Changed (15)
+
 - **Backend**: `dashboard.py`, `uploads.py`
 - **Frontend**: `page.tsx`, `ops/page.tsx`, `sites/[siteId]/page.tsx`, `Navbar.tsx`, `api.ts`
 - **New**: `ScanListingTable.tsx`, `ScanListingFilters.tsx`, `UploadModal.tsx`, `ScanHistoryTable.tsx`, `RegisterCustomerModal.tsx`
 - **Deleted**: `Sidebar.tsx`
 
 ### Known Notes
+
 - N+1 query pattern in `get_sites` (one query per site for tenant/upload lookup) — acceptable at current scale (~5 sites), should optimize if sites grow beyond ~50
 - ScanHistoryTable `onRowClick` logs to console — future enhancement to load specific upload findings
 - "Customers" nav link retained for quick access to admin customer management (deviation from original "Summary-only" concept)

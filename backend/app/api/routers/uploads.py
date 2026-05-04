@@ -337,15 +337,20 @@ async def create_upload(
 async def list_uploads(
     session: SessionDep,
     site_id: str | None = Query(default=None, description="Filter uploads by site ID"),
+    site_ids: str | None = Query(default=None, description="Comma-separated site IDs for multi-site fetch"),
 ):
     """
     Return a lightweight list of uploads for the historical scan selector
     or site scan history.
 
-    Optional site_id filter for PR-R1-09 site scan history.
+    Supports single site_id or multiple site_ids (comma-separated).
     """
     query = select(Upload)
-    if site_id:
+    if site_ids:
+        ids = [s.strip() for s in site_ids.split(',') if s.strip()]
+        if ids:
+            query = query.where(col(Upload.site_id).in_(ids))
+    elif site_id:
         query = query.where(col(Upload.site_id) == site_id)
     query = query.order_by(Upload.uploaded_at.desc())
     uploads = session.exec(query).all()

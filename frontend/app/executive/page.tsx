@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { StandardSelector } from "@/components/StandardSelector"
-import { AlertTriangle, ShieldCheck, ShieldX, ShieldAlert, Loader2, Activity, ArrowUpRight, X, ExternalLink } from "lucide-react"
+import { AlertTriangle, ShieldCheck, ShieldX, ShieldAlert, Loader2, Activity, X, ArrowUpRight } from "lucide-react"
 import type { Finding } from "@/components/findings/types"
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -136,9 +136,9 @@ function getOutcomeLabel(outcome: string): string {
 }
 
 function getScoreColor(score: number): string {
-  if (score >= 90) return "text-[#37CA37]"
-  if (score >= 75) return "text-[#F6AD55]"
-  if (score > 0) return "text-[#E93D3D]"
+  if (score >= 80) return "text-green-600"
+  if (score >= 60) return "text-amber-600"
+  if (score > 0) return "text-red-600"
   return "text-muted-foreground"
 }
 
@@ -173,24 +173,19 @@ function AnimatedMetric({ value, label, color, delay }: { value: number | string
 
 function HealthSummaryCard({ ratings }: { ratings: HealthRatings }) {
   return (
-    <Card className="animate-fade-in border-l-2 border-l-primary bg-accent/30 animate-border-glow">
+    <Card className="animate-fade-in border-l-4 border-l-primary bg-accent/30">
       <CardHeader className="pb-3">
         <CardTitle className="font-heading flex items-center gap-2 text-lg">
           <Activity className="h-5 w-5 text-primary" />
-          Portfolio Health
-          <span className="ml-auto text-[10px] uppercase tracking-widest text-muted-foreground">Live</span>
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#37CA37] opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#37CA37]"></span>
-          </span>
+          Portfolio Summary
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
           <AnimatedMetric value={ratings.total_sites} label="Total Sites" delay={0} />
-          <AnimatedMetric value={ratings.certified} label="Certified" color="text-[#37CA37]" delay={50} />
-          <AnimatedMetric value={ratings.verified} label="Verified" color="text-[#F6AD55]" delay={100} />
-          <AnimatedMetric value={ratings.improvement_recommended} label="Needs Work" color="text-[#E93D3D]" delay={150} />
+          <AnimatedMetric value={ratings.certified} label="Certified" color="text-green-600" delay={50} />
+          <AnimatedMetric value={ratings.verified} label="Verified" color="text-amber-600" delay={100} />
+          <AnimatedMetric value={ratings.improvement_recommended} label="Needs Attention" color="text-red-600" delay={150} />
           <AnimatedMetric value={ratings.insufficient_evidence} label="No Data" color="text-muted-foreground" delay={200} />
         </div>
         <div className="mt-4 border-t pt-4 flex items-center justify-center gap-3">
@@ -225,7 +220,7 @@ function RiskCard({ risk }: { risk: TopRisk }) {
         <span className="font-mono text-xs uppercase tracking-wider">{risk.metric_name}</span>
       </div>
       <p className="text-xs text-muted-foreground">{risk.interpretation_text}</p>
-      <p className="text-xs font-medium">Action: {risk.recommended_action}</p>
+      <p className="text-xs font-medium">Recommended: {risk.recommended_action}</p>
     </div>
   )
 }
@@ -242,7 +237,7 @@ function TopRisksPanel({ risks }: { risks: TopRisk[] }) {
       <CardContent className="space-y-2">
         {risks.length === 0 ? (
           <div className="py-8 text-center">
-            <ShieldCheck className="mx-auto h-10 w-10 text-[#37CA37]/40 mb-3" />
+            <ShieldCheck className="mx-auto h-10 w-10 text-green-500/40 mb-3" />
             <p className="text-sm text-muted-foreground">
               No critical risks detected.
             </p>
@@ -263,9 +258,12 @@ function TopActionsPanel({ actions }: { actions: TopAction[] }) {
       </CardHeader>
       <CardContent>
         {actions.length === 0 ? (
-          <p className="py-6 text-center text-sm text-muted-foreground">
-            No actions pending.
-          </p>
+          <div className="py-8 text-center">
+            <ShieldCheck className="mx-auto h-10 w-10 text-green-500/40 mb-3" />
+            <p className="text-sm text-muted-foreground">
+              All clear — no actions pending.
+            </p>
+          </div>
         ) : (
           <ul className="space-y-2">
             {actions.map((action, idx) => (
@@ -419,30 +417,22 @@ export default function ExecutiveDashboardPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <div className="flex items-center gap-3">
-            <h1 className="font-heading text-2xl font-bold tracking-tight">Executive Dashboard</h1>
-            <span className="relative inline-flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#37CA37] opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#37CA37]"></span>
-            </span>
-            <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">Live</span>
-          </div>
+          <h1 className="font-heading text-2xl font-bold tracking-tight">Executive Summary</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Portfolio-level IAQ wellness overview across all managed sites.
           </p>
-          <div className="h-0.5 w-24 bg-gradient-to-r from-primary to-transparent mt-3 rounded-full"></div>
         </div>
 
         {/* Historical Scan Selector */}
         <Select value={selectedUpload} onValueChange={setSelectedUpload}>
           <SelectTrigger className="w-[280px]">
-            <SelectValue placeholder="Select scan results" />
+            <SelectValue placeholder="Select scan period" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Scans (Latest)</SelectItem>
+            <SelectItem value="all">All Scans</SelectItem>
             {uploads.map((upload) => (
               <SelectItem key={upload.id} value={upload.id}>
                 {upload.file_name} &mdash; {formatDate(upload.uploaded_at)}
@@ -469,9 +459,9 @@ export default function ExecutiveDashboardPage() {
           />
           <label
             htmlFor="needs-attention"
-            className="text-sm font-medium leading-none cursor-pointer"
+            className="text-sm font-medium leading-none cursor-pointer select-none"
           >
-            Show sites needing attention only
+            Sites needing attention
           </label>
         </div>
       </div>
@@ -485,10 +475,10 @@ export default function ExecutiveDashboardPage() {
             <Card className="animate-fade-in" style={{ animationDelay: "100ms" }}>
               <CardHeader className="pb-3">
                 <CardTitle className="font-heading text-lg">
-                  Site Results
+                  Site Overview
                   {showNeedsAttentionOnly && (
                     <span className="ml-2 text-xs text-muted-foreground font-normal">
-                      (needs attention)
+                      (needing attention)
                     </span>
                   )}
                 </CardTitle>
@@ -498,7 +488,7 @@ export default function ExecutiveDashboardPage() {
                   {filteredLeaderboard.map((row, idx) => (
                     <div
                       key={row.site_id}
-                      className="flex items-center justify-between rounded-lg border p-3 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 bg-white cursor-pointer"
+                      className="flex items-center justify-between rounded-lg border p-4 transition-shadow duration-200 hover:shadow-sm bg-white cursor-pointer"
                       style={{ animationDelay: `${idx * 50 + 150}ms` }}
                       onClick={() => handleSiteClick(row.site_id, row.site_name)}
                     >
@@ -543,8 +533,9 @@ export default function ExecutiveDashboardPage() {
 
           {filteredLeaderboard.length === 0 && (
             <Card>
-              <CardContent className="py-8 text-center text-muted-foreground">
+              <CardContent className="py-12 text-center text-muted-foreground">
                 <p className="text-sm">No sites match the current filter.</p>
+                <p className="text-xs mt-1">Try adjusting your filters or upload new scan data.</p>
               </CardContent>
             </Card>
           )}
@@ -560,7 +551,7 @@ export default function ExecutiveDashboardPage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-background rounded-lg p-6 max-w-2xl w-full mx-4 shadow-xl border max-h-[80vh] overflow-hidden flex flex-col">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Findings: {selectedSite.name}</h3>
+              <h3 className="text-lg font-semibold">Scan Findings: {selectedSite.name}</h3>
               <Button variant="ghost" size="sm" onClick={() => setSelectedSite(null)}>
                 <X className="h-4 w-4" />
               </Button>
@@ -591,16 +582,16 @@ export default function ExecutiveDashboardPage() {
                       <span className="text-sm font-semibold">{finding.zone_name}</span>
                       <Badge variant="outline" className={cn(
                         "text-[10px]",
-                        finding.threshold_band === "CRITICAL" ? "bg-red-50 text-red-700 border-red-200" :
-                        finding.threshold_band === "WATCH" ? "bg-amber-50 text-amber-700 border-amber-200" :
-                        "bg-green-50 text-green-700 border-green-200"
+                        finding.threshold_band === "CRITICAL" ? "bg-red-100 text-red-800 border-red-200" :
+                        finding.threshold_band === "WATCH" ? "bg-amber-100 text-amber-800 border-amber-200" :
+                        "bg-green-100 text-green-800 border-green-200"
                       )}>
                         {finding.threshold_band}
                       </Badge>
                     </div>
                     <p className="text-xs font-mono mt-1">{finding.metric_name}: {finding.metric_value}</p>
                     <p className="text-xs text-muted-foreground mt-1">{finding.interpretation_text}</p>
-                    <p className="text-xs font-medium mt-1">Action: {finding.recommended_action}</p>
+                    <p className="text-xs font-medium mt-1">Recommended: {finding.recommended_action}</p>
                   </div>
                 ))}
               </div>
@@ -609,9 +600,9 @@ export default function ExecutiveDashboardPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => router.push(`/ops?tab=findings`)}
+                onClick={() => setSelectedSite(null)}
               >
-                View in Operations <ExternalLink className="ml-2 h-3 w-3" />
+                Close
               </Button>
             </div>
           </div>

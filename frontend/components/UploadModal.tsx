@@ -22,7 +22,7 @@ export function UploadModal({ open, onOpenChange, onUploadComplete }: UploadModa
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Load New CSV</DialogTitle>
+          <DialogTitle>Upload Scan Data</DialogTitle>
         </DialogHeader>
         <UploadForm onUploadComplete={handleComplete} />
       </DialogContent>

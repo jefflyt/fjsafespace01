@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { ScanListingFilters } from '@/components/ScanListingFilters';
 import { ScanListingTable } from '@/components/ScanListingTable';
 import { UploadModal } from '@/components/UploadModal';
@@ -46,24 +46,27 @@ export default function ScanListingPage() {
   }, [sites, searchQuery, scanType]);
 
   const handleRowClick = useCallback(
-    (siteId: string) => {
-      router.push(`/sites/${siteId}`);
+    (siteId: string, allSiteIds?: string[]) => {
+      const ids = allSiteIds?.join(',') || '';
+      router.push(`/sites/${siteId}${ids ? `?siteIds=${ids}` : ''}`);
     },
     [router],
   );
 
   return (
-    <div className="max-w-7xl px-6 py-6">
+    <div className="max-w-7xl mx-auto px-6 py-6">
+      <div className="mb-4">
+        <h1 className="text-2xl font-bold tracking-tight">Scan Listings</h1>
+        <p className="text-sm text-muted-foreground mt-1">IAQ scan results across all sites</p>
+      </div>
       <Card>
-        <CardHeader>
-          <CardTitle>Scan Results</CardTitle>
-          <CardDescription>IAQ scan results across all sites</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="pt-6 space-y-4">
           <div className="flex flex-wrap gap-3">
-            <Button onClick={() => setUploadOpen(true)}>Load New CSV</Button>
+            <Button onClick={() => setUploadOpen(true)}>
+              Load Scan Data
+            </Button>
             <Button variant="outline" onClick={() => setRegisterOpen(true)}>
-              Register CM Customer
+              Register Customer
             </Button>
           </div>
 

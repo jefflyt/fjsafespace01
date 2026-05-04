@@ -8,7 +8,7 @@ import { ArrowRight, Loader2 } from 'lucide-react';
 interface ScanListingTableProps {
   data: SiteListingRow[];
   loading: boolean;
-  onRowClick: (siteId: string) => void;
+  onRowClick: (siteId: string, allSiteIds?: string[]) => void;
 }
 
 function outcomeBadge(outcome: string) {
@@ -45,7 +45,7 @@ export function ScanListingTable({ data, loading, onRowClick }: ScanListingTable
     return (
       <div className="text-center py-12 text-muted-foreground">
         <p className="text-sm">No scan results yet.</p>
-        <p className="text-xs mt-1">Load a CSV to get started.</p>
+        <p className="text-xs mt-1">Upload a scan file to get started.</p>
       </div>
     );
   }
@@ -57,11 +57,12 @@ export function ScanListingTable({ data, loading, onRowClick }: ScanListingTable
           <TableRow>
             <TableHead>Site</TableHead>
             <TableHead>Customer</TableHead>
+            <TableHead className="w-[100px]">Scans</TableHead>
             <TableHead>Last Scan</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Score</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead />
+            <TableHead className="w-[100px]">Type</TableHead>
+            <TableHead className="w-[80px] text-right">Score</TableHead>
+            <TableHead className="w-[120px]">Status</TableHead>
+            <TableHead className="w-[32px]" />
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -69,13 +70,14 @@ export function ScanListingTable({ data, loading, onRowClick }: ScanListingTable
             <TableRow
               key={row.site_id}
               className="cursor-pointer hover:bg-muted/50"
-              onClick={() => onRowClick(row.site_id)}
+              onClick={() => onRowClick(row.site_id, row.all_site_ids)}
             >
               <TableCell className="font-medium">{row.site_name}</TableCell>
               <TableCell className="text-muted-foreground">{row.tenant_name ?? '—'}</TableCell>
-              <TableCell className="text-sm">
-                {row.uploaded_at
-                  ? new Date(row.uploaded_at).toLocaleDateString('en-GB', {
+              <TableCell className="text-center font-mono tabular-nums">{row.scan_count}</TableCell>
+              <TableCell className="text-sm text-muted-foreground">
+                {row.first_scan_date
+                  ? new Date(row.first_scan_date).toLocaleDateString('en-GB', {
                       day: '2-digit',
                       month: 'short',
                       year: 'numeric',
@@ -87,8 +89,8 @@ export function ScanListingTable({ data, loading, onRowClick }: ScanListingTable
                   {row.scan_type === 'continuous' ? 'Continuous' : 'Adhoc'}
                 </Badge>
               </TableCell>
-              <TableCell className={scoreColor(row.wellness_index_score)}>
-                {row.wellness_index_score != null ? `${row.wellness_index_score}%` : '—'}
+              <TableCell className={`text-right font-mono tabular-nums ${scoreColor(row.wellness_index_score)}`}>
+                {row.wellness_index_score != null ? `${Math.round(row.wellness_index_score)}` : '—'}
               </TableCell>
               <TableCell>{outcomeBadge(row.certification_outcome)}</TableCell>
               <TableCell>
