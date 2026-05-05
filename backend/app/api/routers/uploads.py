@@ -52,6 +52,9 @@ router = APIRouter()
 # R1: Default rule version — matches seed_rulebook_v1.py
 _DEFAULT_RULE_VERSION = "v2-refactor"
 
+# Max upload size: 10MB for CSV files
+_MAX_UPLOAD_SIZE = 10 * 1024 * 1024  # 10MB
+
 # Weights sourced from rulebook_entry index_weight_percent for v2-refactor.
 _DEFAULT_RULEBOOK_WEIGHTS: dict[str, float] = {
     "co2_ppm": 25.0,
@@ -164,16 +167,15 @@ def _process_single_upload(
         if not std_rules:
             continue
 
-        # Identify metrics covered by DB rules for this standard
-        db_metric_names = {r.metric_name for r in std_rules}
-        all_metric_names = {r.metric_name for r in _DEFAULT_RULES}
-        uncovered_metrics = all_metric_names - db_metric_names
-
-        # Supplement with embedded defaults for uncovered metrics
+        # Supplement with embedded defaults for bands missing per metric.
+        # E.g., SS 554 may only define GOOD band for temperature — add
+        # WATCH/CRITICAL embedded bands so out-of-range values get proper findings.
+        db_rules_by_metric_band = {(r.metric_name, r.band) for r in std_rules}
         combined_rules = list(std_rules)
-        for metric in uncovered_metrics:
-            embedded_rules = [r for r in _DEFAULT_RULES if r.metric_name == metric]
-            combined_rules.extend(embedded_rules)
+        for embedded_rule in _DEFAULT_RULES:
+            key = (embedded_rule.metric_name, embedded_rule.band)
+            if key not in db_rules_by_metric_band:
+                combined_rules.append(embedded_rule)
 
         std_findings = evaluate_readings(
             rows_to_persist,
@@ -268,6 +270,11 @@ async def preview_upload(
         )
 
     file_bytes = await file.read()
+    if len(file_bytes) > _MAX_UPLOAD_SIZE:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail=f"CSV file too large. Maximum size is {_MAX_UPLOAD_SIZE // (1024 * 1024)}MB.",
+        )
     zones = extract_zones(BytesIO(file_bytes))
 
     if not zones:
@@ -318,6 +325,11 @@ async def create_upload(
 
     # Read file bytes
     file_bytes = await file.read()
+    if len(file_bytes) > _MAX_UPLOAD_SIZE:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail=f"CSV file too large. Maximum size is {_MAX_UPLOAD_SIZE // (1024 * 1024)}MB.",
+        )
 
     # Determine tenant
     _tenant_id = tenant_id or jwt_tenant_id
@@ -406,6 +418,11 @@ async def confirm_upload(
         )
 
     file_bytes = await file.read()
+    if len(file_bytes) > _MAX_UPLOAD_SIZE:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail=f"CSV file too large. Maximum size is {_MAX_UPLOAD_SIZE // (1024 * 1024)}MB.",
+        )
     content_hash = hashlib.sha256(file_bytes).hexdigest()
 
     _tenant_id = tenant_id or jwt_tenant_id
@@ -659,6 +676,7 @@ async def list_uploads(
             "report_type": u.report_type.value if u.report_type else None,
             "scan_type": u.scan_type,
             "standards_evaluated": u.standards_evaluated or [],
+            "content_hash": u.content_hash,
             "is_duplicate": False,
         }
         for u in uploads

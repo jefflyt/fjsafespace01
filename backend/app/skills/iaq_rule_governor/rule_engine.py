@@ -349,12 +349,22 @@ def _find_matching_rule(
         MetricName.humidity_rh: "HUM",
     }.get(metric_name, metric_name.value.upper())
 
+    metric_display = {
+        MetricName.co2_ppm: ("CO₂", "ppm"),
+        MetricName.pm25_ugm3: ("PM2.5", "μg/m³"),
+        MetricName.tvoc_ppb: ("TVOC", "ppb"),
+        MetricName.temperature_c: ("Temperature", "°C"),
+        MetricName.humidity_rh: ("Humidity", "%RH"),
+    }.get(metric_name, (metric_name.value, ""))
+    display_name, unit = metric_display
+    unit_str = f"{unit} " if unit else ""
+
     return RuleDefinition(
         metric_name=metric_name,
         band=ThresholdBand.WATCH,
         min_value=inferred_min,
         max_value=inferred_max,
-        interpretation_template=f"{metric_name.value} of {{value}} is outside the acceptable range.",
+        interpretation_template=f"{display_name} of {{value}} {unit_str}is outside the acceptable range.",
         workforce_impact_template="Conditions may affect occupant comfort or health.",
         recommendation_template="Review environmental controls and take corrective action.",
         rule_id=f"R-{metric_short}-WATCH",
@@ -401,6 +411,13 @@ def evaluate_readings(
 
         if rule is None:
             # No matching rule — create an Insufficient Evidence finding (QA-G5 fallback)
+            display_name = {
+                MetricName.co2_ppm: "CO₂",
+                MetricName.pm25_ugm3: "PM2.5",
+                MetricName.tvoc_ppb: "TVOC",
+                MetricName.temperature_c: "Temperature",
+                MetricName.humidity_rh: "Humidity",
+            }.get(metric_name, metric_name_str)
             findings.append(
                 EvaluatedFinding(
                     zone_name=row["zone_name"],
@@ -408,7 +425,7 @@ def evaluate_readings(
                     metric_value=value,
                     metric_unit=row["metric_unit"],
                     threshold_band=ThresholdBand.WATCH,
-                    interpretation_text=f"No applicable rule found for {metric_name_str} at {value}. Manual review required.",
+                    interpretation_text=f"No applicable rule found for {display_name} at {value}. Manual review required.",
                     workforce_impact_text="Unable to determine impact without applicable rule.",
                     recommended_action="Manual assessment required. No automated finding can be generated.",
                     rule_id="R-INSUFFICIENT",

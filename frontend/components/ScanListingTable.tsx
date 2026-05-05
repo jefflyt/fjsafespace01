@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { Fragment, useCallback, useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { SiteListingRow } from '@/lib/api';
@@ -91,7 +91,7 @@ export function ScanListingTable({ data, loading, onRowClick }: ScanListingTable
         {groups.map((group) => {
           const isExpanded = expandedTenants.has(group.tenantName);
           return (
-            <>
+            <Fragment key={`group-${group.tenantName}`}>
               <TableRow
                 key={`tenant-${group.tenantName}`}
                 className="bg-muted/30 cursor-pointer hover:bg-muted/50"
@@ -131,7 +131,7 @@ export function ScanListingTable({ data, loading, onRowClick }: ScanListingTable
                         {site.scan_type || 'Adhoc'}
                       </Badge>
                     </TableCell>
-                    <TableCell className={`text-right font-semibold ${getScoreColor(site.wellness_index_score)}`}>
+                    <TableCell className={`text-right font-semibold ${getScoreColor(site.wellness_index_score ?? 0)}`}>
                       {site.wellness_index_score != null ? Math.round(site.wellness_index_score) : '—'}
                     </TableCell>
                     <TableCell>
@@ -142,7 +142,7 @@ export function ScanListingTable({ data, loading, onRowClick }: ScanListingTable
                     </TableCell>
                   </TableRow>
                 ))}
-            </>
+            </Fragment>
           );
         })}
       </TableBody>

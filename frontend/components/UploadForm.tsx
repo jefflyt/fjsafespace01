@@ -252,7 +252,6 @@ export function UploadForm({ onUploadComplete }: UploadFormProps) {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("standards", JSON.stringify(selectedStandards));
       formData.append("force", "true");
       if (selectedTenantId) {
         formData.append("tenant_id", selectedTenantId);

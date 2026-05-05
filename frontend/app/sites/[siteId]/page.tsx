@@ -76,7 +76,16 @@ export default function SiteDetailPage() {
         }
       }
       if (prefsRes) setMetricPreferences(prefsRes);
-      if (uploadsRes) setUploads(uploadsRes);
+      if (uploadsRes) {
+        // Deduplicate by content_hash — force-uploads of same CSV should count as one
+        const seen = new Set<string>();
+        const unique = (uploadsRes as UploadListItem[]).filter((u) => {
+          if (u.content_hash && seen.has(u.content_hash)) return false;
+          if (u.content_hash) seen.add(u.content_hash);
+          return true;
+        });
+        setUploads(unique);
+      }
     } catch (err) {
       console.error('Failed to fetch site data:', err);
     } finally {
@@ -288,7 +297,6 @@ export default function SiteDetailPage() {
             zoneName={zone}
             findings={filteredFindings}
             readings={readings}
-            standards={allSources.map((s) => ({ source_id: s.id, title: s.title, is_active: s.status === 'active' }))}
             siteId={siteId}
             metricPreferences={metricPreferences}
           />

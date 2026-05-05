@@ -262,6 +262,7 @@ export interface UploadListItem {
   report_type: string | null;
   scan_type: string | null;
   standards_evaluated: string[];
+  content_hash: string;
   is_duplicate: boolean;
 }
 

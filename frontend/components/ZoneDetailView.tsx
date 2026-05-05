@@ -3,11 +3,10 @@
 import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MetricCard } from "@/components/MetricCard";
-import { StandardSelector } from "@/components/StandardSelector";
 import { MetricSelector } from "@/components/MetricSelector";
 import { ThresholdConfigDialog } from "@/components/ThresholdConfigDialog";
 import { TimeSeriesChart } from "@/components/findings/TimeSeriesChart";
-import { apiClient, type SiteStandard, type MetricPreferences } from "@/lib/api";
+import { apiClient, type MetricPreferences } from "@/lib/api";
 import type { Finding } from "@/components/findings/types";
 import { METRIC_KEYS } from "@/components/findings/MetricConfig";
 
@@ -21,7 +20,6 @@ interface ZoneDetailViewProps {
     metric_value: number;
     is_outlier: boolean;
   }>;
-  standards?: SiteStandard[];
   siteId: string;
   metricPreferences: MetricPreferences;
 }
@@ -36,32 +34,22 @@ export function ZoneDetailView({
   zoneName,
   findings,
   readings,
-  standards = [],
   siteId,
   metricPreferences,
 }: ZoneDetailViewProps) {
-  const [activeStandardId, setActiveStandardId] = useState(
-    standards.find((s) => s.is_active)?.source_id ?? ""
-  );
   const [activeMetrics, setActiveMetrics] = useState(
     metricPreferences.active_metrics.length > 0
       ? metricPreferences.active_metrics
       : METRIC_KEYS
   );
 
+  // Findings are already filtered by active standard at parent level
   const zoneFindings = findings.filter((f) => f.zone_name === zoneName);
-
-  const filteredByStandard = useMemo(() => {
-    if (!activeStandardId) return zoneFindings;
-    return zoneFindings.filter(
-      (f) => f.standard_id === activeStandardId
-    );
-  }, [zoneFindings, activeStandardId]);
 
   // Group by metric_name, keep the worst (highest severity) finding per metric
   const findingsByMetric = useMemo(() => {
     const grouped: Record<string, Finding> = {};
-    for (const f of filteredByStandard) {
+    for (const f of zoneFindings) {
       const existing = grouped[f.metric_name];
       if (
         !existing ||
@@ -72,7 +60,7 @@ export function ZoneDetailView({
       }
     }
     return grouped;
-  }, [filteredByStandard]);
+  }, [zoneFindings]);
 
   const visibleMetrics = activeMetrics.filter((m) => findingsByMetric[m]);
 
@@ -99,13 +87,6 @@ export function ZoneDetailView({
         <CardTitle className="font-heading text-lg">{zoneName}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Standard Selector */}
-        <StandardSelector
-          standards={standards}
-          activeStandardId={activeStandardId}
-          onStandardChange={setActiveStandardId}
-        />
-
         {/* Metric Selector */}
         <details className="rounded-md border p-3">
           <summary className="text-sm font-medium cursor-pointer select-none">
