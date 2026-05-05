@@ -299,9 +299,15 @@ def _find_matching_rule(
 ) -> RuleDefinition | None:
     """
     Find the first rule that matches the given metric and value range.
-    Returns None if no rule matches (which should not happen with the default set).
+
+    Fallback: if no exact match exists but a GOOD-range rule is defined,
+    infer WATCH band based on direction (above max or below min).
+    This handles standards that only define the acceptable range
+    (e.g., SS 554 defines temp 23-26 as GOOD but no WATCH bands).
     """
     target_rules = rules if rules is not None else _DEFAULT_RULES
+
+    # First pass: exact range match
     for rule in target_rules:
         if rule.metric_name != metric_name:
             continue
@@ -309,7 +315,53 @@ def _find_matching_rule(
         max_ok = rule.max_value is None or value <= rule.max_value
         if min_ok and max_ok:
             return rule
-    return None
+
+    # Fallback: value outside GOOD range — infer WATCH band from nearest GOOD rule
+    good_rule = None
+    for rule in target_rules:
+        if rule.metric_name == metric_name and rule.band == ThresholdBand.GOOD:
+            good_rule = rule
+            break
+
+    if good_rule is None:
+        return None
+
+    # Determine direction: value is above max or below min
+    above = good_rule.max_value is not None and value > good_rule.max_value
+    below = good_rule.min_value is not None and value < good_rule.min_value
+
+    if not above and not below:
+        return None  # Shouldn't happen, but safety fallback
+
+    # Build an inferred WATCH rule
+    if above:
+        inferred_min = good_rule.max_value
+        inferred_max = None
+    else:
+        inferred_min = None
+        inferred_max = good_rule.min_value
+
+    metric_short = {
+        MetricName.co2_ppm: "CO2",
+        MetricName.pm25_ugm3: "PM25",
+        MetricName.tvoc_ppb: "TVOC",
+        MetricName.temperature_c: "TEMP",
+        MetricName.humidity_rh: "HUM",
+    }.get(metric_name, metric_name.value.upper())
+
+    return RuleDefinition(
+        metric_name=metric_name,
+        band=ThresholdBand.WATCH,
+        min_value=inferred_min,
+        max_value=inferred_max,
+        interpretation_template=f"{metric_name.value} of {{value}} is outside the acceptable range.",
+        workforce_impact_template="Conditions may affect occupant comfort or health.",
+        recommendation_template="Review environmental controls and take corrective action.",
+        rule_id=f"R-{metric_short}-WATCH",
+        citation_unit_ids=good_rule.citation_unit_ids,
+        confidence_level=ConfidenceLevel.MEDIUM,
+        reference_source_id=good_rule.reference_source_id,
+    )
 
 
 def _fill_template(template: str, value: float) -> str:

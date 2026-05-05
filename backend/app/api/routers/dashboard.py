@@ -86,9 +86,9 @@ async def get_sites(session: SessionDep, tenant_id: TenantIdDep):
             "threshold_band": f.threshold_band.value,
         })
 
-    # ── Batch fetch upload count per site ──────────────────────────────
+    # ── Batch fetch upload count per site (distinct content hashes) ────────
     upload_counts = session.exec(
-        select(Upload.site_id, sa.func.count(Upload.id).label("count"))
+        select(Upload.site_id, sa.func.count(sa.distinct(Upload.content_hash)).label("count"))
         .where(col(Upload.site_id).in_(site_ids))
         .group_by(Upload.site_id)
     ).all()
@@ -147,7 +147,7 @@ async def get_sites(session: SessionDep, tenant_id: TenantIdDep):
             "standards_evaluated": latest_upload.standards_evaluated if latest_upload else [],
             "certification_outcome": outcome,
             "wellness_index_score": score,
-            "last_scan_date": latest_finding.created_at.isoformat() if latest_finding else None,
+            "last_scan_date": latest_upload.uploaded_at.isoformat() if latest_upload and latest_upload.uploaded_at else None,
             "scan_count": upload_count_by_site.get(site.id, 0),
             "first_scan_date": first_scan_by_site[site.id].isoformat() if site.id in first_scan_by_site else None,
         })

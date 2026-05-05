@@ -29,11 +29,13 @@ export function UploadModal({ open, onOpenChange, onUploadComplete }: UploadModa
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="max-w-2xl h-[600px] flex flex-col overflow-hidden gap-0">
+        <DialogHeader className="px-6 pt-6 pb-2">
           <DialogTitle>Upload Scan Data</DialogTitle>
         </DialogHeader>
-        <UploadForm onUploadComplete={handleComplete} />
+        <div className="px-6 pb-6 overflow-y-auto flex-1">
+          <UploadForm onUploadComplete={handleComplete} />
+        </div>
       </DialogContent>
     </Dialog>
   );

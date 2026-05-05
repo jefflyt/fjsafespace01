@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { api } from "@/lib/api"
-import { cn } from "@/lib/utils"
+import { api, apiClient } from "@/lib/api"
+import { cn, getOutcomeConfig, getScoreColor, formatDate } from "@/lib/utils"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -88,71 +88,11 @@ interface SiteStandard {
   is_active: boolean;
 }
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
-function getOutcomeColor(outcome: string): string {
-  switch (outcome) {
-    case "HEALTHY_WORKPLACE_CERTIFIED":
-      return "bg-green-50 text-green-700 border-green-200"
-    case "HEALTHY_SPACE_VERIFIED":
-      return "bg-amber-50 text-amber-700 border-amber-200"
-    case "IMPROVEMENT_RECOMMENDED":
-      return "bg-red-50 text-red-700 border-red-200"
-    case "INSUFFICIENT_EVIDENCE":
-      return "bg-gray-100 text-gray-600 border-gray-200"
-    default:
-      return "bg-gray-100 text-gray-600 border-gray-200"
-  }
-}
-
-function getOutcomeIcon(outcome: string) {
-  switch (outcome) {
-    case "HEALTHY_WORKPLACE_CERTIFIED":
-      return <ShieldCheck size={14} />
-    case "HEALTHY_SPACE_VERIFIED":
-      return <ShieldCheck size={14} />
-    case "IMPROVEMENT_RECOMMENDED":
-      return <ShieldAlert size={14} />
-    case "INSUFFICIENT_EVIDENCE":
-      return <ShieldX size={14} />
-    default:
-      return null
-  }
-}
-
-function getOutcomeLabel(outcome: string): string {
-  switch (outcome) {
-    case "HEALTHY_WORKPLACE_CERTIFIED":
-      return "Certified"
-    case "HEALTHY_SPACE_VERIFIED":
-      return "Verified"
-    case "IMPROVEMENT_RECOMMENDED":
-      return "Improvement Needed"
-    case "INSUFFICIENT_EVIDENCE":
-      return "Insufficient Data"
-    default:
-      return outcome
-  }
-}
-
-function getScoreColor(score: number): string {
-  if (score >= 80) return "text-green-600"
-  if (score >= 60) return "text-amber-600"
-  if (score > 0) return "text-red-600"
-  return "text-muted-foreground"
-}
+// ── Helpers ────────────────────────────────────────────────────────────────
+// Using shared utilities from @/lib/utils: getOutcomeConfig, getScoreColor, formatDate
 
 function formatScore(score: number): string {
-  return score.toFixed(1)
-}
-
-function formatDate(dateStr: string | null): string {
-  if (!dateStr) return "No scans yet"
-  return new Date(dateStr).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  })
+  return score.toFixed(1) + "%"
 }
 
 // ── Components ───────────────────────────────────────────────────────────────
@@ -191,7 +131,7 @@ function HealthSummaryCard({ ratings }: { ratings: HealthRatings }) {
         <div className="mt-4 border-t pt-4 flex items-center justify-center gap-3">
           <span className="text-xs text-muted-foreground uppercase tracking-wider">Average Wellness Index</span>
           <span className={cn("font-heading text-2xl font-bold tabular-nums", getScoreColor(ratings.average_wellness_index))}>
-            {formatScore(ratings.average_wellness_index)}%
+            {formatScore(ratings.average_wellness_index)}
           </span>
           <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
         </div>
@@ -310,24 +250,17 @@ export default function ExecutiveDashboardPage() {
     Promise.all([
       api.get<ExecutiveDashboardData>("/api/dashboard/executive"),
       api.get<UploadSummary[]>("/api/uploads"),
+      apiClient.getAllActiveSources().catch(() => []),
     ])
-      .then(([dashboardData, uploadsData]) => {
+      .then(([dashboardData, uploadsData, sourcesData]) => {
         setData(dashboardData)
         setUploads(uploadsData)
 
-        // Derive standards from leaderboard data
-        const standardTitles = new Set<string>()
-        for (const row of dashboardData.leaderboard) {
-          if (row.standard_scores) {
-            for (const s of row.standard_scores) {
-              standardTitles.add(s.title)
-            }
-          }
-        }
-        const standards: SiteStandard[] = Array.from(standardTitles).map((title, i) => ({
-          source_id: `standard-${i}`,
-          title,
-          is_active: true,
+        // Use actual ReferenceSources for standard filtering
+        const standards: SiteStandard[] = (sourcesData as any[]).map((s) => ({
+          source_id: s.id,
+          title: s.title,
+          is_active: s.status === "active",
         }))
         setAllStandards(standards)
         if (standards.length > 0) {
@@ -348,11 +281,18 @@ export default function ExecutiveDashboardPage() {
       const std = allStandards.find((s) => s.source_id === activeStandardId)
       if (std) {
         rows = rows
-          .map((row) => ({
-            ...row,
-            standard_scores: row.standard_scores?.filter((s) => s.title === std.title),
-          }))
-          .filter((row) => row.standard_scores && row.standard_scores.length > 0)
+          .map((row) => {
+            // If no standard_scores, keep the row (data comes from overall aggregation)
+            if (!row.standard_scores || row.standard_scores.length === 0) return row
+            return {
+              ...row,
+              standard_scores: row.standard_scores.filter((s) => s.title === std.title),
+            }
+          })
+          .filter((row) => {
+            if (!row.standard_scores || row.standard_scores.length === 0) return true
+            return row.standard_scores.length > 0
+          })
       }
     }
 
@@ -517,12 +457,16 @@ export default function ExecutiveDashboardPage() {
                       </div>
                       <div className="text-right">
                         <div className={cn("font-heading text-xl font-bold tabular-nums", getScoreColor(row.wellness_index_score))}>
-                          {formatScore(row.wellness_index_score)}%
+                          {formatScore(row.wellness_index_score)}
                         </div>
-                        <Badge variant="outline" className={cn("mt-1", getOutcomeColor(row.certification_outcome))}>
-                          {getOutcomeIcon(row.certification_outcome)}
-                          <span className="ml-1">{getOutcomeLabel(row.certification_outcome)}</span>
-                        </Badge>
+                        {(() => {
+                          const cfg = getOutcomeConfig(row.certification_outcome)
+                          return (
+                            <Badge variant="outline" className={cn("mt-1", cfg.bg, cfg.color)}>
+                              <span>{cfg.label}</span>
+                            </Badge>
+                          )
+                        })()}
                       </div>
                     </div>
                   ))}

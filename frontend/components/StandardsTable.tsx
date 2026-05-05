@@ -41,8 +41,10 @@ function getOutcomeBadge(outcome: string) {
       return { icon: ShieldAlert, label: 'Action Required', color: 'text-red-700 bg-red-50 border-red-200' };
     case 'COMING_SOON':
       return { icon: Info, label: 'Coming Soon', color: 'text-gray-700 bg-gray-50 border-gray-200' };
+    case 'INSUFFICIENT_EVIDENCE':
+      return { icon: Info, label: 'Partial Evidence', color: 'text-amber-700 bg-amber-50 border-amber-200' };
     default:
-      return { icon: Info, label: 'Insufficient Data', color: 'text-gray-700 bg-gray-50 border-gray-200' };
+      return { icon: Info, label: 'No Data', color: 'text-gray-700 bg-gray-50 border-gray-200' };
   }
 }
 

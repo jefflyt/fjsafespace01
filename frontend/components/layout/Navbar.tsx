@@ -1,8 +1,19 @@
+"use client"
+
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { ShieldCheck } from "lucide-react"
 import { NotificationBell } from "@/components/NotificationBell"
+import { cn } from "@/lib/utils"
 
 export function Navbar() {
+  const pathname = usePathname()
+
+  const isActive = (path: string) => {
+    if (path === "/") return pathname === "/"
+    return pathname?.startsWith(path)
+  }
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-14 max-w-7xl items-center px-6">
@@ -18,19 +29,28 @@ export function Navbar() {
           <nav className="flex items-center space-x-1 text-sm">
             <Link
               href="/"
-              className="rounded-md px-3 py-1.5 font-medium text-foreground/70 transition-colors hover:bg-muted hover:text-foreground"
+              className={cn(
+                "rounded-md px-3 py-1.5 font-medium transition-colors hover:bg-muted",
+                isActive("/") ? "text-foreground bg-muted" : "text-foreground/70 hover:text-foreground"
+              )}
             >
               Scan Listings
             </Link>
             <Link
               href="/executive"
-              className="rounded-md px-3 py-1.5 font-medium text-foreground/70 transition-colors hover:bg-muted hover:text-foreground"
+              className={cn(
+                "rounded-md px-3 py-1.5 font-medium transition-colors hover:bg-muted",
+                isActive("/executive") ? "text-foreground bg-muted" : "text-foreground/70 hover:text-foreground"
+              )}
             >
               Executive Summary
             </Link>
             <Link
               href="/admin/customers"
-              className="rounded-md px-3 py-1.5 font-medium text-foreground/70 transition-colors hover:bg-muted hover:text-foreground"
+              className={cn(
+                "rounded-md px-3 py-1.5 font-medium transition-colors hover:bg-muted",
+                isActive("/admin/customers") ? "text-foreground bg-muted" : "text-foreground/70 hover:text-foreground"
+              )}
             >
               Customers
             </Link>

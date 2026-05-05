@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 interface SiteOption {
   id: string;
@@ -111,11 +112,11 @@ export function ZoneAssignment({
       <div className="space-y-3">
         {zones.map((zone) => (
           <div key={zone} className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 border rounded-lg">
-            <div className="flex-1 min-w-[120px]">
+            <div className="flex-1 min-w-0">
               <span className="font-medium text-sm">{zone}</span>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 shrink-0">
               <Button
                 variant={modes[zone] === 'existing' ? 'default' : 'outline'}
                 size="sm"
@@ -134,7 +135,7 @@ export function ZoneAssignment({
 
             {modes[zone] === 'existing' ? (
               <select
-                className="flex-1 min-w-[200px] px-3 py-2 border rounded-md text-sm"
+                className="flex-1 min-w-0 px-3 py-2 border rounded-md text-sm bg-background"
                 value={selections[zone] || ''}
                 onChange={(e) => handleSelectChange(zone, e.target.value)}
               >
@@ -146,9 +147,8 @@ export function ZoneAssignment({
                 ))}
               </select>
             ) : (
-              <input
-                type="text"
-                className="flex-1 min-w-[200px] px-3 py-2 border rounded-md text-sm"
+              <Input
+                className="flex-1 min-w-0"
                 placeholder="Enter site name..."
                 value={newNames[zone]}
                 onChange={(e) => handleNameChange(zone, e.target.value)}

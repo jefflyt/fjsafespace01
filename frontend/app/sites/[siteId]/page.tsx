@@ -10,6 +10,7 @@ import { StandardsTable } from '@/components/StandardsTable';
 import { CustomerDetailsCard } from '@/components/CustomerDetailsCard';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { api, apiClient, MetricPreferences, UploadListItem, SiteDetail, ReferenceSource } from '@/lib/api';
+import { getScoreColor, formatDate } from '@/lib/utils';
 import type { Finding } from '@/components/findings/types';
 
 interface Reading {
@@ -227,13 +228,9 @@ export default function SiteDetailPage() {
               <div>
                 <p className="text-sm text-muted-foreground">Overall Wellness Index</p>
                 <span className={`text-4xl font-bold tabular-nums ${
-                  overallWellness != null
-                    ? overallWellness >= 80 ? 'text-green-600'
-                    : overallWellness >= 60 ? 'text-amber-600'
-                    : 'text-red-600'
-                    : 'text-muted-foreground'
+                  overallWellness != null ? getScoreColor(overallWellness) : 'text-muted-foreground'
                 }`}>
-                  {overallWellness != null ? Math.round(overallWellness) : '—'}
+                  {overallWellness != null ? `${Math.round(overallWellness)}%` : '—'}
                 </span>
               </div>
             </div>
@@ -291,6 +288,7 @@ export default function SiteDetailPage() {
             zoneName={zone}
             findings={filteredFindings}
             readings={readings}
+            standards={allSources.map((s) => ({ source_id: s.id, title: s.title, is_active: s.status === 'active' }))}
             siteId={siteId}
             metricPreferences={metricPreferences}
           />

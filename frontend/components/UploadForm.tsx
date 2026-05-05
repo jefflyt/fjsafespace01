@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { UploadCloud, FileText, X, AlertCircle, Loader2 } from "lucide-react";
 import { api, apiClient, PreviewUploadResponse, ConfirmUploadResponse, ConfirmUploadChild, SiteListingRow } from "@/lib/api";
 import { CustomerLookup } from "@/components/CustomerLookup";
@@ -30,13 +30,6 @@ export interface BatchUploadResult {
   children: ConfirmUploadChild[];
 }
 
-interface ReferenceSource {
-  id: string;
-  title: string;
-  publisher: string;
-  source_currency_status: string;
-}
-
 interface UploadFormProps {
   onUploadComplete?: (result: UploadResult | BatchUploadResult) => void;
 }
@@ -48,10 +41,6 @@ export function UploadForm({ onUploadComplete }: UploadFormProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
-
-  // R1-05: Standard selector
-  const [availableStandards, setAvailableStandards] = useState<ReferenceSource[]>([]);
-  const [selectedStandards, setSelectedStandards] = useState<string[]>([]);
 
   // R1-07: Two-step flow
   const [step, setStep] = useState<UploadStep>("lookup");
@@ -70,22 +59,6 @@ export function UploadForm({ onUploadComplete }: UploadFormProps) {
   const [previewResult, setPreviewResult] = useState<PreviewUploadResponse | null>(null);
   const [isPreviewing, setIsPreviewing] = useState(false);
   const [existingSites, setExistingSites] = useState<{ id: string; name: string }[]>([]);
-
-  useEffect(() => {
-    apiClient
-      .getRulebookSources()
-      .then((sources) => {
-        setAvailableStandards(sources);
-        // Default to SS554 if available
-        const ss554 = sources.find((s) => s.title.includes("SS 554") || s.title.includes("SS554"));
-        if (ss554) {
-          setSelectedStandards([ss554.id]);
-        } else if (sources.length > 0) {
-          setSelectedStandards([sources[0].id]);
-        }
-      })
-      .catch(console.error);
-  }, []);
 
   // Fetch existing sites for zone assignment dropdown
   useEffect(() => {
@@ -136,7 +109,7 @@ export function UploadForm({ onUploadComplete }: UploadFormProps) {
     }
   };
 
-  const isFormValid = file && selectedStandards.length > 0;
+  const isFormValid = file;
 
   // R1-07: Tenant selection and registration
   const handleTenantSelected = (tenantId: string, clientName: string) => {
@@ -221,7 +194,6 @@ export function UploadForm({ onUploadComplete }: UploadFormProps) {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("standards", JSON.stringify(selectedStandards));
       if (selectedTenantId) {
         formData.append("tenant_id", selectedTenantId);
       }
@@ -257,7 +229,7 @@ export function UploadForm({ onUploadComplete }: UploadFormProps) {
         file,
         selectedTenantId,
         zoneMapping,
-        selectedStandards,
+        null,
       );
 
       onUploadComplete?.(result);
@@ -310,10 +282,8 @@ export function UploadForm({ onUploadComplete }: UploadFormProps) {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="rounded-md border bg-white p-6">
-        <h2 className="text-lg font-semibold mb-4">Upload uHoo CSV</h2>
-
+    <div className="space-y-6">
+      <div>
         {/* Step: Customer Lookup */}
         {step === "lookup" && (
           <div className="space-y-4">
@@ -334,23 +304,21 @@ export function UploadForm({ onUploadComplete }: UploadFormProps) {
               Register a new customer — only name and email required.
             </p>
             <div className="space-y-3">
-              <div>
+              <div className="space-y-1">
                 <label className="text-sm font-medium">Client Name *</label>
-                <input
+                <Input
                   type="text"
                   value={regClientName}
                   onChange={(e) => setRegClientName(e.target.value)}
-                  className="w-full mt-1 px-3 py-2 border rounded-md"
                   placeholder="e.g., Acme Corporation"
                 />
               </div>
-              <div>
+              <div className="space-y-1">
                 <label className="text-sm font-medium">Contact Email *</label>
-                <input
+                <Input
                   type="email"
                   value={regContactEmail}
                   onChange={(e) => setRegContactEmail(e.target.value)}
-                  className="w-full mt-1 px-3 py-2 border rounded-md"
                   placeholder="e.g., contact@acme.com"
                 />
               </div>
@@ -385,47 +353,6 @@ export function UploadForm({ onUploadComplete }: UploadFormProps) {
                 </p>
               </div>
             )}
-
-            {/* R1-05: Standard Selector */}
-            <div className="mb-6 space-y-2">
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                Evaluation Standards
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {availableStandards.map((standard) => {
-                  const isSelected = selectedStandards.includes(standard.id);
-                  const isDraft = standard.source_currency_status === "DRAFT";
-                  return (
-                    <button
-                      key={standard.id}
-                      onClick={() => {
-                        if (isSelected) {
-                          if (selectedStandards.length > 1) {
-                            setSelectedStandards(
-                              selectedStandards.filter((id) => id !== standard.id)
-                            );
-                          }
-                        } else {
-                          setSelectedStandards([...selectedStandards, standard.id]);
-                        }
-                      }}
-                      className={`inline-flex items-center gap-1 rounded-full border px-3 py-1 text-sm transition-colors ${
-                        isSelected
-                          ? "border-primary bg-primary/10 text-primary"
-                          : "border-muted-foreground/25 text-muted-foreground hover:border-primary/50"
-                      } ${isDraft ? "opacity-60" : ""}`}
-                    >
-                      {standard.title}
-                      {isDraft && (
-                        <Badge variant="secondary" className="text-xs px-1">
-                          Draft
-                        </Badge>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
 
             {/* Dropzone */}
             <div

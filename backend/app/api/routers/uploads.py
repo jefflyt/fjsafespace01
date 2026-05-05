@@ -43,7 +43,7 @@ from app.models.supporting import Tenant
 from app.models.workflow_b import Finding, Reading, Upload, UploadBatch, Site
 from app.skills.data_ingestion.csv_parser import parse_csv, extract_zones
 from app.skills.data_ingestion.supabase_storage import SupabaseStorage, SupabaseStorageError
-from app.skills.iaq_rule_governor.rule_engine import evaluate_readings
+from app.skills.iaq_rule_governor.rule_engine import evaluate_readings, _DEFAULT_RULES
 from app.skills.iaq_rule_governor.wellness_index import calculate_wellness_index, derive_certification_outcome
 from app.services.db_rule_service import fetch_rules_by_standard
 
@@ -163,12 +163,24 @@ def _process_single_upload(
         std_rules = fetch_rules_by_standard(session, source.id, _DEFAULT_RULE_VERSION)
         if not std_rules:
             continue
+
+        # Identify metrics covered by DB rules for this standard
+        db_metric_names = {r.metric_name for r in std_rules}
+        all_metric_names = {r.metric_name for r in _DEFAULT_RULES}
+        uncovered_metrics = all_metric_names - db_metric_names
+
+        # Supplement with embedded defaults for uncovered metrics
+        combined_rules = list(std_rules)
+        for metric in uncovered_metrics:
+            embedded_rules = [r for r in _DEFAULT_RULES if r.metric_name == metric]
+            combined_rules.extend(embedded_rules)
+
         std_findings = evaluate_readings(
             rows_to_persist,
             site_id=site_id,
             upload_id=upload_id,
             rule_version=_DEFAULT_RULE_VERSION,
-            rules=std_rules,
+            rules=combined_rules,
         )
         eval_findings.extend(std_findings)
         standards_evaluated.append(source.id)
@@ -315,10 +327,13 @@ async def create_upload(
 
     # Dedup check
     content_hash = hashlib.sha256(file_bytes).hexdigest()
-    if not force and _tenant_id:
+    if _tenant_id:
         existing = _check_dedup_with_session(session, _tenant_id, content_hash)
         if existing:
-            return _build_duplicate_response(existing, _tenant_id, session)
+            if force:
+                _delete_upload_and_children(session, existing)
+            else:
+                return _build_duplicate_response(existing, _tenant_id, session)
 
     # Parse optional standards
     standards_evaluated = None
@@ -545,6 +560,20 @@ def _resolve_site(
             },
         )
         return new_site_id
+
+
+def _delete_upload_and_children(session: Session, upload: Upload) -> None:
+    """Delete an Upload and all its associated readings and findings."""
+    session.exec(
+        text("DELETE FROM finding WHERE upload_id = :uid"),
+        {"uid": upload.id},
+    )
+    session.exec(
+        text("DELETE FROM reading WHERE upload_id = :uid"),
+        {"uid": upload.id},
+    )
+    session.delete(upload)
+    session.commit()
 
 
 def _check_dedup_with_session(

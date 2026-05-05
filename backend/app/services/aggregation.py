@@ -83,8 +83,10 @@ def calculate_site_wellness_index(
     report = _get_latest_report_for_site(session, site_id)
     rule_version = report.rule_version_used if report else None
 
+    # R1 fallback: no report means uploads used the default rule version
     if not rule_version:
-        return 0.0, CertificationOutcome.INSUFFICIENT_EVIDENCE
+        from app.api.routers.uploads import _DEFAULT_RULE_VERSION
+        rule_version = _DEFAULT_RULE_VERSION
 
     weights = _get_rulebook_weights(session, rule_version)
     findings = _get_site_findings(session, site_id)
@@ -212,6 +214,10 @@ def get_leaderboard(
     """
     Build a cross-site leaderboard sorted by wellness_index_score DESC.
 
+    Deduplicates by site_name — when multi-zone CSV splits create multiple
+    Site records with the same name, keeps the most recent one and aggregates
+    finding counts.
+
     Returns:
         List of dicts with keys: site_id, site_name, wellness_index_score,
         certification_outcome, last_scan_date, finding_count
@@ -220,29 +226,55 @@ def get_leaderboard(
     if site_ids:
         sites = [s for s in sites if s.id in site_ids]
 
+    # Group sites by name to handle duplicates from multi-zone CSV splits
+    sites_by_name: dict[str, list[Site]] = {}
+    for s in sites:
+        sites_by_name.setdefault(s.name, []).append(s)
+
     rows = []
-    for site in sites:
-        score, outcome = calculate_site_wellness_index(session, site.id)
+    for site_name, site_group in sites_by_name.items():
+        # Aggregate data across all sites with the same name
+        best_site = None
+        best_score = 0.0
+        best_outcome = "INSUFFICIENT_EVIDENCE"
+        best_date = None
+        total_findings = 0
 
-        # Get last scan date from most recent finding
-        latest_finding = session.exec(
-            select(Finding)
-            .where(col(Finding.site_id) == site.id)
-            .order_by(col(Finding.created_at).desc())
-            .limit(1)
-        ).first()
+        for site in site_group:
+            score, outcome = calculate_site_wellness_index(session, site.id)
 
-        finding_count = session.exec(
-            select(Finding).where(col(Finding.site_id) == site.id)
-        ).all()
+            latest_finding = session.exec(
+                select(Finding)
+                .where(col(Finding.site_id) == site.id)
+                .order_by(col(Finding.created_at).desc())
+                .limit(1)
+            ).first()
+
+            finding_count = session.exec(
+                select(Finding).where(col(Finding.site_id) == site.id)
+            ).all()
+
+            total_findings += len(finding_count)
+
+            # Keep the site with the most recent findings
+            if latest_finding and (best_date is None or latest_finding.created_at > best_date):
+                best_site = site
+                best_date = latest_finding.created_at
+                best_score = score
+                best_outcome = outcome.value
+            elif best_site is None and not latest_finding:
+                # No findings for any site yet — use first one
+                best_site = site
+                best_score = score
+                best_outcome = outcome.value
 
         rows.append({
-            "site_id": site.id,
-            "site_name": site.name,
-            "wellness_index_score": score,
-            "certification_outcome": outcome.value,
-            "last_scan_date": latest_finding.created_at.isoformat() if latest_finding else None,
-            "finding_count": len(finding_count),
+            "site_id": best_site.id if best_site else site_group[0].id,
+            "site_name": site_name,
+            "wellness_index_score": best_score,
+            "certification_outcome": best_outcome,
+            "last_scan_date": best_date.isoformat() if best_date else None,
+            "finding_count": total_findings,
         })
 
     # Sort by wellness_index_score descending

@@ -17,6 +17,11 @@ from app.models.workflow_a import RulebookEntry
 from app.skills.iaq_rule_governor.rule_engine import RuleDefinition
 
 
+# Default recommendation for GOOD band — ensures consistency even if
+# database templates are contradictory.
+_GOOD_RECOMMENDATION = "No action required."
+
+
 # ── Band extraction ───────────────────────────────────────────────────────────
 
 
@@ -46,7 +51,7 @@ def extract_band_from_rule_id(rule_id: str) -> ThresholdBand | None:
 # ── Band inference (fallback for entries without rule_id) ─────────────────────
 
 
-def _infer_band(entry: RulebookEntry) -> ThresholdBand:
+def _infer_band(entry: RulebookEntry, entries_for_metric: list[RulebookEntry] | None = None) -> ThresholdBand:
     """
     Infer the ThresholdBand from a RulebookEntry's threshold_type and min/max values.
 
@@ -55,9 +60,9 @@ def _infer_band(entry: RulebookEntry) -> ThresholdBand:
                     min=fine, max=None  -> CRITICAL (exceeds the limit)
     - lower_bound:  max=None, min=fine  -> GOOD (anything above min is acceptable)
                     max=fine, min=None  -> CRITICAL (below the minimum)
-    - range:        min=0, max=fine     -> GOOD
-                    min>0, max=fine     -> WATCH
-                    min=fine, max=None  -> CRITICAL
+    - range:        min=fine, max=fine  -> GOOD if it's the only/lowermost range
+                                          (defines the acceptable comfort zone)
+                                         WATCH if there's a lower range entry
     """
     threshold_type = entry.threshold_type if hasattr(entry, "threshold_type") else None
 
@@ -74,19 +79,30 @@ def _infer_band(entry: RulebookEntry) -> ThresholdBand:
         if entry.max_value is not None and entry.min_value is None:
             return ThresholdBand.CRITICAL
     elif threshold_type == "range":
+        # range with both bounds: check if there's a lower entry for same metric
+        if entry.min_value is not None and entry.max_value is not None:
+            if entries_for_metric:
+                # If there's another range entry with a lower min_value, this is WATCH
+                has_lower = any(
+                    e.id != entry.id
+                    and e.threshold_type == "range"
+                    and e.min_value is not None
+                    and e.min_value < entry.min_value
+                    for e in entries_for_metric
+                )
+                if has_lower:
+                    return ThresholdBand.WATCH
+            # Otherwise: only entry or lowermost range = GOOD (acceptable zone)
+            return ThresholdBand.GOOD
         if entry.min_value is not None and entry.max_value is None:
             return ThresholdBand.CRITICAL
-        if entry.min_value == 0:
-            return ThresholdBand.GOOD
-        if entry.min_value is not None and entry.max_value is not None:
-            return ThresholdBand.WATCH
+        if entry.min_value is None and entry.max_value is not None:
+            return ThresholdBand.CRITICAL
 
     # Fallback for entries without threshold_type (legacy)
     if entry.max_value is None or entry.min_value is None:
         return ThresholdBand.CRITICAL
-    if entry.min_value == 0:
-        return ThresholdBand.GOOD
-    return ThresholdBand.WATCH
+    return ThresholdBand.GOOD
 
 
 def _build_rule_id(metric_name: MetricName, band: ThresholdBand) -> str:
@@ -105,11 +121,19 @@ def _build_rule_id(metric_name: MetricName, band: ThresholdBand) -> str:
     return f"R-{metric_short}-{band.value}"
 
 
-def entry_to_rule_definition(entry: RulebookEntry) -> RuleDefinition:
+def entry_to_rule_definition(
+    entry: RulebookEntry,
+    entries_for_metric: list[RulebookEntry] | None = None,
+) -> RuleDefinition:
     """Convert a RulebookEntry to a RuleDefinition for use by the rule engine."""
     metric_name = MetricName(entry.metric_name) if isinstance(entry.metric_name, str) else entry.metric_name
 
-    band = _infer_band(entry)
+    band = _infer_band(entry, entries_for_metric)
+
+    # GOOD band always gets "No action required" recommendation
+    recommendation = entry.recommendation_template
+    if band == ThresholdBand.GOOD:
+        recommendation = _GOOD_RECOMMENDATION
 
     return RuleDefinition(
         metric_name=metric_name,
@@ -118,7 +142,7 @@ def entry_to_rule_definition(entry: RulebookEntry) -> RuleDefinition:
         max_value=entry.max_value,
         interpretation_template=entry.interpretation_template,
         workforce_impact_template=entry.business_impact_template,
-        recommendation_template=entry.recommendation_template,
+        recommendation_template=recommendation,
         rule_id=_build_rule_id(metric_name, band),
         citation_unit_ids=[cid.strip() for cid in entry.citation_unit_ids.split(",") if cid.strip()],
         confidence_level=entry.confidence_level,
@@ -140,7 +164,18 @@ def fetch_rules_from_db(session: Session, rule_version: str) -> list[RuleDefinit
         .where(col(RulebookEntry.approval_status) == "approved")
     ).all()
 
-    return [entry_to_rule_definition(e) for e in entries]
+    # Group entries by metric_name for band inference context
+    by_metric: dict[str, list[RulebookEntry]] = {}
+    for e in entries:
+        metric_key = e.metric_name if isinstance(e.metric_name, str) else e.metric_name.value
+        by_metric.setdefault(metric_key, []).append(e)
+
+    return [
+        entry_to_rule_definition(e, by_metric.get(
+            e.metric_name if isinstance(e.metric_name, str) else e.metric_name.value, []
+        ))
+        for e in entries
+    ]
 
 
 def get_latest_approved_version(session: Session) -> str | None:
@@ -180,4 +215,15 @@ def fetch_rules_by_standard(
         .where(col(RulebookEntry.approval_status) == "approved")
     ).all()
 
-    return [entry_to_rule_definition(e) for e in entries]
+    # Group entries by metric_name for band inference context
+    by_metric: dict[str, list[RulebookEntry]] = {}
+    for e in entries:
+        metric_key = e.metric_name if isinstance(e.metric_name, str) else e.metric_name.value
+        by_metric.setdefault(metric_key, []).append(e)
+
+    return [
+        entry_to_rule_definition(e, by_metric.get(
+            e.metric_name if isinstance(e.metric_name, str) else e.metric_name.value, []
+        ))
+        for e in entries
+    ]
