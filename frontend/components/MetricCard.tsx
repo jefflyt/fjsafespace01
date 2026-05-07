@@ -53,7 +53,7 @@ export function MetricCard({
   const BandIcon = band.icon;
 
   return (
-    <Card className={`transition-all hover:shadow-md ${band.border}`}>
+    <Card className={`transition-shadow hover:shadow-md ${band.border}`}>
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center justify-between">
           <span className="text-sm font-semibold">

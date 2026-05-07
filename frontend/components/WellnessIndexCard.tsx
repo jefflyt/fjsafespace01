@@ -97,7 +97,7 @@ export function WellnessIndexCard({
   const OutcomeIcon = config.icon;
 
   return (
-    <Card className="transition-all hover:shadow-md">
+    <Card className="transition-shadow hover:shadow-md">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center justify-between">
           <span className="text-sm font-heading font-semibold">{siteName}</span>

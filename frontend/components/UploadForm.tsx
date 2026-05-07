@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { UploadCloud, FileText, X, AlertCircle, Loader2 } from "lucide-react";
 import { api, apiClient, PreviewUploadResponse, ConfirmUploadResponse, ConfirmUploadChild, SiteListingRow } from "@/lib/api";
 import { CustomerLookup } from "@/components/CustomerLookup";
@@ -469,25 +470,29 @@ export function UploadForm({ onUploadComplete }: UploadFormProps) {
 
         {/* R1-08: Duplicate Detection Dialog */}
         {duplicateResult && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-background rounded-lg p-6 max-w-md w-full mx-4 shadow-xl border">
-              <div className="flex items-center gap-3 mb-4">
-                <AlertCircle className="h-6 w-6 text-amber-500" />
-                <h3 className="text-lg font-semibold">Duplicate Upload Detected</h3>
+          <Dialog open={true} onOpenChange={() => setDuplicateResult(null)}>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-3">
+                  <AlertCircle className="h-6 w-6 text-amber-500" />
+                  Duplicate Upload Detected
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  This CSV file was previously uploaded on{" "}
+                  <span className="font-medium">
+                    {new Date(duplicateResult.uploaded_at).toLocaleDateString()}
+                  </span>
+                  {duplicateResult.file_name && (
+                    <> — <code className="text-xs bg-muted px-1 rounded">{duplicateResult.file_name}</code></>
+                  )}
+                  .
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Would you like to view the existing findings instead?
+                </p>
               </div>
-              <p className="text-sm text-muted-foreground mb-2">
-                This CSV file was previously uploaded on{" "}
-                <span className="font-medium">
-                  {new Date(duplicateResult.uploaded_at).toLocaleDateString()}
-                </span>
-                {duplicateResult.file_name && (
-                  <> — <code className="text-xs bg-muted px-1 rounded">{duplicateResult.file_name}</code></>
-                )}
-                .
-              </p>
-              <p className="text-sm text-muted-foreground mb-6">
-                Would you like to view the existing findings instead?
-              </p>
               <div className="flex gap-3 justify-end">
                 <Button
                   variant="ghost"
@@ -514,8 +519,8 @@ export function UploadForm({ onUploadComplete }: UploadFormProps) {
                   View Existing Findings
                 </Button>
               </div>
-            </div>
-          </div>
+            </DialogContent>
+          </Dialog>
         )}
       </div>
     </div>

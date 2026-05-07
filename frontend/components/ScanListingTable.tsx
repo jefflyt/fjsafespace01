@@ -94,7 +94,7 @@ export function ScanListingTable({ data, loading, onRowClick }: ScanListingTable
             <Fragment key={`group-${group.tenantName}`}>
               <TableRow
                 key={`tenant-${group.tenantName}`}
-                className="bg-muted/30 cursor-pointer hover:bg-muted/50"
+                className="bg-muted/30 cursor-pointer hover:bg-muted/50 active:bg-muted/60 transition-colors"
                 onClick={() => toggleTenant(group.tenantName)}
               >
                 <TableCell>
@@ -112,7 +112,7 @@ export function ScanListingTable({ data, loading, onRowClick }: ScanListingTable
                 group.sites.map((site) => (
                   <TableRow
                     key={site.site_id}
-                    className="cursor-pointer hover:bg-muted/30"
+                    className="cursor-pointer hover:bg-muted/30 active:bg-muted/40 transition-colors"
                     onClick={() => onRowClick(site.site_id, site.all_site_ids)}
                   >
                     <TableCell />

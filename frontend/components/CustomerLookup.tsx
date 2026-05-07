@@ -75,7 +75,7 @@ export function CustomerLookup({ onTenantSelected, onRegisterNew }: CustomerLook
       </div>
 
       {showDropdown && query.length >= 2 && (
-        <div className="absolute left-0 right-0 z-50 mt-1 rounded-md border bg-background shadow-lg max-h-64 overflow-auto">
+        <div className="absolute left-0 right-0 z-50 mt-1 rounded-md border bg-background shadow-lg max-h-64 overflow-auto animate-dropdown-enter">
           {isLoading ? (
             <div className="p-4 text-center text-sm text-muted-foreground">
               Searching...
