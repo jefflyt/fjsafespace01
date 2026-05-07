@@ -4,13 +4,15 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ZoneDetailView } from '@/components/ZoneDetailView';
 import { ScanHistoryTable } from '@/components/ScanHistoryTable';
 import { StandardsTable } from '@/components/StandardsTable';
 import { CustomerDetailsCard } from '@/components/CustomerDetailsCard';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { Sidebar } from '@/components/layout/Sidebar';
 import { api, apiClient, MetricPreferences, UploadListItem, SiteDetail, ReferenceSource } from '@/lib/api';
 import { getScoreColor, formatDate } from '@/lib/utils';
+import { ChevronRight, Home, ShieldCheck, ShieldAlert, Activity } from 'lucide-react';
 import type { Finding } from '@/components/findings/types';
 
 interface Reading {
@@ -36,6 +38,7 @@ export default function SiteDetailPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const siteId = params.siteId as string;
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const allSiteIds = useMemo(() => {
     const idsParam = searchParams.get('siteIds');
@@ -77,7 +80,6 @@ export default function SiteDetailPage() {
       }
       if (prefsRes) setMetricPreferences(prefsRes);
       if (uploadsRes) {
-        // Deduplicate by content_hash — force-uploads of same CSV should count as one
         const seen = new Set<string>();
         const unique = (uploadsRes as UploadListItem[]).filter((u) => {
           if (u.content_hash && seen.has(u.content_hash)) return false;
@@ -185,124 +187,272 @@ export default function SiteDetailPage() {
     fetchAll();
   }, [fetchAll]);
 
+  // ── Loading skeleton ──────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-6 py-6">
-        <Card>
-          <CardContent className="py-12 text-center">
-            <Loader2 className="mx-auto h-8 w-8 animate-spin text-muted-foreground mb-4" />
-            <p className="text-sm text-muted-foreground">Loading scan results...</p>
-          </CardContent>
-        </Card>
+      <div className="flex">
+        <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        <div className="flex-1 lg:pl-60">
+          <MobileTopBar onMenuClick={() => setSidebarOpen(true)} title="Site Detail" />
+          <div className="px-4 md:px-6 py-6 space-y-6">
+            {/* Breadcrumb skeleton */}
+            <Skeleton className="h-5 w-48" />
+            {/* Header skeleton */}
+            <div className="space-y-2">
+              <Skeleton className="h-9 w-64" />
+              <Skeleton className="h-5 w-80" />
+            </div>
+            {/* KPI strip skeleton */}
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+              <Skeleton className="h-28 rounded-lg" />
+              <Skeleton className="h-28 rounded-lg" />
+              <Skeleton className="h-28 rounded-lg" />
+              <Skeleton className="h-28 rounded-lg" />
+            </div>
+            {/* Standards skeleton */}
+            <Skeleton className="h-40 rounded-lg" />
+            {/* Scan history skeleton */}
+            <Skeleton className="h-32 rounded-lg" />
+          </div>
+        </div>
       </div>
     );
   }
 
   const displayName = siteDetail?.site_name || siteId;
 
+  // Score color for wellness gauge
+  const wellnessColor =
+    overallWellness != null
+      ? overallWellness >= 75
+        ? 'text-healthy'
+        : overallWellness >= 50
+          ? 'text-warning'
+          : 'text-destructive'
+      : 'text-muted-foreground';
+
+  const wellnessRingColor =
+    overallWellness != null
+      ? overallWellness >= 75
+        ? 'stroke-healthy'
+        : overallWellness >= 50
+          ? 'stroke-warning'
+          : 'stroke-destructive'
+      : 'stroke-muted';
+
+  // ── Main content ──────────────────────────────────────────────────
   return (
-    <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
-      {/* Back button */}
-      <Button variant="ghost" size="sm" onClick={() => router.push('/')} className="gap-1">
-        <ArrowLeft className="h-4 w-4" /> Back to Scan Listings
-      </Button>
+    <div className="flex">
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <div className="flex-1 lg:pl-60">
+        <MobileTopBar onMenuClick={() => setSidebarOpen(true)} title={displayName} />
 
-      {/* Page header */}
-      <div className="border-b pb-4">
-        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">Scan Details</p>
-        <h1 className="text-3xl font-bold tracking-tight">{displayName}</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          {siteDetail?.tenant_name ? `${siteDetail.tenant_name} · ` : ''}
-          {uploads.length} scan{uploads.length !== 1 ? 's' : ''} total
-          {lastScanDate ? ` · Last scan: ${lastScanDate}` : ''}
-        </p>
-      </div>
+        <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
+          {/* Breadcrumb */}
+          <nav className="flex items-center gap-1 text-sm text-muted-foreground animate-fade-in">
+            <button
+              onClick={() => router.push('/')}
+              className="hover:text-foreground transition-colors"
+            >
+              <Home className="h-3.5 w-3.5" />
+            </button>
+            <ChevronRight className="h-3 w-3" />
+            <button
+              onClick={() => router.push('/')}
+              className="hover:text-foreground transition-colors"
+            >
+              Scans
+            </button>
+            <ChevronRight className="h-3 w-3" />
+            <span className="text-foreground font-medium truncate max-w-[200px]">{displayName}</span>
+          </nav>
 
-      {/* Customer Details */}
-      <CustomerDetailsCard
-        tenantName={siteDetail?.tenant_name ?? null}
-        contactPerson={siteDetail?.contact_person ?? null}
-        contactEmail={siteDetail?.contact_email ?? null}
-        siteAddress={siteDetail?.site_address ?? null}
-        premisesType={siteDetail?.premises_type ?? null}
-        tenantId={siteDetail?.tenant_id ?? null}
-        onUpdate={handleCustomerUpdate}
-      />
+          {/* Page header */}
+          <div className="animate-fade-in">
+            <h1 className="font-heading text-3xl font-bold tracking-tight">{displayName}</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              {siteDetail?.tenant_name ? `${siteDetail.tenant_name} · ` : ''}
+              {uploads.length} scan{uploads.length !== 1 ? 's' : ''} total
+              {lastScanDate ? ` · Last scan: ${lastScanDate}` : ''}
+            </p>
+          </div>
 
-      {/* Overall Score Card */}
-      {standardsEntries.some((s) => s.score != null) && (
-        <Card className="transition-all hover:shadow-md">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Overall Wellness Index</p>
-                <span className={`text-4xl font-bold tabular-nums ${
-                  overallWellness != null ? getScoreColor(overallWellness) : 'text-muted-foreground'
-                }`}>
-                  {overallWellness != null ? `${Math.round(overallWellness)}%` : '—'}
-                </span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+          {/* Wellness gauge + KPI strip */}
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 animate-fade-in">
+            {/* Wellness gauge — featured card */}
+            <Card className="border-l-2 border-l-primary bg-accent/30">
+              <CardContent className="pt-6 flex flex-col items-center">
+                <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Wellness Index</p>
+                <div className="relative h-24 w-24">
+                  {/* Background ring */}
+                  <svg className="h-full w-full -rotate-90" viewBox="0 0 36 36">
+                    <circle
+                      cx="18" cy="18" r="15.915"
+                      fill="none"
+                      strokeWidth="3"
+                      className="stroke-muted"
+                    />
+                    {/* Progress ring */}
+                    {overallWellness != null && (
+                      <circle
+                        cx="18" cy="18" r="15.915"
+                        fill="none"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        strokeDasharray={`${Math.round(overallWellness)} 100`}
+                        className={wellnessRingColor}
+                      />
+                    )}
+                  </svg>
+                  {/* Center value */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className={`font-mono text-2xl font-bold tabular-nums ${wellnessColor}`}>
+                      {overallWellness != null ? `${Math.round(overallWellness)}` : '—'}
+                    </span>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">/ 100</p>
+              </CardContent>
+            </Card>
 
-      {/* Certification Standards */}
-      {standardsEntries.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Certification Standards</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <StandardsTable
-              standards={standardsEntries}
-              activeStandardId={activeStandard}
-              onStandardChange={(id) => {
-                setActiveStandard(id);
-              }}
-            />
-          </CardContent>
-        </Card>
-      )}
+            {/* Standard score cards */}
+            {standardsEntries.slice(0, 3).map((std) => {
+              const scorePct = std.score != null ? Math.round(std.score) : 0;
+              const barColor =
+                std.outcome === 'PASS' || std.outcome === 'HEALTHY_WORKPLACE_CERTIFIED'
+                  ? 'bg-healthy'
+                  : std.outcome === 'FAIL' || std.outcome === 'IMPROVEMENT_REQUIRED'
+                    ? 'bg-destructive'
+                    : 'bg-warning';
+              const iconColor =
+                std.outcome === 'PASS' || std.outcome === 'HEALTHY_WORKPLACE_CERTIFIED'
+                  ? 'text-healthy'
+                  : std.outcome === 'FAIL' || std.outcome === 'IMPROVEMENT_REQUIRED'
+                    ? 'text-destructive'
+                    : 'text-warning';
 
-      {/* Scan History */}
-      {uploads.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Scan History</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ScanHistoryTable
-              uploads={uploads}
-              onRowClick={(uploadId) => {
-                console.log('Selected upload:', uploadId);
-              }}
-            />
-          </CardContent>
-        </Card>
-      )}
+              return (
+                <Card
+                  key={std.sourceId}
+                  className="transition-all duration-150 ease-out hover:border-primary/50 hover:shadow-sm animate-fade-in"
+                >
+                  <CardContent className="pt-6">
+                    <div className="flex items-center gap-2 mb-3">
+                      {std.outcome === 'PASS' ? (
+                        <ShieldCheck className={`h-4 w-4 ${iconColor}`} />
+                      ) : (
+                        <ShieldAlert className={`h-4 w-4 ${iconColor}`} />
+                      )}
+                      <p className="text-xs uppercase tracking-wider text-muted-foreground truncate">{std.shortTitle}</p>
+                    </div>
+                    <p className={`font-mono text-3xl font-bold tabular-nums ${
+                      std.score != null ? getScoreColor(std.score) : 'text-muted-foreground'
+                    }`}>
+                      {std.score != null ? `${Math.round(std.score)}` : '—'}
+                    </p>
+                    {/* Score bar */}
+                    <div className="mt-3 h-1.5 rounded-full bg-muted overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all duration-300 ${barColor}`}
+                        style={{ width: `${scorePct}%` }}
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1.5">
+                      {std.metricCount} metric{std.metricCount !== 1 ? 's' : ''}
+                    </p>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
 
-      {/* Zone Details */}
-      {zones.length === 0 ? (
-        <Card>
-          <CardContent className="py-12 text-center text-muted-foreground">
-            <p className="text-lg font-medium">No findings for this scan</p>
-            <p className="text-sm mt-2">All metrics are within acceptable ranges.</p>
-          </CardContent>
-        </Card>
-      ) : (
-        zones.map((zone) => (
-          <ZoneDetailView
-            key={zone}
-            zoneName={zone}
-            findings={filteredFindings}
-            readings={readings}
-            siteId={siteId}
-            metricPreferences={metricPreferences}
+          {/* Customer Details */}
+          <CustomerDetailsCard
+            tenantName={siteDetail?.tenant_name ?? null}
+            contactPerson={siteDetail?.contact_person ?? null}
+            contactEmail={siteDetail?.contact_email ?? null}
+            siteAddress={siteDetail?.site_address ?? null}
+            premisesType={siteDetail?.premises_type ?? null}
+            tenantId={siteDetail?.tenant_id ?? null}
+            onUpdate={handleCustomerUpdate}
           />
-        ))
-      )}
+
+          {/* Certification Standards */}
+          {standardsEntries.length > 0 && (
+            <Card className="animate-fade-in">
+              <CardHeader className="pb-3">
+                <CardTitle className="font-heading text-lg font-semibold">Certification Standards</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <StandardsTable
+                  standards={standardsEntries}
+                  activeStandardId={activeStandard}
+                  onStandardChange={(id) => setActiveStandard(id)}
+                />
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Scan History */}
+          {uploads.length > 0 && (
+            <Card className="animate-fade-in">
+              <CardHeader className="pb-3">
+                <CardTitle className="font-heading text-lg font-semibold">Scan History</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ScanHistoryTable uploads={uploads} onRowClick={() => {}} />
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Zone Details */}
+          {zones.length === 0 ? (
+            <Card className="animate-fade-in">
+              <CardContent className="py-16 text-center">
+                <Activity className="mx-auto h-12 w-12 text-muted-foreground/40 mb-4" />
+                <p className="font-heading text-lg font-semibold">No findings for this scan</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  All metrics are within acceptable ranges.
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-6">
+              <div className="flex items-center gap-2">
+                <Activity className="h-4 w-4 text-muted-foreground" />
+                <h2 className="font-heading text-xl font-semibold">Zone Analysis</h2>
+                <span className="text-sm text-muted-foreground">({zones.length} zone{zones.length !== 1 ? 's' : ''})</span>
+              </div>
+              {zones.map((zone) => (
+                <ZoneDetailView
+                  key={zone}
+                  zoneName={zone}
+                  findings={filteredFindings}
+                  readings={readings}
+                  siteId={siteId}
+                  metricPreferences={metricPreferences}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
+  );
+}
+
+// ── Mobile Top Bar ───────────────────────────────────────────────────────────
+
+function MobileTopBar({ onMenuClick, title }: { onMenuClick: () => void; title: string }) {
+  return (
+    <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur-md lg:hidden">
+      <Button variant="ghost" size="sm" onClick={onMenuClick} className="px-2">
+        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </Button>
+      <span className="font-heading text-sm font-semibold truncate">{title}</span>
+    </header>
   );
 }
 

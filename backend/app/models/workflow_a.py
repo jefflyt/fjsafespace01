@@ -51,7 +51,6 @@ class ReferenceSource(SQLModel, table=True):
 
     citation_units: list["CitationUnit"] = Relationship(back_populates="source")
     entries: list["RulebookEntry"] = Relationship(back_populates="source")
-    entries: list["RulebookEntry"] = Relationship(back_populates="source")
 
 
 # ── CitationUnit ──────────────────────────────────────────────────────────────
@@ -93,6 +92,8 @@ class RulebookEntry(SQLModel, table=True):
 
     id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True)
     metric_name: MetricName
+    # GOOD | WATCH | CRITICAL — explicit band, not inferred
+    threshold_band: Optional[str] = None  # "GOOD", "WATCH", or "CRITICAL"
     # range | upper_bound | lower_bound
     threshold_type: str
     min_value: Optional[float] = None

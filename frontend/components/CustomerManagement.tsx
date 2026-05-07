@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { apiClient, TenantDetail as TenantDetailType, TenantSummary } from "@/lib/api";
 import {
   Table,
@@ -17,10 +18,11 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Pencil, Save, X } from "lucide-react";
+import { Pencil, Save, X, Users } from "lucide-react";
 
 export function CustomerManagement() {
   const [tenants, setTenants] = useState<TenantSummary[]>([]);
@@ -69,7 +71,6 @@ export function CustomerManagement() {
       const refreshed = await apiClient.getTenant(selectedTenant.id);
       setSelectedTenant(refreshed);
       setIsEditing(false);
-      // Refresh list
       apiClient.getTenants().then(setTenants);
     } catch (err) {
       console.error("Failed to update tenant:", err);
@@ -79,32 +80,36 @@ export function CustomerManagement() {
   };
 
   if (isLoading) {
-    return <div className="text-center py-8 text-muted-foreground">Loading customers...</div>;
+    return <Skeleton className="h-72 rounded-lg" />;
   }
 
   return (
     <>
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Client Name</TableHead>
-              <TableHead>Site Address</TableHead>
-              <TableHead>Contact Person</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead className="text-right">Scans</TableHead>
-              <TableHead className="text-right">Sites</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {tenants.length === 0 ? (
+      {tenants.length === 0 ? (
+        <div className="rounded-lg border bg-card animate-fade-in">
+          <div className="py-16 text-center">
+            <Users className="mx-auto h-12 w-12 text-muted-foreground/40 mb-4" />
+            <p className="font-heading text-lg font-semibold">No customers yet</p>
+            <p className="text-sm text-muted-foreground mt-1 mb-4">
+              Upload a CSV scan to create your first customer.
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="rounded-md border animate-fade-in">
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
-                  No customers yet. Upload a CSV to create your first customer.
-                </TableCell>
+                <TableHead>Client Name</TableHead>
+                <TableHead>Site Address</TableHead>
+                <TableHead>Contact Person</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead className="text-right font-mono">Scans</TableHead>
+                <TableHead className="text-right font-mono">Sites</TableHead>
               </TableRow>
-            ) : (
-              tenants.map((tenant) => (
+            </TableHeader>
+            <TableBody>
+              {tenants.map((tenant) => (
                 <TableRow
                   key={tenant.id}
                   className="cursor-pointer hover:bg-muted/50"
@@ -115,78 +120,95 @@ export function CustomerManagement() {
                   <TableCell>{tenant.contact_person || "—"}</TableCell>
                   <TableCell>{tenant.contact_email}</TableCell>
                   <TableCell className="text-right">
-                    <Badge variant="secondary">{tenant.scan_count}</Badge>
+                    <Badge variant="secondary" className="font-mono tabular-nums">{tenant.scan_count}</Badge>
                   </TableCell>
-                  <TableCell className="text-right">{tenant.site_count}</TableCell>
+                  <TableCell className="text-right font-mono tabular-nums">{tenant.site_count}</TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
 
       <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="font-heading text-xl">
               {isEditing ? "Edit Customer" : selectedTenant?.client_name}
             </DialogTitle>
+            {!isEditing && (
+              <DialogDescription>
+                Customer details and recent uploads for {selectedTenant?.client_name}.
+              </DialogDescription>
+            )}
           </DialogHeader>
 
           {selectedTenant && !isEditing && (
             <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-x-6 gap-y-4">
                 <div>
-                  <Label className="text-muted-foreground">Client Name</Label>
-                  <p className="font-medium">{selectedTenant.client_name}</p>
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">Client Name</p>
+                  <p className="text-sm font-medium">{selectedTenant.client_name}</p>
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">Email</Label>
-                  <p>{selectedTenant.contact_email}</p>
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">Email</p>
+                  <p className="text-sm">{selectedTenant.contact_email}</p>
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">Contact Person</Label>
-                  <p>{selectedTenant.contact_person || "—"}</p>
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">Contact Person</p>
+                  <p className="text-sm">{selectedTenant.contact_person || "—"}</p>
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">Site Address</Label>
-                  <p>{selectedTenant.site_address || "—"}</p>
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">Site Address</p>
+                  <p className="text-sm">{selectedTenant.site_address || "—"}</p>
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">Premises Type</Label>
-                  <p>{selectedTenant.premises_type || "—"}</p>
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">Premises Type</p>
+                  <p className="text-sm">{selectedTenant.premises_type || "—"}</p>
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">Created</Label>
-                  <p>{new Date(selectedTenant.created_at).toLocaleDateString()}</p>
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">Created</p>
+                  <p className="text-sm font-mono tabular-nums">
+                    {new Date(selectedTenant.created_at).toLocaleDateString("en-GB", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </p>
                 </div>
               </div>
 
-              <div className="flex gap-4 text-sm">
-                <Badge variant="secondary">
+              <div className="flex gap-3">
+                <Badge variant="secondary" className="font-mono tabular-nums">
                   {selectedTenant.scan_count} scan{selectedTenant.scan_count !== 1 ? "s" : ""}
                 </Badge>
-                <Badge variant="secondary">
+                <Badge variant="secondary" className="font-mono tabular-nums">
                   {selectedTenant.site_count} site{selectedTenant.site_count !== 1 ? "s" : ""}
                 </Badge>
               </div>
 
               {selectedTenant.uploads.length > 0 && (
                 <div>
-                  <Label className="text-muted-foreground">Recent Uploads</Label>
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Recent Uploads</p>
                   <Table className="mt-2">
                     <TableHeader>
                       <TableRow>
                         <TableHead>File</TableHead>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Status</TableHead>
+                        <TableHead className="w-[120px]">Date</TableHead>
+                        <TableHead className="w-[100px]">Status</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {selectedTenant.uploads.map((u) => (
                         <TableRow key={u.id}>
                           <TableCell className="font-medium">{u.file_name}</TableCell>
-                          <TableCell>{new Date(u.uploaded_at).toLocaleDateString()}</TableCell>
+                          <TableCell className="text-sm text-muted-foreground font-mono tabular-nums">
+                            {new Date(u.uploaded_at).toLocaleDateString("en-GB", {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                            })}
+                          </TableCell>
                           <TableCell>
                             <Badge variant={u.parse_status === "COMPLETE" ? "default" : "secondary"}>
                               {u.parse_status}
@@ -208,7 +230,7 @@ export function CustomerManagement() {
           )}
 
           {selectedTenant && isEditing && (
-            <div className="space-y-4">
+            <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="edit-client-name">Client Name *</Label>
@@ -252,7 +274,7 @@ export function CustomerManagement() {
                   <Save className="mr-2 h-4 w-4" /> {isSaving ? "Saving..." : "Save"}
                 </Button>
               </div>
-            </div>
+            </form>
           )}
         </DialogContent>
       </Dialog>

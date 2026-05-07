@@ -9,6 +9,13 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Skeleton } from "@/components/ui/skeleton"
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -16,7 +23,8 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { StandardSelector } from "@/components/StandardSelector"
-import { AlertTriangle, ShieldCheck, ShieldX, ShieldAlert, Loader2, Activity, X, ArrowUpRight } from "lucide-react"
+import { Sidebar } from "@/components/layout/Sidebar"
+import { AlertTriangle, ShieldCheck, Loader2, Activity } from "lucide-react"
 import type { Finding } from "@/components/findings/types"
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -34,7 +42,6 @@ interface LeaderboardRow {
   certification_outcome: string
   last_scan_date: string | null
   finding_count: number
-  // R1-05: per-standard scores
   standard_scores?: StandardScore[]
 }
 
@@ -88,76 +95,420 @@ interface SiteStandard {
   is_active: boolean;
 }
 
-// ── Helpers ────────────────────────────────────────────────────────────────
-// Using shared utilities from @/lib/utils: getOutcomeConfig, getScoreColor, formatDate
+// ── Helpers ──────────────────────────────────────────────────────────────────
 
 function formatScore(score: number): string {
   return score.toFixed(1) + "%"
 }
 
-// ── Components ───────────────────────────────────────────────────────────────
+// ── Page ─────────────────────────────────────────────────────────────────────
 
-function AnimatedMetric({ value, label, color, delay }: { value: number | string; label: string; color?: string; delay: number }) {
-  return (
-    <div
-      className="animate-fade-in text-center"
-      style={{ animationDelay: `${delay}ms` }}
-    >
-      <div className={cn("font-heading text-3xl font-bold tabular-nums", color)}>
-        {value}
+export default function ExecutiveDashboardPage() {
+  const router = useRouter()
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [data, setData] = useState<ExecutiveDashboardData | null>(null)
+  const [uploads, setUploads] = useState<UploadSummary[]>([])
+  const [selectedUpload, setSelectedUpload] = useState<string>("all")
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const [allStandards, setAllStandards] = useState<SiteStandard[]>([])
+  const [activeStandardId, setActiveStandardId] = useState<string>("")
+  const [showNeedsAttentionOnly, setShowNeedsAttentionOnly] = useState(false)
+
+  const [selectedSite, setSelectedSite] = useState<{ id: string; name: string } | null>(null)
+  const [siteFindings, setSiteFindings] = useState<Finding[]>([])
+  const [loadingFindings, setLoadingFindings] = useState(false)
+
+  useEffect(() => {
+    Promise.all([
+      api.get<ExecutiveDashboardData>("/api/dashboard/executive"),
+      api.get<UploadSummary[]>("/api/uploads"),
+      apiClient.getAllActiveSources().catch(() => []),
+    ])
+      .then(([dashboardData, uploadsData, sourcesData]) => {
+        setData(dashboardData)
+        setUploads(uploadsData)
+
+        const standards: SiteStandard[] = (sourcesData as any[]).map((s) => ({
+          source_id: s.id,
+          title: s.title,
+          is_active: s.status === "active",
+        }))
+        setAllStandards(standards)
+        if (standards.length > 0) {
+          setActiveStandardId(standards[0].source_id)
+        }
+      })
+      .catch((err: Error) => setError(err.message))
+      .finally(() => setLoading(false))
+  }, [])
+
+  const filteredLeaderboard = (() => {
+    if (!data) return []
+    let rows = [...data.leaderboard]
+
+    if (activeStandardId) {
+      const std = allStandards.find((s) => s.source_id === activeStandardId)
+      if (std) {
+        rows = rows
+          .map((row) => {
+            if (!row.standard_scores || row.standard_scores.length === 0) return row
+            return {
+              ...row,
+              standard_scores: row.standard_scores.filter((s) => s.title === std.title),
+            }
+          })
+          .filter((row) => {
+            if (!row.standard_scores || row.standard_scores.length === 0) return true
+            return row.standard_scores.length > 0
+          })
+      }
+    }
+
+    if (showNeedsAttentionOnly) {
+      rows = rows.filter((row) => {
+        const hasBadOutcome = row.certification_outcome?.includes("IMPROVEMENT") ||
+          row.certification_outcome?.includes("INSUFFICIENT")
+        const hasBadStandard = row.standard_scores?.some(
+          (s) => s.outcome === "FAIL" || s.outcome === "INSUFFICIENT_EVIDENCE"
+        )
+        return hasBadOutcome || hasBadStandard
+      })
+    }
+
+    return rows
+  })()
+
+  const handleSiteClick = (siteId: string, siteName: string) => {
+    setSelectedSite({ id: siteId, name: siteName })
+    setLoadingFindings(true)
+    setSiteFindings([])
+    api.get<UploadSummary[]>("/api/uploads")
+      .then((allUploads) => {
+        const siteUploads = allUploads.filter((u) => u.site_id === siteId)
+        if (siteUploads.length > 0) {
+          return api.get<Finding[]>(`/api/uploads/${siteUploads[0].id}/findings`)
+        }
+        return []
+      })
+      .then((findings) => {
+        setSiteFindings(findings)
+      })
+      .catch(console.error)
+      .finally(() => setLoadingFindings(false))
+  }
+
+  if (loading) {
+    return (
+      <div className="flex">
+        <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        <div className="flex-1 lg:pl-60">
+          <MobileTopBar onMenuClick={() => setSidebarOpen(true)} title="Executive Summary" />
+          <div className="px-4 md:px-6 py-6 space-y-6">
+            <Skeleton className="h-9 w-56" />
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <Skeleton className="h-24 rounded-lg" />
+              <Skeleton className="h-24 rounded-lg" />
+              <Skeleton className="h-24 rounded-lg" />
+              <Skeleton className="h-24 rounded-lg" />
+            </div>
+            <Skeleton className="h-64 rounded-lg" />
+          </div>
+        </div>
       </div>
-      <div className="text-[11px] uppercase tracking-widest text-muted-foreground mt-1">{label}</div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex">
+        <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        <div className="flex-1 lg:pl-60">
+          <div className="px-4 md:px-6 py-6">
+            <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center">
+              <p className="font-medium text-red-600">Failed to load dashboard data</p>
+              <p className="mt-1 text-sm text-muted-foreground">{error}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (!data) {
+    return (
+      <div className="flex">
+        <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        <div className="flex-1 lg:pl-60">
+          <div className="px-4 md:px-6 py-6">
+            <Card>
+              <CardContent className="py-12 text-center text-muted-foreground">
+                <p className="text-sm">Upload your first scan to see portfolio overview.</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex">
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <div className="flex-1 lg:pl-60">
+        <MobileTopBar onMenuClick={() => setSidebarOpen(true)} title="Executive Summary" />
+
+        <div className="px-4 md:px-6 py-6 space-y-6">
+          {/* Page header */}
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h1 className="font-heading text-2xl md:text-3xl font-bold tracking-tight">Executive Summary</h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                Portfolio-level IAQ wellness overview across all managed sites.
+              </p>
+            </div>
+
+            <Select value={selectedUpload} onValueChange={setSelectedUpload}>
+              <SelectTrigger className="w-full sm:w-[280px]">
+                <SelectValue placeholder="Select scan period" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Scans</SelectItem>
+                {uploads.map((upload) => (
+                  <SelectItem key={upload.id} value={upload.id}>
+                    {upload.file_name} &mdash; {formatDate(upload.uploaded_at)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* KPI Strip */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <KpiCard
+              label="Total Sites"
+              value={data.health_ratings.total_sites}
+            />
+            <KpiCard
+              label="Certified"
+              value={data.health_ratings.certified}
+              dotColor="bg-healthy"
+            />
+            <KpiCard
+              label="Needs Attention"
+              value={data.health_ratings.improvement_recommended}
+              dotColor="bg-warning"
+            />
+            <KpiCard
+              label="Avg Wellness"
+              value={formatScore(data.health_ratings.average_wellness_index)}
+              valueColor={getScoreColor(data.health_ratings.average_wellness_index)}
+              featured
+            />
+          </div>
+
+          {/* Standard Selector + Filter */}
+          {allStandards.length > 0 && (
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              <StandardSelector
+                standards={allStandards}
+                activeStandardId={activeStandardId}
+                onStandardChange={setActiveStandardId}
+              />
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="needs-attention"
+                  checked={showNeedsAttentionOnly}
+                  onCheckedChange={(checked) => setShowNeedsAttentionOnly(!!checked)}
+                />
+                <label
+                  htmlFor="needs-attention"
+                  className="text-sm font-medium leading-none cursor-pointer select-none"
+                >
+                  Sites needing attention
+                </label>
+              </div>
+            </div>
+          )}
+
+          {/* Main content: full width, no 3-column grid that causes overflow */}
+          <div className="space-y-6">
+            {/* Leaderboard with score bars */}
+            {filteredLeaderboard.length > 0 && (
+              <Card className="animate-fade-in" style={{ animationDelay: "100ms" }}>
+                <CardHeader className="pb-3">
+                  <CardTitle className="font-heading text-lg">
+                    Site Overview
+                    {showNeedsAttentionOnly && (
+                      <span className="ml-2 text-xs text-muted-foreground font-normal">
+                        (needing attention)
+                      </span>
+                    )}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {filteredLeaderboard.map((row, idx) => {
+                      const scorePct = row.wellness_index_score
+                      const barColor = scorePct >= 75
+                        ? "bg-healthy"
+                        : scorePct >= 50
+                          ? "bg-warning"
+                          : "bg-destructive"
+                      const cfg = getOutcomeConfig(row.certification_outcome)
+
+                      return (
+                        <div
+                          key={row.site_id}
+                          className="flex items-center justify-between rounded-lg border p-3 md:p-4 transition-all duration-150 ease-out hover:border-primary/50 hover:shadow-sm bg-white cursor-pointer"
+                          style={{ animationDelay: `${idx * 50 + 150}ms` }}
+                          onClick={() => handleSiteClick(row.site_id, row.site_name)}
+                        >
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono text-xs text-muted-foreground">
+                                #{idx + 1}
+                              </span>
+                              <p className="text-sm font-medium truncate">{row.site_name}</p>
+                            </div>
+                            {/* Score bar */}
+                            <div className="mt-2 h-1.5 rounded-full bg-gray-200 overflow-hidden">
+                              <div
+                                className={cn("h-full rounded-full transition-all duration-300 ease-out", barColor)}
+                                style={{ width: `${Math.min(scorePct, 100)}%` }}
+                              />
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Last scan: {formatDate(row.last_scan_date)} &middot; {row.finding_count} findings
+                            </p>
+                          </div>
+                          <div className="text-right ml-3 md:ml-4 shrink-0">
+                            <div className={cn("font-mono text-lg md:text-xl font-bold tabular-nums", getScoreColor(row.wellness_index_score))}>
+                              {formatScore(row.wellness_index_score)}
+                            </div>
+                            <Badge variant="outline" className={cn("mt-1 text-xs", cfg.bg, cfg.color)}>
+                              <span>{cfg.label}</span>
+                            </Badge>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {filteredLeaderboard.length === 0 && (
+              <Card>
+                <CardContent className="py-12 text-center text-muted-foreground">
+                  <p className="text-sm">No sites match the current filter.</p>
+                  <p className="text-xs mt-1">Try adjusting your filters or upload new scan data.</p>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Risks + Actions — side by side on desktop, stacked on mobile */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <TopRisksPanel risks={data.top_risks} />
+              <TopActionsPanel actions={data.top_actions} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Site Findings Dialog */}
+      <Dialog open={!!selectedSite} onOpenChange={(open) => !open && setSelectedSite(null)}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle>
+              Scan Findings: {selectedSite?.name}
+            </DialogTitle>
+          </DialogHeader>
+          {loadingFindings ? (
+            <div className="py-8 text-center">
+              <Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground mb-2" />
+              <p className="text-sm text-muted-foreground">Loading findings...</p>
+            </div>
+          ) : siteFindings.length === 0 ? (
+            <div className="py-8 text-center text-muted-foreground">
+              <ShieldCheck className="mx-auto h-10 w-10 text-green-500/50 mb-3" />
+              <p className="text-sm">All clear — no findings for this site.</p>
+            </div>
+          ) : (
+            <div className="overflow-y-auto flex-1 space-y-2 pr-1">
+              {siteFindings.map((finding) => (
+                <div
+                  key={finding.id}
+                  className={cn(
+                    "rounded-lg border p-3",
+                    finding.threshold_band === "CRITICAL" ? "bg-red-50 border-red-200" :
+                    finding.threshold_band === "WATCH" ? "bg-amber-50 border-amber-200" :
+                    "bg-green-50 border-green-200"
+                  )}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold">{finding.zone_name}</span>
+                    <Badge variant="outline" className={cn(
+                      "text-[10px]",
+                      finding.threshold_band === "CRITICAL" ? "bg-red-100 text-red-800 border-red-200" :
+                      finding.threshold_band === "WATCH" ? "bg-amber-100 text-amber-800 border-amber-200" :
+                      "bg-green-100 text-green-800 border-green-200"
+                    )}>
+                      {finding.threshold_band}
+                    </Badge>
+                  </div>
+                  <p className="text-xs font-mono mt-1">{finding.metric_name}: {finding.metric_value}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{finding.interpretation_text}</p>
+                  <p className="text-xs font-medium mt-1">Recommended: {finding.recommended_action}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
 
-function HealthSummaryCard({ ratings }: { ratings: HealthRatings }) {
+// ── KPI Card ─────────────────────────────────────────────────────────────────
+
+function KpiCard({ label, value, dotColor, valueColor, featured }: {
+  label: string;
+  value: string | number;
+  dotColor?: string;
+  valueColor?: string;
+  featured?: boolean;
+}) {
   return (
-    <Card className="animate-fade-in border-l-4 border-l-primary bg-accent/30">
-      <CardHeader className="pb-3">
-        <CardTitle className="font-heading flex items-center gap-2 text-lg">
-          <Activity className="h-5 w-5 text-primary" />
-          Portfolio Summary
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
-          <AnimatedMetric value={ratings.total_sites} label="Total Sites" delay={0} />
-          <AnimatedMetric value={ratings.certified} label="Certified" color="text-green-600" delay={50} />
-          <AnimatedMetric value={ratings.verified} label="Verified" color="text-amber-600" delay={100} />
-          <AnimatedMetric value={ratings.improvement_recommended} label="Needs Attention" color="text-red-600" delay={150} />
-          <AnimatedMetric value={ratings.insufficient_evidence} label="No Data" color="text-muted-foreground" delay={200} />
+    <Card className={cn("animate-fade-in", featured && "border-l-2 border-l-primary bg-accent/30")}>
+      <CardContent className="pt-5">
+        <div className="flex items-center gap-1.5 mb-1">
+          {dotColor && <div className={cn("h-2 w-2 rounded-full", dotColor)} />}
+          <p className="text-xs uppercase tracking-wider text-muted-foreground">{label}</p>
         </div>
-        <div className="mt-4 border-t pt-4 flex items-center justify-center gap-3">
-          <span className="text-xs text-muted-foreground uppercase tracking-wider">Average Wellness Index</span>
-          <span className={cn("font-heading text-2xl font-bold tabular-nums", getScoreColor(ratings.average_wellness_index))}>
-            {formatScore(ratings.average_wellness_index)}
-          </span>
-          <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
-        </div>
+        <p className={cn("font-mono text-2xl md:text-3xl font-bold tabular-nums", valueColor)}>
+          {value}
+        </p>
       </CardContent>
     </Card>
   )
 }
 
-function RiskCard({ risk }: { risk: TopRisk }) {
-  const bandColor = risk.threshold_band === "CRITICAL"
-    ? "bg-red-50 border-red-200"
-    : risk.threshold_band === "WATCH"
-      ? "bg-amber-50 border-amber-200"
-      : "bg-green-50 border-green-200"
+// ── Risk Card ────────────────────────────────────────────────────────────────
 
+function RiskCard({ risk }: { risk: TopRisk }) {
   return (
-    <div className={cn("rounded-lg border p-3 space-y-1.5", bandColor)}>
+    <div className="rounded-lg border p-3 space-y-1.5">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold">{risk.site_name}</span>
+        <span className="text-sm font-semibold truncate">{risk.site_name}</span>
         {risk.is_advisory && (
-          <Badge variant="outline" className="text-[10px] text-muted-foreground">Advisory</Badge>
+          <Badge variant="outline" className="text-[10px] text-muted-foreground shrink-0">Advisory</Badge>
         )}
       </div>
       <div className="flex items-center gap-2">
-        <AlertTriangle size={14} className="text-red-500" />
-        <span className="font-mono text-xs uppercase tracking-wider">{risk.metric_name}</span>
+        <AlertTriangle size={14} className="text-red-500 shrink-0" />
+        <span className="font-mono text-xs uppercase tracking-wider truncate">{risk.metric_name}</span>
       </div>
       <p className="text-xs text-muted-foreground">{risk.interpretation_text}</p>
       <p className="text-xs font-medium">Recommended: {risk.recommended_action}</p>
@@ -169,8 +520,8 @@ function TopRisksPanel({ risks }: { risks: TopRisk[] }) {
   return (
     <Card className="animate-fade-in" style={{ animationDelay: "150ms" }}>
       <CardHeader className="pb-3">
-        <CardTitle className="font-heading flex items-center gap-2 text-lg">
-          <AlertTriangle size={16} className="text-red-500" />
+        <CardTitle className="font-heading text-lg flex items-center gap-2">
+          <AlertTriangle size={16} className="text-red-500 shrink-0" />
           Top Risks
         </CardTitle>
       </CardHeader>
@@ -211,9 +562,9 @@ function TopActionsPanel({ actions }: { actions: TopAction[] }) {
                 <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
                   {idx + 1}
                 </span>
-                <div>
+                <div className="min-w-0">
                   <p className="text-sm font-medium">{action.recommended_action}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
+                  <p className="text-xs text-muted-foreground mt-0.5 truncate">
                     {action.site_name} &middot; <span className="font-mono uppercase">{action.metric_name}</span> &middot; Priority: {action.priority}
                   </p>
                 </div>
@@ -226,332 +577,17 @@ function TopActionsPanel({ actions }: { actions: TopAction[] }) {
   )
 }
 
-// ── Page ─────────────────────────────────────────────────────────────────────
+// ── Mobile Top Bar ───────────────────────────────────────────────────────────
 
-export default function ExecutiveDashboardPage() {
-  const router = useRouter()
-  const [data, setData] = useState<ExecutiveDashboardData | null>(null)
-  const [uploads, setUploads] = useState<UploadSummary[]>([])
-  const [selectedUpload, setSelectedUpload] = useState<string>("all")
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  // R1-05: Standard filtering
-  const [allStandards, setAllStandards] = useState<SiteStandard[]>([])
-  const [activeStandardId, setActiveStandardId] = useState<string>("")
-  const [showNeedsAttentionOnly, setShowNeedsAttentionOnly] = useState(false)
-
-  // R1-08: Site findings dialog
-  const [selectedSite, setSelectedSite] = useState<{ id: string; name: string } | null>(null)
-  const [siteFindings, setSiteFindings] = useState<Finding[]>([])
-  const [loadingFindings, setLoadingFindings] = useState(false)
-
-  useEffect(() => {
-    Promise.all([
-      api.get<ExecutiveDashboardData>("/api/dashboard/executive"),
-      api.get<UploadSummary[]>("/api/uploads"),
-      apiClient.getAllActiveSources().catch(() => []),
-    ])
-      .then(([dashboardData, uploadsData, sourcesData]) => {
-        setData(dashboardData)
-        setUploads(uploadsData)
-
-        // Use actual ReferenceSources for standard filtering
-        const standards: SiteStandard[] = (sourcesData as any[]).map((s) => ({
-          source_id: s.id,
-          title: s.title,
-          is_active: s.status === "active",
-        }))
-        setAllStandards(standards)
-        if (standards.length > 0) {
-          setActiveStandardId(standards[0].source_id)
-        }
-      })
-      .catch((err: Error) => setError(err.message))
-      .finally(() => setLoading(false))
-  }, [])
-
-  // Filter leaderboard by standard and attention
-  const filteredLeaderboard = (() => {
-    if (!data) return []
-    let rows = [...data.leaderboard]
-
-    // Filter by standard
-    if (activeStandardId) {
-      const std = allStandards.find((s) => s.source_id === activeStandardId)
-      if (std) {
-        rows = rows
-          .map((row) => {
-            // If no standard_scores, keep the row (data comes from overall aggregation)
-            if (!row.standard_scores || row.standard_scores.length === 0) return row
-            return {
-              ...row,
-              standard_scores: row.standard_scores.filter((s) => s.title === std.title),
-            }
-          })
-          .filter((row) => {
-            if (!row.standard_scores || row.standard_scores.length === 0) return true
-            return row.standard_scores.length > 0
-          })
-      }
-    }
-
-    // Filter: needs attention only
-    if (showNeedsAttentionOnly) {
-      rows = rows.filter((row) => {
-        const hasBadOutcome = row.certification_outcome?.includes("IMPROVEMENT") ||
-          row.certification_outcome?.includes("INSUFFICIENT")
-        const hasBadStandard = row.standard_scores?.some(
-          (s) => s.outcome === "FAIL" || s.outcome === "INSUFFICIENT_EVIDENCE"
-        )
-        return hasBadOutcome || hasBadStandard
-      })
-    }
-
-    return rows
-  })()
-
-  // R1-08: Fetch findings when a site is clicked
-  const handleSiteClick = (siteId: string, siteName: string) => {
-    setSelectedSite({ id: siteId, name: siteName })
-    setLoadingFindings(true)
-    setSiteFindings([])
-    api.get<UploadSummary[]>("/api/uploads")
-      .then((allUploads) => {
-        const siteUploads = allUploads.filter((u) => u.site_id === siteId)
-        if (siteUploads.length > 0) {
-          return api.get<Finding[]>(`/api/uploads/${siteUploads[0].id}/findings`)
-        }
-        return []
-      })
-      .then((findings) => {
-        setSiteFindings(findings)
-      })
-      .catch(console.error)
-      .finally(() => setLoadingFindings(false))
-  }
-
-  if (loading) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <Loader2 size={28} className="animate-spin text-muted-foreground" />
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center">
-        <p className="font-medium text-red-600">Failed to load dashboard data</p>
-        <p className="mt-1 text-sm text-muted-foreground">{error}</p>
-      </div>
-    )
-  }
-
-  if (!data) {
-    return (
-      <div className="rounded-lg border bg-card p-8 text-center text-muted-foreground">
-        No data available — upload scan data to populate the dashboard.
-      </div>
-    )
-  }
-
+function MobileTopBar({ onMenuClick, title }: { onMenuClick: () => void; title: string }) {
   return (
-    <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="font-heading text-2xl font-bold tracking-tight">Executive Summary</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Portfolio-level IAQ wellness overview across all managed sites.
-          </p>
-        </div>
-
-        {/* Historical Scan Selector */}
-        <Select value={selectedUpload} onValueChange={setSelectedUpload}>
-          <SelectTrigger className="w-[280px]">
-            <SelectValue placeholder="Select scan period" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Scans</SelectItem>
-            {uploads.map((upload) => (
-              <SelectItem key={upload.id} value={upload.id}>
-                {upload.file_name} &mdash; {formatDate(upload.uploaded_at)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* R1-05: Standard Selector + Attention Filter */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-        {allStandards.length > 0 && (
-          <StandardSelector
-            standards={allStandards}
-            activeStandardId={activeStandardId}
-            onStandardChange={setActiveStandardId}
-          />
-        )}
-        <div className="flex items-center gap-2">
-          <Checkbox
-            id="needs-attention"
-            checked={showNeedsAttentionOnly}
-            onCheckedChange={(checked) => setShowNeedsAttentionOnly(!!checked)}
-          />
-          <label
-            htmlFor="needs-attention"
-            className="text-sm font-medium leading-none cursor-pointer select-none"
-          >
-            Sites needing attention
-          </label>
-        </div>
-      </div>
-
-      <HealthSummaryCard ratings={data.health_ratings} />
-
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2 space-y-6">
-          {/* Leaderboard with per-standard badges */}
-          {filteredLeaderboard.length > 0 && (
-            <Card className="animate-fade-in" style={{ animationDelay: "100ms" }}>
-              <CardHeader className="pb-3">
-                <CardTitle className="font-heading text-lg">
-                  Site Overview
-                  {showNeedsAttentionOnly && (
-                    <span className="ml-2 text-xs text-muted-foreground font-normal">
-                      (needing attention)
-                    </span>
-                  )}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {filteredLeaderboard.map((row, idx) => (
-                    <div
-                      key={row.site_id}
-                      className="flex items-center justify-between rounded-lg border p-4 transition-shadow duration-200 hover:shadow-sm bg-white cursor-pointer"
-                      style={{ animationDelay: `${idx * 50 + 150}ms` }}
-                      onClick={() => handleSiteClick(row.site_id, row.site_name)}
-                    >
-                      <div>
-                        <p className="text-sm font-medium">{row.site_name}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          Last scan: {formatDate(row.last_scan_date)} &middot; {row.finding_count} findings
-                        </p>
-                        {/* R1-05: Per-standard badges */}
-                        {row.standard_scores && row.standard_scores.length > 0 && (
-                          <div className="flex gap-1 mt-1">
-                            {row.standard_scores.map((s) => {
-                              const sColor = s.outcome === "PASS"
-                                ? "bg-green-50 text-green-700 border-green-200"
-                                : s.outcome === "FAIL"
-                                  ? "bg-red-50 text-red-700 border-red-200"
-                                  : "bg-gray-100 text-gray-600 border-gray-200"
-                              return (
-                                <Badge key={s.title} variant="outline" className={`text-[10px] ${sColor}`}>
-                                  {s.title}: {s.score != null ? Math.round(s.score) : "N/A"}
-                                </Badge>
-                              )
-                            })}
-                          </div>
-                        )}
-                      </div>
-                      <div className="text-right">
-                        <div className={cn("font-heading text-xl font-bold tabular-nums", getScoreColor(row.wellness_index_score))}>
-                          {formatScore(row.wellness_index_score)}
-                        </div>
-                        {(() => {
-                          const cfg = getOutcomeConfig(row.certification_outcome)
-                          return (
-                            <Badge variant="outline" className={cn("mt-1", cfg.bg, cfg.color)}>
-                              <span>{cfg.label}</span>
-                            </Badge>
-                          )
-                        })()}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {filteredLeaderboard.length === 0 && (
-            <Card>
-              <CardContent className="py-12 text-center text-muted-foreground">
-                <p className="text-sm">No sites match the current filter.</p>
-                <p className="text-xs mt-1">Try adjusting your filters or upload new scan data.</p>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-        <div className="space-y-6">
-          <TopRisksPanel risks={data.top_risks} />
-          <TopActionsPanel actions={data.top_actions} />
-        </div>
-      </div>
-
-      {/* R1-08: Site Findings Dialog */}
-      {selectedSite && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-background rounded-lg p-6 max-w-2xl w-full mx-4 shadow-xl border max-h-[80vh] overflow-hidden flex flex-col">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Scan Findings: {selectedSite.name}</h3>
-              <Button variant="ghost" size="sm" onClick={() => setSelectedSite(null)}>
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-            {loadingFindings ? (
-              <div className="py-8 text-center">
-                <Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground mb-2" />
-                <p className="text-sm text-muted-foreground">Loading findings...</p>
-              </div>
-            ) : siteFindings.length === 0 ? (
-              <div className="py-8 text-center text-muted-foreground">
-                <ShieldCheck className="mx-auto h-10 w-10 text-green-500/50 mb-3" />
-                <p className="text-sm">No findings for this site.</p>
-              </div>
-            ) : (
-              <div className="overflow-y-auto flex-1 space-y-2">
-                {siteFindings.map((finding) => (
-                  <div
-                    key={finding.id}
-                    className={cn(
-                      "rounded-lg border p-3",
-                      finding.threshold_band === "CRITICAL" ? "bg-red-50 border-red-200" :
-                      finding.threshold_band === "WATCH" ? "bg-amber-50 border-amber-200" :
-                      "bg-green-50 border-green-200"
-                    )}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-semibold">{finding.zone_name}</span>
-                      <Badge variant="outline" className={cn(
-                        "text-[10px]",
-                        finding.threshold_band === "CRITICAL" ? "bg-red-100 text-red-800 border-red-200" :
-                        finding.threshold_band === "WATCH" ? "bg-amber-100 text-amber-800 border-amber-200" :
-                        "bg-green-100 text-green-800 border-green-200"
-                      )}>
-                        {finding.threshold_band}
-                      </Badge>
-                    </div>
-                    <p className="text-xs font-mono mt-1">{finding.metric_name}: {finding.metric_value}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{finding.interpretation_text}</p>
-                    <p className="text-xs font-medium mt-1">Recommended: {finding.recommended_action}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-            <div className="mt-4 pt-4 border-t flex justify-end">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setSelectedSite(null)}
-              >
-                Close
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+    <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur-md lg:hidden">
+      <Button variant="ghost" size="sm" onClick={onMenuClick} className="px-2">
+        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </Button>
+      <span className="font-heading text-sm font-semibold">{title}</span>
+    </header>
   )
 }

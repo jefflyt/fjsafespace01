@@ -125,10 +125,14 @@ def entry_to_rule_definition(
     entry: RulebookEntry,
     entries_for_metric: list[RulebookEntry] | None = None,
 ) -> RuleDefinition:
-    """Convert a RulebookEntry to a RuleDefinition for use by the rule engine."""
+    """Convert a RulebookEntry to a RuleDefinition for use by the rule engine.
+
+    Uses the explicit threshold_band column set at seed time.
+    Falls back to _infer_band only for legacy entries without it.
+    """
     metric_name = MetricName(entry.metric_name) if isinstance(entry.metric_name, str) else entry.metric_name
 
-    band = _infer_band(entry, entries_for_metric)
+    band = _resolve_band(entry, entries_for_metric)
 
     # GOOD band always gets "No action required" recommendation
     recommendation = entry.recommendation_template
@@ -148,6 +152,19 @@ def entry_to_rule_definition(
         confidence_level=entry.confidence_level,
         reference_source_id=entry.reference_source_id,
     )
+
+
+def _resolve_band(
+    entry: RulebookEntry,
+    entries_for_metric: list[RulebookEntry] | None = None,
+) -> ThresholdBand:
+    """Resolve the ThresholdBand for an entry.
+
+    Priority: explicit threshold_band → inference fallback for legacy entries.
+    """
+    if entry.threshold_band:
+        return ThresholdBand(entry.threshold_band)
+    return _infer_band(entry, entries_for_metric)
 
 
 # ── DB fetching ───────────────────────────────────────────────────────────────

@@ -15,12 +15,52 @@ Tests use the embedded rule engine (unit tests) and DB-linked aggregation (integ
 """
 
 
-from app.models.enums import CertificationOutcome, MetricName, ThresholdBand
-from app.skills.iaq_rule_governor.rule_engine import evaluate_readings
+from app.models.enums import CertificationOutcome, ConfidenceLevel, MetricName, ThresholdBand
+from app.skills.iaq_rule_governor.rule_engine import RuleDefinition, evaluate_readings
 from app.skills.iaq_rule_governor.wellness_index import (
     calculate_wellness_index,
     derive_certification_outcome,
 )
+
+# Minimal test rules for unit tests (CO2: GOOD <1000, WATCH 1000-1500, CRITICAL >1500)
+_TEST_RULES = [
+    RuleDefinition(
+        metric_name=MetricName.co2_ppm,
+        band=ThresholdBand.GOOD,
+        min_value=None,
+        max_value=1000.0,
+        interpretation_template="CO2 of {value} ppm is acceptable.",
+        workforce_impact_template="Normal conditions.",
+        recommendation_template="No action required.",
+        rule_id="R-CO2-GOOD",
+        citation_unit_ids=["CIT-TEST-001"],
+        confidence_level=ConfidenceLevel.HIGH,
+    ),
+    RuleDefinition(
+        metric_name=MetricName.co2_ppm,
+        band=ThresholdBand.WATCH,
+        min_value=1000.0,
+        max_value=1500.0,
+        interpretation_template="CO2 of {value} ppm is elevated.",
+        workforce_impact_template="May affect comfort.",
+        recommendation_template="Review ventilation.",
+        rule_id="R-CO2-WATCH",
+        citation_unit_ids=["CIT-TEST-002"],
+        confidence_level=ConfidenceLevel.MEDIUM,
+    ),
+    RuleDefinition(
+        metric_name=MetricName.co2_ppm,
+        band=ThresholdBand.CRITICAL,
+        min_value=1500.0,
+        max_value=None,
+        interpretation_template="CO2 of {value} ppm is critical.",
+        workforce_impact_template="Health risk.",
+        recommendation_template="Immediate action required.",
+        rule_id="R-CO2-CRITICAL",
+        citation_unit_ids=["CIT-TEST-003"],
+        confidence_level=ConfidenceLevel.HIGH,
+    ),
+]
 
 
 # ── Rule Engine Unit Tests ───────────────────────────────────────────────────
@@ -46,18 +86,18 @@ class TestRuleEngineEvaluation:
             site_id="site-1",
             upload_id="upload-1",
             rule_version="v1.0",
-            rules=None,
+            rules=_TEST_RULES,
         )
         assert len(findings) == 1
         assert findings[0].threshold_band == ThresholdBand.GOOD
         assert findings[0].rule_id == "R-CO2-GOOD"
 
     def test_co2_watch_classification(self):
-        """CO2 at 1000ppm should be classified as WATCH."""
+        """CO2 at 1200ppm should be classified as WATCH."""
         row = {
             "zone_name": "Zone A",
             "metric_name": "co2_ppm",
-            "metric_value": 1000,
+            "metric_value": 1200,
             "metric_unit": "ppm",
             "site_id": "site-1",
             "upload_id": "upload-1",
@@ -68,15 +108,16 @@ class TestRuleEngineEvaluation:
             site_id="site-1",
             upload_id="upload-1",
             rule_version="v1.0",
+            rules=_TEST_RULES,
         )
         assert findings[0].threshold_band == ThresholdBand.WATCH
 
     def test_co2_critical_classification(self):
-        """CO2 at 1500ppm should be classified as CRITICAL."""
+        """CO2 at 2000ppm should be classified as CRITICAL."""
         row = {
             "zone_name": "Zone A",
             "metric_name": "co2_ppm",
-            "metric_value": 1500,
+            "metric_value": 2000,
             "metric_unit": "ppm",
             "site_id": "site-1",
             "upload_id": "upload-1",
@@ -87,6 +128,7 @@ class TestRuleEngineEvaluation:
             site_id="site-1",
             upload_id="upload-1",
             rule_version="v1.0",
+            rules=_TEST_RULES,
         )
         assert findings[0].threshold_band == ThresholdBand.CRITICAL
 
@@ -106,32 +148,15 @@ class TestRuleEngineEvaluation:
             site_id="site-1",
             upload_id="upload-1",
             rule_version="v1.0",
+            rules=_TEST_RULES,
         )
         assert findings[0].rule_version == "v1.0"
         assert findings[0].citation_unit_ids is not None
         assert len(findings[0].citation_unit_ids) > 0
 
-    def test_insufficient_evidence_finding(self):
-        """Reading with no matching rule → INSUFFICIENT_EVIDENCE finding."""
-        # Create a minimal ruleset that doesn't cover all metrics
-        from app.skills.iaq_rule_governor.rule_engine import RuleDefinition
-        from app.models.enums import ConfidenceLevel
-
-        limited_rules = [
-            RuleDefinition(
-                metric_name=MetricName.co2_ppm,
-                band=ThresholdBand.GOOD,
-                min_value=300,
-                max_value=1000,
-                interpretation_template="CO2 is good.",
-                workforce_impact_template="Normal.",
-                recommendation_template="OK.",
-                rule_id="R-CO2-GOOD",
-                citation_unit_ids=["CIT-001"],
-                confidence_level=ConfidenceLevel.HIGH,
-            ),
-        ]
-
+    def test_uncovered_metric_no_finding(self):
+        """Reading for a metric the standard doesn't cover → no finding created."""
+        # Per-standard evaluation: only metrics the standard defines produce findings
         row = {
             "zone_name": "Zone A",
             "metric_name": "pm25_ugm3",
@@ -146,11 +171,9 @@ class TestRuleEngineEvaluation:
             site_id="site-1",
             upload_id="upload-1",
             rule_version="v1.0",
-            rules=limited_rules,
+            rules=_TEST_RULES,  # Only CO2 rules — PM25 not covered
         )
-        assert len(findings) == 1
-        assert findings[0].rule_id == "R-INSUFFICIENT"
-        assert findings[0].confidence_level.value == "LOW"
+        assert len(findings) == 0
 
     def test_outlier_flagged_low_confidence(self):
         """Outlier readings should have LOW confidence."""
@@ -168,6 +191,7 @@ class TestRuleEngineEvaluation:
             site_id="site-1",
             upload_id="upload-1",
             rule_version="v1.0",
+            rules=_TEST_RULES,
         )
         assert findings[0].confidence_level.value == "LOW"
 
@@ -187,12 +211,14 @@ class TestRuleEngineEvaluation:
             site_id="site-1",
             upload_id="upload-1",
             rule_version="v1.0",
+            rules=_TEST_RULES,
         )
         findings2 = evaluate_readings(
             [row],
             site_id="site-1",
             upload_id="upload-1",
             rule_version="v1.0",
+            rules=_TEST_RULES,
         )
         assert findings1[0].threshold_band == findings2[0].threshold_band
         assert findings1[0].rule_id == findings2[0].rule_id

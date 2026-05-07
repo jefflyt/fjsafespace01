@@ -43,7 +43,7 @@ from app.models.supporting import Tenant
 from app.models.workflow_b import Finding, Reading, Upload, UploadBatch, Site
 from app.skills.data_ingestion.csv_parser import parse_csv, extract_zones
 from app.skills.data_ingestion.supabase_storage import SupabaseStorage, SupabaseStorageError
-from app.skills.iaq_rule_governor.rule_engine import evaluate_readings, _DEFAULT_RULES
+from app.skills.iaq_rule_governor.rule_engine import evaluate_readings
 from app.skills.iaq_rule_governor.wellness_index import calculate_wellness_index, derive_certification_outcome
 from app.services.db_rule_service import fetch_rules_by_standard
 
@@ -167,22 +167,12 @@ def _process_single_upload(
         if not std_rules:
             continue
 
-        # Supplement with embedded defaults for bands missing per metric.
-        # E.g., SS 554 may only define GOOD band for temperature — add
-        # WATCH/CRITICAL embedded bands so out-of-range values get proper findings.
-        db_rules_by_metric_band = {(r.metric_name, r.band) for r in std_rules}
-        combined_rules = list(std_rules)
-        for embedded_rule in _DEFAULT_RULES:
-            key = (embedded_rule.metric_name, embedded_rule.band)
-            if key not in db_rules_by_metric_band:
-                combined_rules.append(embedded_rule)
-
         std_findings = evaluate_readings(
             rows_to_persist,
             site_id=site_id,
             upload_id=upload_id,
             rule_version=_DEFAULT_RULE_VERSION,
-            rules=combined_rules,
+            rules=std_rules,
         )
         eval_findings.extend(std_findings)
         standards_evaluated.append(source.id)
@@ -581,11 +571,11 @@ def _resolve_site(
 
 def _delete_upload_and_children(session: Session, upload: Upload) -> None:
     """Delete an Upload and all its associated readings and findings."""
-    session.exec(
+    session.execute(
         text("DELETE FROM finding WHERE upload_id = :uid"),
         {"uid": upload.id},
     )
-    session.exec(
+    session.execute(
         text("DELETE FROM reading WHERE upload_id = :uid"),
         {"uid": upload.id},
     )
@@ -817,14 +807,35 @@ def _find_standard_id_for_finding(finding, session: Session) -> str | None:
         )
     ).all()
 
+    if not entries:
+        return None
+
     # Try to match by band for more precise attribution
+    matching_entries = []
     for entry in entries:
-        from app.services.db_rule_service import _infer_band
-        if band and _infer_band(entry) == band:
+        from app.services.db_rule_service import _resolve_band
+        if band and _resolve_band(entry, entries) == band:
+            matching_entries.append(entry)
+
+    if not matching_entries:
+        matching_entries = list(entries)
+
+    # If only one standard defines this metric, use it directly
+    unique_sources = {e.reference_source_id for e in matching_entries}
+    if len(unique_sources) == 1:
+        return matching_entries[0].reference_source_id
+
+    # For metrics defined by multiple standards (CO2, PM25):
+    # - Prefer CURRENT_VERIFIED sources
+    # - For RESET: humidity is RESET-only, use as anchor
+    from app.models.workflow_a import ReferenceSource
+    for entry in matching_entries:
+        source = session.get(ReferenceSource, entry.reference_source_id)
+        if source and source.source_currency_status == "CURRENT_VERIFIED":
             return entry.reference_source_id
 
     # Last resort: return first match
-    return entries[0].reference_source_id if entries else None
+    return matching_entries[0].reference_source_id
 
 
 def _find_standard_title_for_finding(finding, session: Session) -> str | None:
