@@ -201,9 +201,9 @@ export default function ExecutiveDashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex">
+      <div className="flex min-h-screen">
         <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        <div className="flex-1 lg:pl-60">
+        <div className="flex-1 lg:ml-60 min-w-0">
           <MobileTopBar onMenuClick={() => setSidebarOpen(true)} title="Executive Summary" />
           <div className="px-4 md:px-6 py-6 space-y-6">
             <Skeleton className="h-9 w-56" />
@@ -222,9 +222,9 @@ export default function ExecutiveDashboardPage() {
 
   if (error) {
     return (
-      <div className="flex">
+      <div className="flex min-h-screen">
         <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        <div className="flex-1 lg:pl-60">
+        <div className="flex-1 lg:ml-60 min-w-0">
           <div className="px-4 md:px-6 py-6">
             <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center">
               <p className="font-medium text-red-600">Failed to load dashboard data</p>
@@ -238,9 +238,9 @@ export default function ExecutiveDashboardPage() {
 
   if (!data) {
     return (
-      <div className="flex">
+      <div className="flex min-h-screen">
         <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        <div className="flex-1 lg:pl-60">
+        <div className="flex-1 lg:ml-60 min-w-0">
           <div className="px-4 md:px-6 py-6">
             <Card>
               <CardContent className="py-12 text-center text-muted-foreground">
@@ -254,12 +254,12 @@ export default function ExecutiveDashboardPage() {
   }
 
   return (
-    <div className="flex">
+    <div className="flex min-h-screen">
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      <div className="flex-1 lg:pl-60">
+      <div className="flex-1 lg:ml-60 min-w-0">
         <MobileTopBar onMenuClick={() => setSidebarOpen(true)} title="Executive Summary" />
 
-        <div className="px-4 md:px-6 py-6 space-y-6">
+        <div className="w-full px-4 md:px-6 lg:px-8 py-6 space-y-6">
           {/* Page header */}
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -273,7 +273,7 @@ export default function ExecutiveDashboardPage() {
               <SelectTrigger className="w-full sm:w-[280px]">
                 <SelectValue placeholder="Select scan period" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-w-[90vw]">
                 <SelectItem value="all">All Scans</SelectItem>
                 {uploads.map((upload) => (
                   <SelectItem key={upload.id} value={upload.id}>
@@ -285,7 +285,7 @@ export default function ExecutiveDashboardPage() {
           </div>
 
           {/* KPI Strip */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <KpiCard
               label="Total Sites"
               value={data.health_ratings.total_sites}
@@ -311,12 +311,14 @@ export default function ExecutiveDashboardPage() {
           {/* Standard Selector + Filter */}
           {allStandards.length > 0 && (
             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-              <StandardSelector
-                standards={allStandards}
-                activeStandardId={activeStandardId}
-                onStandardChange={setActiveStandardId}
-              />
-              <div className="flex items-center gap-2">
+              <div className="w-full overflow-x-auto">
+                <StandardSelector
+                  standards={allStandards}
+                  activeStandardId={activeStandardId}
+                  onStandardChange={setActiveStandardId}
+                />
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
                 <Checkbox
                   id="needs-attention"
                   checked={showNeedsAttentionOnly}
@@ -324,7 +326,7 @@ export default function ExecutiveDashboardPage() {
                 />
                 <label
                   htmlFor="needs-attention"
-                  className="text-sm font-medium leading-none cursor-pointer select-none"
+                  className="text-sm font-medium leading-none cursor-pointer select-none whitespace-nowrap"
                 >
                   Sites needing attention
                 </label>
@@ -408,10 +410,14 @@ export default function ExecutiveDashboardPage() {
               </Card>
             )}
 
-            {/* Risks + Actions — side by side on desktop, stacked on mobile */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <TopRisksPanel risks={data.top_risks} />
-              <TopActionsPanel actions={data.top_actions} />
+            {/* Risks + Actions — responsive grid: Risks wider on large screens */}
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="xl:col-span-2">
+                <TopRisksPanel risks={data.top_risks} />
+              </div>
+              <div className="xl:col-span-1">
+                <TopActionsPanel actions={data.top_actions} />
+              </div>
             </div>
           </div>
         </div>

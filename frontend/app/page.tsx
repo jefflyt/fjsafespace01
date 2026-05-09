@@ -67,9 +67,9 @@ export default function ScanListingPage() {
 
   if (loading) {
     return (
-      <div className="flex">
+      <div className="flex min-h-screen">
         <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        <div className="flex-1 lg:pl-60">
+        <div className="flex-1 lg:ml-60 min-w-0">
           {/* Mobile top bar */}
           <MobileTopBar onMenuClick={() => setSidebarOpen(true)} title="Scan Listings" />
           <div className="px-4 md:px-6 py-6 space-y-6">
@@ -88,9 +88,9 @@ export default function ScanListingPage() {
   }
 
   return (
-    <div className="flex">
+    <div className="flex min-h-screen">
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      <div className="flex-1 lg:pl-60">
+      <div className="flex-1 lg:ml-60 min-w-0">
         {/* Mobile top bar */}
         <MobileTopBar onMenuClick={() => setSidebarOpen(true)} title="Scan Listings" />
 

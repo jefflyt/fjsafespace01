@@ -19,9 +19,9 @@ export default function AdminCustomersPage() {
 
   if (loading) {
     return (
-      <div className="flex">
+      <div className="flex min-h-screen">
         <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        <div className="flex-1 lg:pl-60">
+        <div className="flex-1 lg:ml-60 min-w-0">
           <MobileTopBar onMenuClick={() => setSidebarOpen(true)} title="Customers" />
           <div className="px-4 md:px-6 py-6 space-y-6">
             <Skeleton className="h-9 w-48" />
@@ -34,9 +34,9 @@ export default function AdminCustomersPage() {
   }
 
   return (
-    <div className="flex">
+    <div className="flex min-h-screen">
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      <div className="flex-1 lg:pl-60">
+      <div className="flex-1 lg:ml-60 min-w-0">
         <MobileTopBar onMenuClick={() => setSidebarOpen(true)} title="Customers" />
 
         <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
