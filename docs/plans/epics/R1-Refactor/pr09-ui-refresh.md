@@ -49,7 +49,7 @@ Restructure the dashboard navigation so scan results are the primary landing exp
 
 - [x] `Navbar` — new links (Scan Results, Summary, Customers), role-aware
 - [x] `UploadForm` — support modal embedding + redirect on complete
-- [x] Deleted unused `Sidebar.tsx`
+- [x] `Sidebar` — added (fixed position, responsive overlay on mobile, used by all pages)
 
 ## 5. Dependencies
 
@@ -76,8 +76,7 @@ Restructure the dashboard navigation so scan results are the primary landing exp
 
 - **Backend**: `dashboard.py`, `uploads.py`
 - **Frontend**: `page.tsx`, `ops/page.tsx`, `sites/[siteId]/page.tsx`, `Navbar.tsx`, `api.ts`
-- **New**: `ScanListingTable.tsx`, `ScanListingFilters.tsx`, `UploadModal.tsx`, `ScanHistoryTable.tsx`, `RegisterCustomerModal.tsx`
-- **Deleted**: `Sidebar.tsx`
+- **New**: `ScanListingTable.tsx`, `ScanListingFilters.tsx`, `UploadModal.tsx`, `ScanHistoryTable.tsx`, `RegisterCustomerModal.tsx`, `Sidebar.tsx`
 
 ### Known Notes
 

@@ -1,7 +1,7 @@
 # FJDashboard — Supabase Schema Reference
 
 > Source of truth for all tables in the Supabase Postgres project (`jertvmbhgehajcrfifwl`).
-> Updated 2026-05-03. Bump this date when schema changes land.
+> Updated 2026-05-10. Bump this date when schema changes land.
 
 ---
 
@@ -180,6 +180,24 @@ These tables form the core operational pipeline: Upload → Readings → Finding
 | `scan_type` | TEXT | `adhoc` \| `continuous`. Default `adhoc`. |
 | `standards_evaluated` | TEXT | JSON string[] — reference_source IDs used during evaluation |
 | `content_hash` | VARCHAR(64) | SHA-256 hash of uploaded CSV for dedup detection. Nullable. |
+| `batch_id` | UUID | Nullable FK → `upload_batch.id` (added by migration 018) |
+| `zone_list` | TEXT | Nullable — which zones this upload covers |
+
+### `upload_batch`
+
+**What it is:** Groups multiple child uploads from a single multi-site CSV upload.
+Every upload (single-site or multi-site) belongs to exactly one batch for traceability.
+
+**When updated:** Created when a CSV is uploaded via the two-phase preview/confirm flow.
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | UUID | PK |
+| `file_name` | TEXT | Original CSV filename |
+| `uploaded_at` | TIMESTAMPTZ | Upload timestamp |
+| `tenant_id` | UUID | Nullable FK → `tenant.id` |
+| `content_hash` | TEXT | SHA-256 hash for dedup detection |
+| `child_upload_ids` | TEXT | JSON string[] — child upload UUIDs |
 
 ### `reading`
 
@@ -228,7 +246,7 @@ Never modified — findings are the authoritative record of what the rules said 
 | `confidence_level` | TEXT | `HIGH` \| `MEDIUM` \| `LOW` |
 | `source_currency_status` | TEXT | Status of the rule's source |
 | `benchmark_lane` | TEXT | `FJ_SAFESPACE` |
-| `metric_value` | FLOAT | Nullable — the raw metric value that triggered this finding |
+| `reference_source_id` | UUID | Nullable FK → `reference_source.id` (added by migration 019) |
 | `created_at` | TIMESTAMPTZ | Creation timestamp |
 
 ### `report`
@@ -381,13 +399,13 @@ reference_source ──┐
                                                     │
                                                     │  (SELECT-only by dashboard)
                                                     ▼
-site ──► upload ──► reading ──► finding ◄───────────┘
-                      │
-                      ▼
-                   report ──► report_snapshot (at approval)
-                      │
-                      ▼
-                   PDF (generated on-demand from snapshot HTML)
+site ──► upload_batch ──► upload ──► reading ──► finding ◄───────────┘
+                          │
+                          ▼
+                       report ──► report_snapshot (at approval)
+                          │
+                          ▼
+                       PDF (generated on-demand from snapshot HTML)
 ```
 
 ## Indexes

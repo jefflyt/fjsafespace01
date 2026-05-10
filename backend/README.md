@@ -45,23 +45,28 @@ app/
 ├── core/
 │   └── config.py     ← pydantic-settings env config
 ├── api/
-│   ├── dependencies.py    ← DB session + Phase 3 auth stub
+│   ├── dependencies.py    ← Supabase JWT extraction, tenant scoping
 │   └── routers/
-│       ├── uploads.py
-│       ├── dashboard.py
-│       ├── reports.py
-│       ├── rulebook.py    ← READ-ONLY; mutations return 405
-│       └── notifications.py
+│       ├── uploads.py         ← POST uploads, preview, confirm, GET findings
+│       ├── dashboard.py       ← sites, zones, comparison, summary, executive
+│       ├── reports.py         ← CRUD + QA + PDF generation
+│       ├── rulebook.py        ← READ-ONLY; mutations return 405
+│       ├── notifications.py   ← list + mark read
+│       ├── preferences.py     ← metric preferences + site standards
+│       ├── interpretations.py ← threshold band → plain-language text
+│       └── tenants.py         ← list + search tenants
 ├── services/
-│   ├── csv_parser.py      ← CSV validation + normalisation
-│   ├── rule_engine.py     ← Deterministic rule evaluation
-│   ├── pdf_generator.py   ← WeasyPrint HTML→PDF
-│   └── wellness_index.py  ← FJ Wellness Index calculator
+│   ├── aggregation.py         ← Wellness Index, cross-site aggregation
+│   ├── db_rule_service.py     ← fetch rules by standard
+│   └── wellness_index.py      ← FJ Wellness Index calculator
+├── skills/
+│   ├── data_ingestion/        ← CSV parsing + Supabase Storage client
+│   └── iaq_rule_governor/     ← Rule evaluation engine
 └── models/
-    ├── enums.py            ← All shared enums
-    ├── workflow_b.py       ← Site, Upload, Reading, Finding, Report
-    ├── workflow_a.py       ← RulebookEntry, CitationUnit, ReferenceSource (read-only)
-    └── supporting.py       ← Tenant, Notification
+    ├── enums.py               ← All shared enums (15 metrics)
+    ├── workflow_b.py          ← Site, Upload, UploadBatch, Reading, Finding, Report
+    ├── workflow_a.py          ← RulebookEntry, CitationUnit, ReferenceSource
+    └── supporting.py          ← Tenant, Notification, UserTenant, SiteMetricPreferences, SiteStandards
 ```
 
 ## Key Governance Rules

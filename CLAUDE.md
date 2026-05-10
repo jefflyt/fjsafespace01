@@ -86,7 +86,8 @@ traceable reports for operations and executive views.
 
 ### Existing Backend Routes
 
-- **uploads**: `POST /api/uploads`, `GET /api/uploads/{id}`, `GET /api/uploads/{id}/findings?standard_id=`
+- **uploads**: `POST /api/uploads`, `POST /api/uploads/preview`, `POST /api/uploads/confirm`, `GET /api/uploads`, `GET /api/uploads/{id}`, `GET /api/uploads/{id}/findings?standard_id=`
+- **tenants**: `GET /api/tenants`, `GET /api/tenants/search?q=<text>`
 - **reports**: `POST /api/reports`, `GET /api/reports`, `GET /api/reports/{id}`, `PATCH /api/reports/{id}/qa-checklist`, `POST /api/reports/{id}/approve`, `GET /api/reports/{id}/export`, `GET /api/reports/{id}/pdf`
 - **dashboard**: `GET /api/dashboard/sites`, `GET /api/dashboard/sites/{id}/zones`, `GET /api/dashboard/comparison`, `GET /api/dashboard/summary`, `GET /api/dashboard/executive`
 - **rulebook**: `GET /api/rulebook/rules`, `GET /api/rulebook/rules/{id}`, `GET /api/rulebook/sources`
@@ -102,6 +103,7 @@ traceable reports for operations and executive views.
 
 - `/` — Scan Listing (new home, PR-R1-09)
 - `/sites/[siteId]` — Site Scan Results (PR-R1-09)
+- `/login` — Supabase Auth login (PR-R1-01)
 - `/ops/` — Operations view (Upload, Findings, Reports tabs) — redirects to `/`
 - `/executive/` — Executive dashboard
 - `/admin/customers` — Customer management (PR-R1-09)
@@ -122,7 +124,7 @@ traceable reports for operations and executive views.
 - **Feature**: UploadForm, UploadQueueTable, WellnessIndexCard, CrossSiteComparisonTable, DailySummaryCard, TrendChart, NotificationBell
 - **PR-R1-09**: ScanListingTable, ScanListingFilters, UploadModal, ScanHistoryTable, RegisterCustomerModal, CustomerDetailsCard, StandardsTable
 - **Findings**: MetricChart, TimeSeriesChart, MetricConfig, types
-- **Layout**: Navbar (updated PR-R1-09)
+- **Layout**: Navbar (updated PR-R1-09), Sidebar (added PR-R1-09, fixed position + responsive overlay)
 
 ### Test Coverage
 
@@ -136,6 +138,8 @@ traceable reports for operations and executive views.
 - `scripts/seed_rulebook_v1.py` — Seeds 4 standards: SS 554, WELL v2,
   RESET Viral Index, SafeSpace (rule_version="v2-refactor")
 - `scripts/seed_default_tenant.py` — Seeds default tenant, assigns sites
+- `scripts/cleanup_test_data.py` — Removes all test data except NPE tenant
+- `scripts/zone_extractor.py` — Extracts zone names from multi-site CSV
 - `assets/sample_uploads/npe_sample.csv` — New Park Estate sample (3 zones, 24 rows, clean PASS)
 - `assets/sample_uploads/cag_sample.csv` — Changi Airport Group sample (3 zones, 30 rows, data gaps + critical CO2)
 

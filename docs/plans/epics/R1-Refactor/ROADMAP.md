@@ -103,7 +103,7 @@ per-standard evaluation, tenant scoping.
 - **Goal**: Restructure navigation so scan results are the primary landing experience
 - **Scope (in)**: Scan Listing home page, site scan results page, upload modal, role-aware Summary nav, backward redirects
 - **Scope (out)**: Full auth integration, tenant user summary view, CM registration
-- **Key Changes**: New routes `/` and `/sites/{siteId}`, enhanced dashboard/sites API, 5 new components, Navbar update, Sidebar removed
+- **Key Changes**: New routes `/` and `/sites/{siteId}`, enhanced dashboard/sites API, 5 new components, Sidebar added (fixed position, responsive overlay on mobile)
 - **Testing**: Build passes, TypeScript passes, backend imports verified
 - **Dependencies**: PR-R1-05 (components exist), PR-R1-08 (upload flow stable)
 

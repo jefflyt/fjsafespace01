@@ -11,8 +11,8 @@
 | PR-R1-05 | Frontend Refactor | ✅ Complete | 2026-04-30 |
 | PR-R1-06 | Testing and Polish | ⏳ Pending | — |
 | PR-R1-09 | UI Refresh — Scan Results as Home | ✅ Complete (committed) | 2026-05-03 |
-| PR-R1-10 | Multi-Site CSV Upload Split | 📋 Plan ready | — |
-| PR-R1-11 | uHoo API Consistency Audit | 📋 Plan ready | — |
+| PR-R1-10 | Multi-Site CSV Upload Split | ✅ Complete (committed) | 2026-05-04 |
+| PR-R1-11 | uHoo API Consistency Audit | ✅ Complete (committed) | 2026-05-04 |
 
 ## 1. Product Summary
 
@@ -457,6 +457,11 @@ PR-R1-06 (Testing + Polish)
 | 013_alert_log | Create alert_log table | R2 |
 | 014_user_tenant | Create user_tenant table | R1 |
 | 015_rulebook_standard_link | Add reference_source_id FK to rulebook_entry | R1 |
+| 016_tenant_email_unique | Add UNIQUE constraint on tenant.email | R1 |
+| 017_upload_content_hash | Add content_hash column to upload for dedup | R1 |
+| 018_upload_batch_multi_site | Create upload_batch table, add batch_id/zone_list to upload | R1 |
+| 019_finding_reference_source | Add reference_source_id FK to finding | R1 |
+| 020_rulebook_threshold_band | Add threshold_band column to rulebook_entry | R1 |
 
 ## 6. Risks, Trade-offs, and Open Questions
 
