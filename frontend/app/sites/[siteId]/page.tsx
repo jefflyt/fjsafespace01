@@ -11,8 +11,8 @@ import { StandardsTable } from '@/components/StandardsTable';
 import { CustomerDetailsCard } from '@/components/CustomerDetailsCard';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { api, apiClient, MetricPreferences, UploadListItem, SiteDetail, ReferenceSource } from '@/lib/api';
-import { getScoreColor, formatDate } from '@/lib/utils';
-import { ChevronRight, Home, ShieldCheck, ShieldAlert, Activity } from 'lucide-react';
+import { getScoreColor, getOutcomeConfig, formatDate, bandToOutcome } from '@/lib/utils';
+import { ChevronRight, Home, Activity } from 'lucide-react';
 import type { Finding } from '@/components/findings/types';
 
 interface Reading {
@@ -133,9 +133,7 @@ export default function SiteDetailPage() {
       const scores = sourceFindings.map((f) =>
         f.threshold_band === 'GOOD' ? 100 : f.threshold_band === 'WATCH' ? 50 : 0,
       );
-      const outcomes = sourceFindings.map((f) =>
-        f.threshold_band === 'GOOD' ? 'PASS' : f.threshold_band === 'WATCH' ? 'INSUFFICIENT_EVIDENCE' : 'FAIL',
-      );
+      const outcomes = sourceFindings.map((f) => bandToOutcome(f.threshold_band));
 
       const score = scores.length > 0
         ? scores.reduce((a, b) => a + b, 0 as number) / scores.length
@@ -148,7 +146,9 @@ export default function SiteDetailPage() {
             ? 'FAIL'
             : outcomes.every((o) => o === 'PASS')
               ? 'PASS'
-              : 'INSUFFICIENT_EVIDENCE';
+              : outcomes.includes('WATCH')
+                ? 'WATCH'
+                : 'INSUFFICIENT_EVIDENCE';
 
       return {
         sourceId: source.id,
@@ -169,9 +169,9 @@ export default function SiteDetailPage() {
     return scored.reduce((sum, s) => sum + (s.score ?? 0), 0) / scored.length;
   }, [standardsEntries]);
 
-  // Last scan date from uploads
-  const lastScanDate = uploads.length > 0
-    ? new Date(uploads[0].uploaded_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+  // Last scan date from uploads — always use scan_date (actual reading time)
+  const lastScanDate = uploads.length > 0 && uploads[0].scan_date
+    ? new Date(uploads[0].scan_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
     : null;
 
   // Zones from findings filtered by active standard
@@ -247,7 +247,7 @@ export default function SiteDetailPage() {
       <div className="flex-1 lg:ml-60 min-w-0">
         <MobileTopBar onMenuClick={() => setSidebarOpen(true)} title={displayName} />
 
-        <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
+        <div className="w-full px-4 md:px-6 lg:px-8 py-6 space-y-6">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-1 text-sm text-muted-foreground animate-fade-in">
             <button
@@ -318,18 +318,9 @@ export default function SiteDetailPage() {
             {/* Standard score cards */}
             {standardsEntries.slice(0, 3).map((std) => {
               const scorePct = std.score != null ? Math.round(std.score) : 0;
-              const barColor =
-                std.outcome === 'PASS' || std.outcome === 'HEALTHY_WORKPLACE_CERTIFIED'
-                  ? 'bg-healthy'
-                  : std.outcome === 'FAIL' || std.outcome === 'IMPROVEMENT_REQUIRED'
-                    ? 'bg-destructive'
-                    : 'bg-warning';
-              const iconColor =
-                std.outcome === 'PASS' || std.outcome === 'HEALTHY_WORKPLACE_CERTIFIED'
-                  ? 'text-healthy'
-                  : std.outcome === 'FAIL' || std.outcome === 'IMPROVEMENT_REQUIRED'
-                    ? 'text-destructive'
-                    : 'text-warning';
+              const cfg = getOutcomeConfig(std.outcome);
+              const barColor = cfg.bg ? cfg.bg.replace('bg-', 'bg-').split(' ')[0] : 'bg-warning';
+              const iconColor = cfg.color;
 
               return (
                 <Card
@@ -338,11 +329,7 @@ export default function SiteDetailPage() {
                 >
                   <CardContent className="pt-6">
                     <div className="flex items-center gap-2 mb-3">
-                      {std.outcome === 'PASS' ? (
-                        <ShieldCheck className={`h-4 w-4 ${iconColor}`} />
-                      ) : (
-                        <ShieldAlert className={`h-4 w-4 ${iconColor}`} />
-                      )}
+                      <cfg.icon className={`h-4 w-4 ${iconColor}`} />
                       <p className="text-xs uppercase tracking-wider text-muted-foreground truncate">{std.shortTitle}</p>
                     </div>
                     <p className={`font-mono text-3xl font-bold tabular-nums ${

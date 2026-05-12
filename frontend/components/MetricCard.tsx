@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { METRIC_CONFIGS } from "@/components/findings/MetricConfig";
-import { AlertCircle, CheckCircle2, AlertTriangle } from "lucide-react";
+import { BAND_TAILWIND } from "@/lib/constants";
 
 interface MetricCardProps {
   metricName: string;
@@ -15,30 +15,6 @@ interface MetricCardProps {
   workforceImpactText?: string;
 }
 
-const BAND_CONFIG = {
-  GOOD: {
-    color: "text-green-700",
-    bg: "bg-green-50",
-    border: "border-green-200",
-    icon: CheckCircle2,
-    label: "Healthy",
-  },
-  WATCH: {
-    color: "text-amber-700",
-    bg: "bg-amber-50",
-    border: "border-amber-200",
-    icon: AlertTriangle,
-    label: "Attention",
-  },
-  CRITICAL: {
-    color: "text-red-700",
-    bg: "bg-red-50",
-    border: "border-red-200",
-    icon: AlertCircle,
-    label: "Action Required",
-  },
-};
-
 export function MetricCard({
   metricName,
   metricValue,
@@ -49,7 +25,7 @@ export function MetricCard({
   workforceImpactText,
 }: MetricCardProps) {
   const config = METRIC_CONFIGS[metricName];
-  const band = BAND_CONFIG[thresholdBand] ?? BAND_CONFIG.WATCH;
+  const band = BAND_TAILWIND[thresholdBand] ?? BAND_TAILWIND.WATCH;
   const BandIcon = band.icon;
 
   return (

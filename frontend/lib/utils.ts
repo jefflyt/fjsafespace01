@@ -31,32 +31,6 @@ export function getScoreColor(score: number): string {
   return BAND_COLORS.red
 }
 
-// ── Outcome config ───────────────────────────────────────────────────────────
+// ── Outcome config (consolidated in constants.ts) ────────────────────
 
-export const OUTCOME_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  HEALTHY_WORKPLACE_CERTIFIED: {
-    label: "Certified",
-    color: "text-green-700",
-    bg: "bg-green-50 border-green-200",
-  },
-  HEALTHY_SPACE_VERIFIED: {
-    label: "Verified",
-    color: "text-amber-700",
-    bg: "bg-amber-50 border-amber-200",
-  },
-  IMPROVEMENT_RECOMMENDED: {
-    label: "Improvement Needed",
-    color: "text-red-700",
-    bg: "bg-red-50 border-red-200",
-  },
-  INSUFFICIENT_EVIDENCE: {
-    label: "Insufficient Data",
-    color: "text-muted-foreground",
-    bg: "bg-muted/30 border-muted",
-  },
-}
-
-export function getOutcomeConfig(outcome: string | undefined | null) {
-  if (!outcome) return OUTCOME_CONFIG.INSUFFICIENT_EVIDENCE
-  return OUTCOME_CONFIG[outcome] ?? OUTCOME_CONFIG.INSUFFICIENT_EVIDENCE
-}
+export { OUTCOME_CONFIG, getOutcomeConfig, bandToOutcome } from "@/lib/constants";

@@ -8,6 +8,7 @@ interface ScanHistoryEntry {
   id: string;
   file_name: string;
   uploaded_at: string;
+  scan_date: string | null;
   scan_type: string | null;
   parse_status: string;
   standards_evaluated: string[];
@@ -45,11 +46,13 @@ export function ScanHistoryTable({ uploads, onRowClick }: ScanHistoryTableProps)
               onClick={() => onRowClick(upload.id)}
             >
               <TableCell className="text-sm text-muted-foreground">
-                {new Date(upload.uploaded_at).toLocaleDateString('en-GB', {
-                  day: '2-digit',
-                  month: 'short',
-                  year: 'numeric',
-                })}
+                {upload.scan_date
+                  ? new Date(upload.scan_date).toLocaleDateString('en-GB', {
+                      day: '2-digit',
+                      month: 'short',
+                      year: 'numeric',
+                    })
+                  : '—'}
               </TableCell>
               <TableCell>
                 <Badge variant={upload.scan_type === 'continuous' ? 'default' : 'outline'} className="text-xs">

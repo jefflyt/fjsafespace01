@@ -39,7 +39,7 @@ export default function AdminCustomersPage() {
       <div className="flex-1 lg:ml-60 min-w-0">
         <MobileTopBar onMenuClick={() => setSidebarOpen(true)} title="Customers" />
 
-        <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
+        <div className="w-full px-4 md:px-6 lg:px-8 py-6 space-y-6">
           {/* Page header */}
           <div className="animate-fade-in">
             <div className="flex items-center gap-2 mb-1">

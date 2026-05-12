@@ -10,9 +10,10 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Info, Loader2, ShieldCheck, ShieldAlert } from 'lucide-react';
+import { Info, Loader2 } from 'lucide-react';
 import { apiClient, type RulebookRule } from '@/lib/api';
 import type { Finding } from '@/components/findings/types';
+import { getOutcomeConfig, getScoreColor } from '@/lib/constants';
 
 interface StandardEntry {
   sourceId: string;
@@ -31,28 +32,12 @@ interface StandardsTableProps {
 }
 
 function getOutcomeBadge(outcome: string) {
-  switch (outcome) {
-    case 'PASS':
-    case 'HEALTHY_WORKPLACE_CERTIFIED':
-      return { icon: ShieldCheck, label: 'Certified', color: 'text-green-700 bg-green-50 border-green-200' };
-    case 'FAIL':
-    case 'IMPROVEMENT_REQUIRED':
-    case 'IMPROVEMENT_RECOMMENDED':
-      return { icon: ShieldAlert, label: 'Action Required', color: 'text-red-700 bg-red-50 border-red-200' };
-    case 'COMING_SOON':
-      return { icon: Info, label: 'Coming Soon', color: 'text-gray-700 bg-gray-50 border-gray-200' };
-    case 'INSUFFICIENT_EVIDENCE':
-      return { icon: Info, label: 'Partial Evidence', color: 'text-amber-700 bg-amber-50 border-amber-200' };
-    default:
-      return { icon: Info, label: 'No Data', color: 'text-gray-700 bg-gray-50 border-gray-200' };
-  }
+  const cfg = getOutcomeConfig(outcome);
+  return { icon: cfg.icon, label: cfg.label, color: `${cfg.color} ${cfg.bg ?? ''} ${cfg.border}` };
 }
 
-function getScoreColor(score: number | null): string {
-  if (score == null) return 'text-muted-foreground';
-  if (score >= 80) return 'text-green-600';
-  if (score >= 60) return 'text-amber-600';
-  return 'text-red-600';
+function scoreColor(score: number | null): string {
+  return getScoreColor(score);
 }
 
 function shortTitle(title: string): string {

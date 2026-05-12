@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { api, apiClient } from "@/lib/api"
 import { cn, getOutcomeConfig, getScoreColor, formatDate } from "@/lib/utils"
+import { BAND_TAILWIND } from "@/lib/constants"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -168,10 +169,13 @@ export default function ExecutiveDashboardPage() {
 
     if (showNeedsAttentionOnly) {
       rows = rows.filter((row) => {
-        const hasBadOutcome = row.certification_outcome?.includes("IMPROVEMENT") ||
-          row.certification_outcome?.includes("INSUFFICIENT")
+        const rowOutcome = getOutcomeConfig(row.certification_outcome)
+        const hasBadOutcome = rowOutcome.label.includes("Improvement") || rowOutcome.label.includes("Insufficient")
         const hasBadStandard = row.standard_scores?.some(
-          (s) => s.outcome === "FAIL" || s.outcome === "INSUFFICIENT_EVIDENCE"
+          (s) => {
+            const cfg = getOutcomeConfig(s.outcome)
+            return cfg.label === "Fail" || cfg.label.includes("Insufficient")
+          }
         )
         return hasBadOutcome || hasBadStandard
       })
@@ -226,8 +230,8 @@ export default function ExecutiveDashboardPage() {
         <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         <div className="flex-1 lg:ml-60 min-w-0">
           <div className="px-4 md:px-6 py-6">
-            <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center">
-              <p className="font-medium text-red-600">Failed to load dashboard data</p>
+            <div className={`rounded-lg border p-6 text-center ${BAND_TAILWIND.CRITICAL.bg} ${BAND_TAILWIND.CRITICAL.border}`}>
+              <p className={`font-medium ${BAND_TAILWIND.CRITICAL.color.replace('700', '600')}`}>Failed to load dashboard data</p>
               <p className="mt-1 text-sm text-muted-foreground">{error}</p>
             </div>
           </div>
@@ -285,7 +289,7 @@ export default function ExecutiveDashboardPage() {
           </div>
 
           {/* KPI Strip */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <KpiCard
               label="Total Sites"
               value={data.health_ratings.total_sites}
@@ -448,18 +452,14 @@ export default function ExecutiveDashboardPage() {
                   key={finding.id}
                   className={cn(
                     "rounded-lg border p-3",
-                    finding.threshold_band === "CRITICAL" ? "bg-red-50 border-red-200" :
-                    finding.threshold_band === "WATCH" ? "bg-amber-50 border-amber-200" :
-                    "bg-green-50 border-green-200"
+                    (BAND_TAILWIND[finding.threshold_band] ?? BAND_TAILWIND.WATCH).bg + ' ' + (BAND_TAILWIND[finding.threshold_band] ?? BAND_TAILWIND.WATCH).border
                   )}
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-semibold">{finding.zone_name}</span>
                     <Badge variant="outline" className={cn(
                       "text-[10px]",
-                      finding.threshold_band === "CRITICAL" ? "bg-red-100 text-red-800 border-red-200" :
-                      finding.threshold_band === "WATCH" ? "bg-amber-100 text-amber-800 border-amber-200" :
-                      "bg-green-100 text-green-800 border-green-200"
+                      (BAND_TAILWIND[finding.threshold_band] ?? BAND_TAILWIND.WATCH).bg + ' text-foreground ' + (BAND_TAILWIND[finding.threshold_band] ?? BAND_TAILWIND.WATCH).border
                     )}>
                       {finding.threshold_band}
                     </Badge>

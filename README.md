@@ -139,28 +139,48 @@ fjsafespace01/
 │   │   └── executive/         ← Executive portfolio (results, suggestions, history)
 │   ├── components/
 │   │   ├── ui/                ← Shadcn primitives (button, card, dialog, etc.)
-│   │   ├── CitationBadge.tsx
-│   │   ├── CitationDrawer.tsx
+│   │   ├── layout/            ← Navbar, Sidebar, AuthProvider
+│   │   ├── findings/          ← MetricChart, TimeSeriesChart, MetricConfig, types
+│   │   ├── MetricCard.tsx
+│   │   ├── ScanListingTable.tsx
+│   │   ├── ScanListingFilters.tsx
+│   │   ├── ScanHistoryTable.tsx
+│   │   ├── UploadModal.tsx
+│   │   ├── UploadForm.tsx
+│   │   ├── UploadQueueTable.tsx
+│   │   ├── WellnessIndexCard.tsx
 │   │   ├── CrossSiteComparisonTable.tsx
 │   │   ├── DailySummaryCard.tsx
 │   │   ├── NotificationBell.tsx
-│   │   ├── QAChecklist.tsx
-│   │   ├── ReportTypeBadge.tsx
-│   │   ├── TrendChart.tsx
-│   │   ├── UploadForm.tsx
-│   │   ├── WellnessIndexCard.tsx
-│   │   └── layout/            ← Navbar, Sidebar
+│   │   ├── StandardSelector.tsx
+│   │   ├── ThresholdConfigDialog.tsx
+│   │   ├── ZoneDetailView.tsx
+│   │   ├── ZoneAssignment.tsx
+│   │   ├── CustomerLookup.tsx
+│   │   ├── CustomerDetailsCard.tsx
+│   │   ├── RegisterCustomerModal.tsx
+│   │   ├── StandardsTable.tsx
+│   │   ├── CustomerManagement.tsx
+│   │   └── MetricSelector.tsx
 │   ├── lib/
-│   │   └── api.ts             ← Fetch client for FastAPI backend
-│   ├── tests/
-│   │   ├── components.test.tsx
-│   │   └── wellness-index-card.test.tsx
+│   │   ├── api.ts             ← Fetch client for FastAPI backend
+│   │   ├── constants.ts       ← Global constants (outcomes, bands, score colors)
+│   │   ├── utils.ts           ← cn(), formatDate, re-exports from constants
+│   │   └── supabase.ts        ← Supabase auth client
+│   ├── app/
+│   │   ├── page.tsx           ← Scan Listing (home)
+│   │   ├── layout.tsx
+│   │   ├── login/page.tsx     ← Supabase Auth login
+│   │   ├── executive/page.tsx ← Executive dashboard
+│   │   ├── ops/page.tsx       ← Operations (redirects to /)
+│   │   ├── sites/[siteId]/page.tsx ← Site scan results
+│   │   └── admin/customers/page.tsx ← Customer management
 │   └── package.json
 │
 ├── scripts/
-│   ├── seed_rulebook.py              ← Populates WHO AQG 2021 + SS554 rulebook entries
-│   ├── run_qa_audit.py               ← Runs all 8 QA gates against an upload_id
-│   └── preview_report.py             ← Renders report HTML template to PDF
+│   ├── seed_rulebook_v1.py           ← Seeds 4 standards (SS554, WELL, RESET, SafeSpace)
+│   ├── seed_default_tenant.py        ← Seeds default tenant, assigns sites
+│   └── cleanup_test_data.py          ← Removes all test data except NPE tenant
 │
 ├── assets/sample_uploads/
 │   ├── npe_sample.csv                ← New Park Estate sample (3 zones, 24 rows, clean PASS)

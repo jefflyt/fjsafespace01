@@ -259,6 +259,7 @@ export interface UploadListItem {
   site_id: string;
   parse_status: string;
   uploaded_at: string;
+  scan_date: string | null;
   report_type: string | null;
   scan_type: string | null;
   standards_evaluated: string[];

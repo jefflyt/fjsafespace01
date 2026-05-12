@@ -118,6 +118,13 @@ def _process_single_upload(
     if zone_list:
         rows_to_persist = [r for r in rows_to_persist if r.get("zone_name") in zone_list]
 
+    # Derive scan_date from earliest reading timestamp
+    scan_date = None
+    if rows_to_persist:
+        timestamps = [r["reading_timestamp"] for r in rows_to_persist if r.get("reading_timestamp")]
+        if timestamps:
+            scan_date = min(timestamps)
+
     # Create upload record
     upload = Upload(
         id=upload_id,
@@ -132,6 +139,7 @@ def _process_single_upload(
         content_hash=hashlib.sha256(file_bytes).hexdigest(),
         batch_id=batch_id,
         zone_list=zone_list,
+        scan_date=scan_date,
         warnings=", ".join(parse_result.warnings) if parse_result.warnings else None,
     )
     session.add(upload)
@@ -663,6 +671,7 @@ async def list_uploads(
             "site_id": u.site_id,
             "parse_status": u.parse_status.value,
             "uploaded_at": u.uploaded_at.isoformat(),
+            "scan_date": u.scan_date.isoformat() if u.scan_date else None,
             "report_type": u.report_type.value if u.report_type else None,
             "scan_type": u.scan_type,
             "standards_evaluated": u.standards_evaluated or [],

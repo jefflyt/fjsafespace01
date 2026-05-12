@@ -120,11 +120,20 @@ traceable reports for operations and executive views.
 
 ### Existing Frontend Components
 
-- **UI** (Shadcn): button, input, card, dialog, label, select, table, badge, dropdown-menu, textarea, checkbox
+- **UI** (Shadcn): button, input, card, dialog, label, select, table, badge, dropdown-menu, textarea, checkbox, skeleton
 - **Feature**: UploadForm, UploadQueueTable, WellnessIndexCard, CrossSiteComparisonTable, DailySummaryCard, TrendChart, NotificationBell
 - **PR-R1-09**: ScanListingTable, ScanListingFilters, UploadModal, ScanHistoryTable, RegisterCustomerModal, CustomerDetailsCard, StandardsTable
+- **R1-05**: SiteOverviewCard, MetricCard, StandardSelector, MetricSelector, ThresholdConfigDialog, ZoneDetailView
+- **Multi-site**: ZoneAssignment, CustomerLookup, CustomerManagement
 - **Findings**: MetricChart, TimeSeriesChart, MetricConfig, types
-- **Layout**: Navbar (updated PR-R1-09), Sidebar (added PR-R1-09, fixed position + responsive overlay)
+- **Layout**: Navbar (updated PR-R1-09), Sidebar (added PR-R1-09, fixed position + responsive overlay), AuthProvider
+
+### Frontend Libraries
+
+- `frontend/lib/api.ts` — Fetch client for FastAPI backend
+- `frontend/lib/constants.ts` — Global constants (OUTCOME_CONFIG, BAND_TAILWIND, getScoreColor, BAND_PRIORITY, BAND_TO_OUTCOME, bandToOutcome). **All new components should import from here instead of duplicating.**
+- `frontend/lib/utils.ts` — cn(), formatDate, re-exports OUTCOME_CONFIG/getOutcomeConfig/bandToOutcome from constants.ts
+- `frontend/lib/supabase.ts` — Supabase auth client
 
 ### Test Coverage
 
@@ -139,7 +148,6 @@ traceable reports for operations and executive views.
   RESET Viral Index, SafeSpace (rule_version="v2-refactor")
 - `scripts/seed_default_tenant.py` — Seeds default tenant, assigns sites
 - `scripts/cleanup_test_data.py` — Removes all test data except NPE tenant
-- `scripts/zone_extractor.py` — Extracts zone names from multi-site CSV
 - `assets/sample_uploads/npe_sample.csv` — New Park Estate sample (3 zones, 24 rows, clean PASS)
 - `assets/sample_uploads/cag_sample.csv` — Changi Airport Group sample (3 zones, 30 rows, data gaps + critical CO2)
 

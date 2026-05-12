@@ -18,7 +18,7 @@ from sqlmodel import Session, col, select
 
 from app.models.enums import CertificationOutcome, SourceCurrency, ThresholdBand
 from app.models.workflow_a import RulebookEntry
-from app.models.workflow_b import Finding, Report, Site
+from app.models.workflow_b import Finding, Report, Site, Upload
 from app.skills.iaq_rule_governor.wellness_index import (
     calculate_wellness_index,
     derive_certification_outcome,
@@ -243,10 +243,12 @@ def get_leaderboard(
         for site in site_group:
             score, outcome = calculate_site_wellness_index(session, site.id)
 
-            latest_finding = session.exec(
-                select(Finding)
-                .where(col(Finding.site_id) == site.id)
-                .order_by(col(Finding.created_at).desc())
+            # Use scan_date from latest upload (actual CSV reading time)
+            latest_upload = session.exec(
+                select(Upload)
+                .where(col(Upload.site_id) == site.id)
+                .where(col(Upload.scan_date).isnot(None))
+                .order_by(col(Upload.scan_date).desc())
                 .limit(1)
             ).first()
 
@@ -256,14 +258,14 @@ def get_leaderboard(
 
             total_findings += len(finding_count)
 
-            # Keep the site with the most recent findings
-            if latest_finding and (best_date is None or latest_finding.created_at > best_date):
+            # Keep the site with the most recent scan_date
+            if latest_upload and (best_date is None or latest_upload.scan_date > best_date):
                 best_site = site
-                best_date = latest_finding.created_at
+                best_date = latest_upload.scan_date
                 best_score = score
                 best_outcome = outcome.value
-            elif best_site is None and not latest_finding:
-                # No findings for any site yet — use first one
+            elif best_site is None and not latest_upload:
+                # No uploads with scan_date yet — use first one
                 best_site = site
                 best_score = score
                 best_outcome = outcome.value

@@ -9,6 +9,7 @@ import { TimeSeriesChart } from "@/components/findings/TimeSeriesChart";
 import { apiClient, type MetricPreferences } from "@/lib/api";
 import type { Finding } from "@/components/findings/types";
 import { METRIC_KEYS } from "@/components/findings/MetricConfig";
+import { BAND_PRIORITY } from "@/lib/constants";
 
 interface ZoneDetailViewProps {
   zoneName: string;
@@ -23,12 +24,6 @@ interface ZoneDetailViewProps {
   siteId: string;
   metricPreferences: MetricPreferences;
 }
-
-const BAND_ORDER: Record<string, number> = {
-  CRITICAL: 0,
-  WATCH: 1,
-  GOOD: 2,
-};
 
 export function ZoneDetailView({
   zoneName,
@@ -53,8 +48,8 @@ export function ZoneDetailView({
       const existing = grouped[f.metric_name];
       if (
         !existing ||
-        (BAND_ORDER[f.threshold_band] ?? 99) <
-          (BAND_ORDER[existing.threshold_band] ?? 99)
+        (BAND_PRIORITY[f.threshold_band] ?? 99) <
+          (BAND_PRIORITY[existing.threshold_band] ?? 99)
       ) {
         grouped[f.metric_name] = f;
       }

@@ -2,7 +2,8 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, TrendingDown, Minus, ShieldCheck, ShieldAlert, Info } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { OUTCOME_CONFIG, getOutcomeConfig, getScoreColor } from "@/lib/constants";
 
 interface StandardScore {
   title: string;
@@ -18,59 +19,6 @@ interface WellnessIndexCardProps {
   trend?: "up" | "down" | "stable";
   // R1-05: per-standard scores
   standardScores?: StandardScore[];
-}
-
-const OUTCOME_CONFIG: Record<string, { label: string; icon: React.ElementType; color: string; bg: string; border: string }> = {
-  HEALTHY_WORKPLACE_CERTIFIED: {
-    label: "Certified",
-    icon: ShieldCheck,
-    color: "text-green-700",
-    bg: "bg-green-50",
-    border: "border-green-200",
-  },
-  HEALTHY_SPACE_VERIFIED: {
-    label: "Verified",
-    icon: ShieldCheck,
-    color: "text-amber-700",
-    bg: "bg-amber-50",
-    border: "border-amber-200",
-  },
-  IMPROVEMENT_REQUIRED: {
-    label: "Improvement Needed",
-    icon: ShieldAlert,
-    color: "text-red-700",
-    bg: "bg-red-50",
-    border: "border-red-200",
-  },
-  INSUFFICIENT_EVIDENCE: {
-    label: "Insufficient Evidence",
-    icon: Info,
-    color: "text-muted-foreground",
-    bg: "bg-gray-50",
-    border: "border-gray-200",
-  },
-  PASS: {
-    label: "Pass",
-    icon: ShieldCheck,
-    color: "text-green-700",
-    bg: "bg-green-50",
-    border: "border-green-200",
-  },
-  FAIL: {
-    label: "Fail",
-    icon: ShieldAlert,
-    color: "text-red-700",
-    bg: "bg-red-50",
-    border: "border-red-200",
-  },
-};
-
-function getScoreColor(score: number | null): string {
-  if (score == null) return "text-muted-foreground";
-  if (score >= 80) return "text-[#37CA37]";
-  if (score >= 60) return "text-[#F6AD55]";
-  if (score >= 40) return "text-[#F6AD55]";
-  return "text-[#E93D3D]";
 }
 
 function getTrendIcon(trend: "up" | "down" | "stable" | undefined) {
@@ -92,8 +40,7 @@ export function WellnessIndexCard({
   trend = "stable",
   standardScores,
 }: WellnessIndexCardProps) {
-  const outcomeKey = certificationOutcome as keyof typeof OUTCOME_CONFIG;
-  const config = OUTCOME_CONFIG[outcomeKey] ?? OUTCOME_CONFIG.INSUFFICIENT_EVIDENCE;
+  const config = getOutcomeConfig(certificationOutcome);
   const OutcomeIcon = config.icon;
 
   return (
@@ -143,7 +90,7 @@ export function WellnessIndexCard({
         {standardScores && standardScores.length > 0 && (
           <div className="mt-4 space-y-2">
             {standardScores.map((s) => {
-              const sConfig = OUTCOME_CONFIG[s.outcome] ?? OUTCOME_CONFIG.INSUFFICIENT_EVIDENCE;
+              const sConfig = getOutcomeConfig(s.outcome);
               const SIcon = sConfig.icon;
               return (
                 <div key={s.title} className="flex items-center justify-between rounded-md border p-2">

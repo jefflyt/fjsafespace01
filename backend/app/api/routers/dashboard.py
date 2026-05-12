@@ -147,7 +147,7 @@ async def get_sites(session: SessionDep, tenant_id: TenantIdDep):
             "standards_evaluated": latest_upload.standards_evaluated if latest_upload else [],
             "certification_outcome": outcome,
             "wellness_index_score": score,
-            "last_scan_date": latest_upload.uploaded_at.isoformat() if latest_upload and latest_upload.uploaded_at else None,
+            "last_scan_date": latest_upload.scan_date.isoformat() if latest_upload and latest_upload.scan_date else None,
             "scan_count": upload_count_by_site.get(site.id, 0),
             "first_scan_date": first_scan_by_site[site.id].isoformat() if site.id in first_scan_by_site else None,
         })
@@ -162,8 +162,8 @@ async def get_sites(session: SessionDep, tenant_id: TenantIdDep):
             grouped[name] = row
         else:
             existing = grouped[name]
-            new_ts = row.get("uploaded_at") or ""
-            old_ts = existing.get("uploaded_at") or ""
+            new_ts = row.get("last_scan_date") or ""
+            old_ts = existing.get("last_scan_date") or ""
             if new_ts > old_ts:
                 grouped[name] = row
 

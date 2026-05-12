@@ -78,6 +78,8 @@ class Upload(SQLModel, table=True):
     )
     # R1-08: SHA-256 content hash for dedup detection
     content_hash: Optional[str] = Field(default=None)
+    # R1-09: Actual scan date derived from earliest reading timestamp
+    scan_date: Optional[datetime] = Field(default=None)
     # R1-10: batch membership and zone coverage
     batch_id: Optional[str] = Field(default=None, foreign_key="upload_batch.id")
     zone_list: Optional[list[str]] = Field(

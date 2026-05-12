@@ -1,8 +1,9 @@
-"use client"
+'use client'
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { cn } from '@/lib/utils'
 import {
   LayoutDashboard,
   ClipboardList,
@@ -10,7 +11,7 @@ import {
   Users,
   Settings,
   ShieldCheck,
-} from "lucide-react"
+} from 'lucide-react'
 
 interface SidebarProps {
   open: boolean
@@ -18,16 +19,24 @@ interface SidebarProps {
 }
 
 const navItems = [
-  { href: "/", label: "Scans", icon: ClipboardList, count: true },
-  { href: "/executive", label: "Executive", icon: LayoutDashboard },
-  { href: "/admin/customers", label: "Customers", icon: Users },
+  { href: '/', label: 'Scans', icon: ClipboardList, count: true },
+  { href: '/executive', label: 'Executive', icon: LayoutDashboard },
+  { href: '/admin/customers', label: 'Customers', icon: Users },
 ]
 
 export function Sidebar({ open, onClose }: SidebarProps) {
   const pathname = usePathname()
+  const [scanCount, setScanCount] = useState<number | null>(null)
+
+  useEffect(() => {
+    fetch('/api/uploads')
+      .then((r) => r.json())
+      .then((data) => setScanCount(Array.isArray(data) ? data.length : 0))
+      .catch(() => setScanCount(0))
+  }, [])
 
   const isActive = (path: string) => {
-    if (path === "/") return pathname === "/"
+    if (path === '/') return pathname === '/'
     return pathname?.startsWith(path)
   }
 
@@ -79,9 +88,9 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 >
                   <Icon className="h-4 w-4 shrink-0" />
                   <span className="flex-1">{item.label}</span>
-                  {item.count && (
+                  {item.count && scanCount !== null && (
                     <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-mono text-primary">
-                      12
+                      {scanCount}
                     </span>
                   )}
                 </Link>

@@ -26,9 +26,13 @@ export function StandardSelector({
 
   return (
     <Tabs value={activeStandardId} onValueChange={onStandardChange}>
-      <TabsList>
+      <TabsList className="flex flex-nowrap overflow-x-auto">
         {activeStandards.map((standard) => (
-          <TabsTrigger key={standard.source_id} value={standard.source_id}>
+          <TabsTrigger
+            key={standard.source_id}
+            value={standard.source_id}
+            className="whitespace-nowrap shrink-0"
+          >
             {standard.title}
           </TabsTrigger>
         ))}

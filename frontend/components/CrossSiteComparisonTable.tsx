@@ -10,16 +10,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowUpDown, ArrowUp, ArrowDown, ShieldCheck, ShieldAlert, Info } from "lucide-react";
-
-const OUTCOME_CONFIG: Record<string, { label: string; icon: React.ElementType; color: string; border: string }> = {
-  HEALTHY_WORKPLACE_CERTIFIED: { label: "Certified", icon: ShieldCheck, color: "text-green-700 bg-green-50 border-green-200", border: "border-green-200" },
-  HEALTHY_SPACE_VERIFIED: { label: "Verified", icon: ShieldCheck, color: "text-blue-700 bg-blue-50 border-blue-200", border: "border-blue-200" },
-  IMPROVEMENT_REQUIRED: { label: "Improvement", icon: ShieldAlert, color: "text-yellow-700 bg-yellow-50 border-yellow-200", border: "border-yellow-200" },
-  INSUFFICIENT_EVIDENCE: { label: "Insufficient", icon: Info, color: "text-gray-700 bg-gray-50 border-gray-200", border: "border-gray-200" },
-  PASS: { label: "Pass", icon: ShieldCheck, color: "text-green-700 bg-green-50 border-green-200", border: "border-green-200" },
-  FAIL: { label: "Fail", icon: ShieldAlert, color: "text-red-700 bg-red-50 border-red-200", border: "border-red-200" },
-};
+import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { OUTCOME_CONFIG, getOutcomeConfig, getScoreColor } from "@/lib/constants";
 
 interface StandardScore {
   title: string;
@@ -147,8 +139,7 @@ export function CrossSiteComparisonTable({ sites, availableStandards }: CrossSit
               </thead>
               <tbody>
                 {sorted.map((site, idx) => {
-                  const outcomeKey = site.certification_outcome as string;
-                  const config = OUTCOME_CONFIG[outcomeKey] ?? OUTCOME_CONFIG.INSUFFICIENT_EVIDENCE;
+                  const config = getOutcomeConfig(site.certification_outcome);
                   const StatusIcon = config.icon;
 
                   // Get the filtered standard score
@@ -165,12 +156,7 @@ export function CrossSiteComparisonTable({ sites, availableStandards }: CrossSit
                       <td className="text-sm font-medium p-2">{site.site_name}</td>
                       <td className="text-right p-2">
                         {site.wellness_index_score != null ? (
-                          <span className={`font-heading text-lg font-bold tabular-nums ${
-                            site.wellness_index_score >= 80 ? "text-[#37CA37]"
-                            : site.wellness_index_score >= 60 ? "text-[#F6AD55]"
-                            : site.wellness_index_score >= 40 ? "text-[#F6AD55]"
-                            : "text-[#E93D3D]"
-                          }`}>
+                          <span className={`font-heading text-lg font-bold tabular-nums ${getScoreColor(site.wellness_index_score)}`}>
                             {Math.round(site.wellness_index_score)}
                           </span>
                         ) : (
@@ -186,11 +172,7 @@ export function CrossSiteComparisonTable({ sites, availableStandards }: CrossSit
                       {/* R1-05: Per-standard score cell */}
                       {filterStandard !== "all" && filteredStandardScore && (
                         <td className="text-right p-2">
-                          <span className={`font-heading text-lg font-bold tabular-nums ${
-                            filteredStandardScore.score != null && filteredStandardScore.score >= 80 ? "text-[#37CA37]"
-                            : filteredStandardScore.score != null && filteredStandardScore.score >= 60 ? "text-[#F6AD55]"
-                            : "text-[#E93D3D]"
-                          }`}>
+                          <span className={`font-heading text-lg font-bold tabular-nums ${getScoreColor(filteredStandardScore.score)}`}>
                             {filteredStandardScore.score != null ? Math.round(filteredStandardScore.score) : "N/A"}
                           </span>
                         </td>
