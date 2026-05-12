@@ -12,8 +12,40 @@ import { CustomerDetailsCard } from '@/components/CustomerDetailsCard';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { api, apiClient, MetricPreferences, UploadListItem, SiteDetail, ReferenceSource } from '@/lib/api';
 import { getScoreColor, getOutcomeConfig, formatDate, bandToOutcome } from '@/lib/utils';
-import { ChevronRight, Home, Activity } from 'lucide-react';
+import { ChevronRight, Home, Activity, BarChart3, ShieldCheck } from 'lucide-react';
 import type { Finding } from '@/components/findings/types';
+
+// ── Breadcrumb Button ────────────────────────────────────────────────────────
+
+function BreadcrumbButton({
+  icon: Icon,
+  label,
+  onClick,
+  isLast,
+}: {
+  icon?: React.ElementType;
+  label: string;
+  onClick?: () => void;
+  isLast?: boolean;
+}) {
+  if (isLast) {
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-lg bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary transition-all">
+        {Icon && <Icon className="h-3.5 w-3.5" />}
+        {label}
+      </span>
+    );
+  }
+  return (
+    <button
+      onClick={onClick}
+      className="group inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm text-muted-foreground transition-all duration-200 hover:border-primary/40 hover:bg-primary/5 hover:text-foreground active:scale-[0.97]"
+    >
+      {Icon && <Icon className="h-3.5 w-3.5 transition-transform group-hover:scale-110" />}
+      {label}
+    </button>
+  );
+}
 
 interface Reading {
   metric_name: string;
@@ -248,33 +280,35 @@ export default function SiteDetailPage() {
         <MobileTopBar onMenuClick={() => setSidebarOpen(true)} title={displayName} />
 
         <div className="w-full px-4 md:px-6 lg:px-8 py-6 space-y-6">
-          {/* Breadcrumb */}
-          <nav className="flex items-center gap-1 text-sm text-muted-foreground animate-fade-in">
-            <button
+          {/* Breadcrumb Navigation */}
+          <nav className="flex items-center gap-2 animate-fade-in">
+            <BreadcrumbButton
+              icon={Home}
+              label="Scan Listings"
               onClick={() => router.push('/')}
-              className="hover:text-foreground transition-colors"
-            >
-              <Home className="h-3.5 w-3.5" />
-            </button>
-            <ChevronRight className="h-3 w-3" />
-            <button
-              onClick={() => router.push('/')}
-              className="hover:text-foreground transition-colors"
-            >
-              Scans
-            </button>
-            <ChevronRight className="h-3 w-3" />
-            <span className="text-foreground font-medium truncate max-w-[200px]">{displayName}</span>
+            />
+            <ChevronRight className="h-3 w-3 text-muted-foreground shrink-0" />
+            <BreadcrumbButton icon={ShieldCheck} label="Certification Results" isLast />
           </nav>
 
           {/* Page header */}
-          <div className="animate-fade-in">
-            <h1 className="font-heading text-3xl font-bold tracking-tight">{displayName}</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              {siteDetail?.tenant_name ? `${siteDetail.tenant_name} · ` : ''}
-              {uploads.length} scan{uploads.length !== 1 ? 's' : ''} total
-              {lastScanDate ? ` · Last scan: ${lastScanDate}` : ''}
-            </p>
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 animate-fade-in">
+            <div>
+              <h1 className="font-heading text-3xl font-bold tracking-tight">{displayName}</h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                {siteDetail?.tenant_name ? `${siteDetail.tenant_name} · ` : ''}
+                {uploads.length} scan{uploads.length !== 1 ? 's' : ''} total
+                {lastScanDate ? ` · Last scan: ${lastScanDate}` : ''}
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => router.push(`/scan-data/${siteId}${searchParams.get('batchId') ? `?batchId=${searchParams.get('batchId')}` : ''}`)}
+            >
+              <BarChart3 className="mr-1.5 h-4 w-4" />
+              View Raw Data
+            </Button>
           </div>
 
           {/* Wellness gauge + KPI strip */}

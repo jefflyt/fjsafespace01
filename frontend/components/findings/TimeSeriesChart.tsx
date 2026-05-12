@@ -102,9 +102,11 @@ function buildThresholds(
 // Custom X-axis tick: time only
 function CustomTick({ x, y, payload }: { x: number; y: number; payload: { value: string } }) {
   const d = parseTimestamp(payload.value);
-  const time = `${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`;
+  const hours = d.getHours().toString().padStart(2, "0");
+  const minutes = d.getMinutes().toString().padStart(2, "0");
+  const time = `${hours}:${minutes}`;
   return (
-    <g transform={`translate(${x},${y})`}>
+    <g transform={`translate(${x},${y + 15})`}>
       <text x={0} y={0} textAnchor="middle" fontSize={10} fill="hsl(var(--muted-foreground) / 0.8)">
         {time}
       </text>
@@ -176,6 +178,18 @@ export function TimeSeriesChart({
     return result;
   }, [dates, isMultiDay]);
 
+  // Evenly-spaced X-axis tick positions — returns actual timestamp values
+  const xTicks = useMemo(() => {
+    const len = chartData.length;
+    if (len === 0) return [];
+    const maxTicks = Math.min(8, len);
+    if (len <= maxTicks) return chartData.map((r) => r.timestamp as string);
+    const step = Math.floor(len / maxTicks);
+    return Array.from({ length: maxTicks }, (_, i) =>
+      chartData[i * step].timestamp as string
+    );
+  }, [chartData]);
+
   if (!config || chartData.length === 0) return null;
 
   return (
@@ -210,10 +224,8 @@ export function TimeSeriesChart({
                 tick={(props: any) => <CustomTick {...props} />}
                 tickLine={false}
                 axisLine={{ stroke: "hsl(var(--muted-foreground) / 0.2)" }}
-                angle={chartData.length > 20 ? -25 : 0}
-                textAnchor={chartData.length > 20 ? "end" : "middle"}
                 height={40}
-                interval="preserveStartEnd"
+                ticks={xTicks}
               />
 
               <YAxis
@@ -240,7 +252,7 @@ export function TimeSeriesChart({
                   }
                   return null;
                 }}
-                labelFormatter={(label: unknown) => parseTimestamp(label as string).toLocaleString()}
+                labelFormatter={(label: unknown) => parseTimestamp(label as string).toLocaleString("en-GB")}
               />
 
               {/* GOOD band — only if it intersects visible range */}

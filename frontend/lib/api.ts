@@ -306,6 +306,51 @@ export interface ConfirmUploadResponse {
   children: ConfirmUploadChild[];
 }
 
+// ── R1-12: Scan Data View ──────────────────────────────────────────────────
+
+export interface ReadingEntry {
+  zone_name: string;
+  timestamp: string;
+  metric_value: number;
+  is_outlier: boolean;
+}
+
+export interface ReadingsResponse {
+  upload_id: string;
+  metrics: Record<string, ReadingEntry[]>;
+}
+
+export interface TrendComparisonMetric {
+  current_avg: number;
+  previous_avg: number;
+  pct_change?: number;
+}
+
+export interface TrendComparisonResponse {
+  upload_id: string;
+  previous_upload_id: string | null;
+  metrics: Record<string, TrendComparisonMetric>;
+}
+
+export interface AnomalyEntry {
+  metric_name: string;
+  zone_name: string;
+  timestamp: string | null;
+  type: 'spike' | 'drop' | 'outlier';
+  value: number;
+  description: string;
+}
+
+export interface AnomaliesResponse {
+  anomalies: AnomalyEntry[];
+}
+
+export interface LatestUploadResponse {
+  upload_id: string;
+  site_id: string;
+  site_name: string;
+}
+
 export const apiClient = {
   // Metric Preferences
   getSitesMetricPreferences: (siteId: string, options?: FetchOptions) =>
@@ -408,4 +453,21 @@ export const apiClient = {
     }
     return api.upload<ConfirmUploadResponse>('/api/uploads/confirm', formData, options);
   },
+
+  // ── R1-12: Scan Data View ──────────────────────────────────────────────
+
+  getUploadReadings: (uploadId: string, zoneName?: string, options?: FetchOptions) =>
+    api.get<ReadingsResponse>(
+      `/api/uploads/${uploadId}/readings${zoneName ? `?zone_name=${encodeURIComponent(zoneName)}` : ''}`,
+      options,
+    ),
+
+  getTrendComparison: (uploadId: string, options?: FetchOptions) =>
+    api.get<TrendComparisonResponse>(`/api/uploads/${uploadId}/trend-comparison`, options),
+
+  getAnomalies: (uploadId: string, options?: FetchOptions) =>
+    api.get<AnomaliesResponse>(`/api/uploads/${uploadId}/anomalies`, options),
+
+  getLatestUploadForSite: (siteId: string, options?: FetchOptions) =>
+    api.get<LatestUploadResponse>(`/api/sites/${siteId}/latest-upload`, options),
 };

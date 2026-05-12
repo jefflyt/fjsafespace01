@@ -5,7 +5,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { CustomerManagement } from "@/components/CustomerManagement";
-import { Users } from "lucide-react";
 
 export default function AdminCustomersPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -42,11 +41,8 @@ export default function AdminCustomersPage() {
         <div className="w-full px-4 md:px-6 lg:px-8 py-6 space-y-6">
           {/* Page header */}
           <div className="animate-fade-in">
-            <div className="flex items-center gap-2 mb-1">
-              <Users className="h-5 w-5 text-muted-foreground" />
-              <h1 className="font-heading text-3xl font-bold tracking-tight">Customers</h1>
-            </div>
-            <p className="text-sm text-muted-foreground">
+            <h1 className="font-heading text-3xl font-bold tracking-tight">Customers</h1>
+            <p className="text-sm text-muted-foreground mt-1">
               Manage customer accounts and their scan history.
             </p>
           </div>

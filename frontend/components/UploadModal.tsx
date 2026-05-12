@@ -17,13 +17,13 @@ export function UploadModal({ open, onOpenChange, onUploadComplete }: UploadModa
     onUploadComplete(result);
     onOpenChange(false);
 
-    // For single upload, redirect to site
+    // For single upload, redirect to scan data view
     if ('upload_id' in result) {
-      router.push(`/sites/${result.site_id}`);
+      router.push(`/scan-data/${result.site_id}`);
     }
-    // For batch upload, redirect to first child's site
+    // For batch upload, redirect to first child's scan data view
     else if ('children' in result && result.children.length > 0) {
-      router.push(`/sites/${result.children[0].site_id}`);
+      router.push(`/scan-data/${result.children[0].site_id}`);
     }
   };
 

@@ -1,0 +1,35 @@
+{
+  "version": "1.0.0",
+  "patterns": {
+    "brainstorming:api+benchmark+brainstorming+data+design+designing+load+page+scan+view": {
+      "keywords": [
+        "api",
+        "design",
+        "benchmark",
+        "load",
+        "brainstorming",
+        "designing",
+        "scan",
+        "data",
+        "view",
+        "page"
+      ],
+      "agent": "brainstorming",
+      "confidence": 0.55,
+      "successCount": 1,
+      "failureCount": 0,
+      "lastUsed": 1778591940265,
+      "createdAt": 1778591940265
+    }
+  },
+  "stats": {
+    "trajectoriesProcessed": 1,
+    "successfulRoutings": 1,
+    "failedRoutings": 0,
+    "lastUpdate": 1778591940265
+  },
+  "metadata": {
+    "createdAt": "2026-05-12T13:19:00.265Z",
+    "savedAt": "2026-05-12T13:19:00.265Z"
+  }
+}

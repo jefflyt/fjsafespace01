@@ -267,7 +267,7 @@ export default function ExecutiveDashboardPage() {
           {/* Page header */}
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="font-heading text-2xl md:text-3xl font-bold tracking-tight">Executive Summary</h1>
+              <h1 className="font-heading text-3xl font-bold tracking-tight">Executive Summary</h1>
               <p className="text-sm text-muted-foreground mt-1">
                 Portfolio-level IAQ wellness overview across all managed sites.
               </p>

@@ -28,6 +28,8 @@ SENSOR_COLUMNS = {
     "co2_ppm", "co_ppb", "pm2_5_ugm3", "humidity_rh", "temperature_c",
     "tvoc_ppb", "o3_ppb", "no_ppb", "no2_ppb", "voc_ppb",
     "pressure_hpa", "noise_dba", "pm10_ugm3", "aqi_index",
+    "virus_index", "pm1_ugm3", "pm4_ugm3", "formaldehyde_ppb",
+    "light_lux", "mold_index",
 }
 
 # Map alternate uHoo export headers to standard column names
@@ -57,6 +59,12 @@ COLUMN_ALIASES = {
     "PM10": "pm10_ugm3",
     "Air Quality Index": "aqi_index",
     "AQI": "aqi_index",
+    "Virus Index": "virus_index",
+    "Mold Index": "mold_index",
+    "PM1": "pm1_ugm3",
+    "PM4": "pm4_ugm3",
+    "Formaldehyde": "formaldehyde_ppb",
+    "Light": "light_lux",
 }
 
 # Outlier detection thresholds — physically plausible bounds per metric
@@ -75,6 +83,12 @@ OUTLIER_BOUNDS = {
     "noise_dba": {"min": 0, "max": 140},
     "pm10_ugm3": {"min": 0, "max": 600},
     "aqi_index": {"min": 0, "max": 500},
+    "virus_index": {"min": 0, "max": 10},
+    "pm1_ugm3": {"min": 0, "max": 300},
+    "pm4_ugm3": {"min": 0, "max": 500},
+    "formaldehyde_ppb": {"min": 0, "max": 200},
+    "light_lux": {"min": 0, "max": 5000},
+    "mold_index": {"min": 0, "max": 10},
 }
 
 # Map CSV column names to metric enum names and units (all 16 uHoo sensor metrics)
@@ -93,6 +107,12 @@ METRIC_MAP = [
     ("noise_dba", "noise_dba", "dBA"),
     ("pm10_ugm3", "pm10_ugm3", "μg/m³"),
     ("aqi_index", "aqi_index", "AQI"),
+    ("virus_index", "virus_index", ""),
+    ("pm1_ugm3", "pm1_ugm3", "μg/m³"),
+    ("pm4_ugm3", "pm4_ugm3", "μg/m³"),
+    ("formaldehyde_ppb", "formaldehyde_ppb", "ppb"),
+    ("light_lux", "light_lux", "lux"),
+    ("mold_index", "mold_index", ""),
 ]
 
 # Sensor metric columns that should be filled with 0 when data is missing
@@ -109,7 +129,7 @@ def detect_report_type(df: pd.DataFrame) -> ReportType:
         return ReportType.ASSESSMENT
 
     try:
-        timestamps = pd.to_datetime(df["timestamp"], utc=True)
+        timestamps = pd.to_datetime(df["timestamp"], dayfirst=True)
         unique_dates = timestamps.dt.date.nunique()
         return ReportType.INTERVENTION_IMPACT if unique_dates > 1 else ReportType.ASSESSMENT
     except Exception:
@@ -186,11 +206,14 @@ def parse_csv(file: IO[bytes], site_id: str, upload_id: str) -> ParseResult:
             normalised_rows=[],
         )
 
-    # Parse timestamps (handles both ISO 8601 and UK DD/MM/YY formats)
+    # Parse timestamps — CSV times are in SGT, store as-is (naive datetime)
     try:
-        df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True, dayfirst=True)
-    except Exception as e:
-        warnings.append(f"Timestamp parsing failed for some rows: {str(e)}")
+        df["timestamp"] = pd.to_datetime(df["timestamp"], dayfirst=True, format="%d/%m/%y %H:%M")
+    except Exception:
+        try:
+            df["timestamp"] = pd.to_datetime(df["timestamp"], dayfirst=True)
+        except Exception as e:
+            warnings.append(f"Timestamp parsing failed for some rows: {str(e)}")
 
     # Only process sensor columns present in the CSV
     present_sensors = SENSOR_COLUMNS & set(df.columns)

@@ -11,7 +11,7 @@ import { UploadModal } from '@/components/UploadModal';
 import { RegisterCustomerModal } from '@/components/RegisterCustomerModal';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { apiClient, SiteListingRow } from '@/lib/api';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, Upload, UserPlus } from 'lucide-react';
 
 export default function ScanListingPage() {
   const router = useRouter();
@@ -52,7 +52,7 @@ export default function ScanListingPage() {
   const handleRowClick = useCallback(
     (siteId: string, allSiteIds?: string[]) => {
       const ids = allSiteIds?.join(',') || '';
-      router.push(`/sites/${siteId}${ids ? `?siteIds=${ids}` : ''}`);
+      router.push(`/scan-data/${siteId}${ids ? `?siteIds=${ids}` : ''}`);
     },
     [router],
   );
@@ -96,16 +96,18 @@ export default function ScanListingPage() {
 
         <div className="w-full px-4 md:px-6 lg:px-8 py-6 space-y-6">
           {/* Page header */}
-          <div className="flex items-start justify-between">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between animate-fade-in">
             <div>
               <h1 className="font-heading text-3xl font-bold tracking-tight">Scan Listings</h1>
-              <p className="text-sm text-muted-foreground mt-1">IAQ scan results across all sites</p>
+              <p className="text-sm text-muted-foreground mt-1">All scans across all sites</p>
             </div>
-            <div className="flex gap-3">
-              <Button size="sm" className="rounded-full" onClick={() => setUploadOpen(true)}>
+            <div className="flex gap-2">
+              <Button size="sm" onClick={() => setUploadOpen(true)}>
+                <Upload className="mr-1.5 h-4 w-4" />
                 Load Scan Data
               </Button>
-              <Button variant="outline" size="sm" className="rounded-md" onClick={() => setRegisterOpen(true)}>
+              <Button variant="outline" size="sm" onClick={() => setRegisterOpen(true)}>
+                <UserPlus className="mr-1.5 h-4 w-4" />
                 Register Customer
               </Button>
             </div>
@@ -145,7 +147,10 @@ export default function ScanListingPage() {
                 <p className="text-sm text-muted-foreground mt-1 mb-4">
                   Upload your first IAQ scan to get started.
                 </p>
-                <Button onClick={() => setUploadOpen(true)}>Load Scan Data</Button>
+                <Button size="sm" onClick={() => setUploadOpen(true)}>
+                  <Upload className="mr-1.5 h-4 w-4" />
+                  Load Scan Data
+                </Button>
               </CardContent>
             </Card>
           ) : (

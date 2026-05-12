@@ -796,6 +796,251 @@ async def get_findings(
     ]
 
 
+# ── R1-12: Scan Data View — Readings with zone filter ─────────────────────
+
+
+@router.get("/uploads/{upload_id}/readings", status_code=status.HTTP_200_OK)
+async def get_upload_readings(
+    upload_id: str,
+    session: SessionDep,
+    zone_name: str | None = Query(default=None),
+):
+    """
+    Return all readings for an upload, grouped by metric.
+    Optional ?zone_name= filters to a specific zone.
+    Each metric entry contains: zone_name, timestamp, metric_value, is_outlier.
+    Sorted by timestamp ascending for time-series charts.
+    """
+    query = select(Reading).where(col(Reading.upload_id) == upload_id)
+    if zone_name:
+        query = query.where(col(Reading.zone_name) == zone_name)
+    query = query.order_by(col(Reading.reading_timestamp))
+
+    readings = session.exec(query).all()
+
+    by_metric: dict[str, list[dict]] = {}
+    for r in readings:
+        metric = r.metric_name.value if hasattr(r.metric_name, "value") else str(r.metric_name)
+        if metric not in by_metric:
+            by_metric[metric] = []
+        by_metric[metric].append({
+            "zone_name": r.zone_name,
+            "timestamp": r.reading_timestamp.strftime("%d/%m/%y %H:%M"),
+            "metric_value": r.metric_value,
+            "is_outlier": r.is_outlier,
+        })
+
+    return {
+        "upload_id": upload_id,
+        "metrics": by_metric,
+    }
+
+
+# ── R1-12: Scan Data View — Trend Comparison ─────────────────────────────
+
+
+@router.get("/uploads/{upload_id}/trend-comparison", status_code=status.HTTP_200_OK)
+async def get_trend_comparison(upload_id: str, session: SessionDep):
+    """
+    Compare current upload's average metric values vs previous upload
+    for the same site. Returns pct_change per metric.
+
+    Response: {
+        upload_id, previous_upload_id,
+        metrics: { metric_name: { current_avg, previous_avg, pct_change } }
+    }
+    """
+    upload = session.get(Upload, upload_id)
+    if not upload:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Upload {upload_id} not found",
+        )
+
+    # Find previous upload for the same site
+    previous_uploads = session.exec(
+        select(Upload)
+        .where(
+            col(Upload.site_id) == upload.site_id,
+            col(Upload.id) != upload_id,
+        )
+        .order_by(col(Upload.uploaded_at).desc())
+    ).all()
+
+    if not previous_uploads:
+        return {
+            "upload_id": upload_id,
+            "previous_upload_id": None,
+            "metrics": {},
+        }
+
+    previous = previous_uploads[0]
+
+    # Fetch current readings
+    current_readings = session.exec(
+        select(Reading)
+        .where(col(Reading.upload_id) == upload_id)
+    ).all()
+
+    # Fetch previous readings
+    previous_readings = session.exec(
+        select(Reading)
+        .where(col(Reading.upload_id) == previous.id)
+    ).all()
+
+    # Compute averages per metric for current
+    current_avgs: dict[str, float] = {}
+    current_sums: dict[str, float] = {}
+    current_counts: dict[str, int] = {}
+    for r in current_readings:
+        metric = r.metric_name.value if hasattr(r.metric_name, "value") else str(r.metric_name)
+        current_sums[metric] = current_sums.get(metric, 0) + r.metric_value
+        current_counts[metric] = current_counts.get(metric, 0) + 1
+    for metric, total in current_sums.items():
+        current_avgs[metric] = total / current_counts[metric] if current_counts[metric] > 0 else 0
+
+    # Compute averages per metric for previous
+    previous_avgs: dict[str, float] = {}
+    previous_sums: dict[str, float] = {}
+    previous_counts: dict[str, int] = {}
+    for r in previous_readings:
+        metric = r.metric_name.value if hasattr(r.metric_name, "value") else str(r.metric_name)
+        previous_sums[metric] = previous_sums.get(metric, 0) + r.metric_value
+        previous_counts[metric] = previous_counts.get(metric, 0) + 1
+    for metric, total in previous_sums.items():
+        previous_avgs[metric] = total / previous_counts[metric] if previous_counts[metric] > 0 else 0
+
+    # Compute pct_change for metrics present in both
+    all_metrics = set(current_avgs.keys()) | set(previous_avgs.keys())
+    metrics_result: dict[str, dict] = {}
+    for metric in sorted(all_metrics):
+        current_avg = round(current_avgs.get(metric, 0), 2)
+        previous_avg = round(previous_avgs.get(metric, 0), 2)
+        entry: dict = {
+            "current_avg": current_avg,
+            "previous_avg": previous_avg,
+        }
+        if previous_avg != 0:
+            entry["pct_change"] = round((current_avg - previous_avg) / abs(previous_avg) * 100, 1)
+        metrics_result[metric] = entry
+
+    return {
+        "upload_id": upload_id,
+        "previous_upload_id": previous.id,
+        "metrics": metrics_result,
+    }
+
+
+# ── R1-12: Scan Data View — Anomaly Summary ─────────────────────────────
+
+
+@router.get("/uploads/{upload_id}/anomalies", status_code=status.HTTP_200_OK)
+async def get_anomalies(upload_id: str, session: SessionDep):
+    """
+    Return detected anomalies from the upload's readings.
+    Uses existing is_outlier flag + heuristic detection (sudden >2x changes).
+
+    Response: { anomalies: [{ metric_name, zone_name, timestamp, type, value, description }] }
+    """
+    readings = session.exec(
+        select(Reading)
+        .where(col(Reading.upload_id) == upload_id)
+        .order_by(col(Reading.reading_timestamp))
+    ).all()
+
+    if not readings:
+        return {"anomalies": []}
+
+    # Group readings by (metric_name, zone_name) for per-zone averaging
+    zone_metric_values: dict[tuple[str, str], list[float]] = {}
+    for r in readings:
+        metric = r.metric_name.value if hasattr(r.metric_name, "value") else str(r.metric_name)
+        key = (metric, r.zone_name)
+        zone_metric_values.setdefault(key, []).append(r.metric_value)
+
+    # Compute per-zone per-metric averages
+    zone_metric_avgs: dict[tuple[str, str], float] = {}
+    for key, values in zone_metric_values.items():
+        zone_metric_avgs[key] = sum(values) / len(values) if values else 0
+
+    anomalies: list[dict] = []
+    for r in readings:
+        metric = r.metric_name.value if hasattr(r.metric_name, "value") else str(r.metric_name)
+        zone_avg = zone_metric_avgs.get((metric, r.zone_name), 0)
+
+        # Determine anomaly type
+        if r.is_outlier:
+            # Use heuristic to classify
+            if zone_avg > 0 and r.metric_value > zone_avg * 2:
+                anomaly_type = "spike"
+            elif zone_avg > 0 and r.metric_value < zone_avg * 0.5:
+                anomaly_type = "drop"
+            else:
+                anomaly_type = "outlier"
+        else:
+            continue  # Skip non-outlier readings
+
+        # Build plain-language description
+        ts = r.reading_timestamp
+        time_str = ts.strftime("%-I:%M %p").lstrip("0") if ts else "unknown time"
+        metric_label = metric.replace("_ppm", "").replace("_ppb", "").replace("_ugm3", "").replace("_hpa", "").replace("_dba", "").replace("_rh", "").replace("_c", "").upper()
+        zone_label = r.zone_name or "Unknown zone"
+
+        if anomaly_type == "spike":
+            desc = f"{metric_label} spike detected in {zone_label} at {time_str}"
+        elif anomaly_type == "drop":
+            desc = f"{metric_label} drop detected in {zone_label} at {time_str}"
+        else:
+            desc = f"{metric_label} anomaly detected in {zone_label} at {time_str}"
+
+        anomalies.append({
+            "metric_name": metric,
+            "zone_name": r.zone_name,
+            "timestamp": r.reading_timestamp.isoformat() if r.reading_timestamp else None,
+            "type": anomaly_type,
+            "value": r.metric_value,
+            "description": desc,
+        })
+
+    return {"anomalies": anomalies}
+
+
+# ── R1-12: Scan Data View — Latest Upload for Site ───────────────────────
+
+
+@router.get("/sites/{site_id}/latest-upload", status_code=status.HTTP_200_OK)
+async def get_latest_upload_for_site(site_id: str, session: SessionDep):
+    """
+    Return the latest upload ID for a given site.
+    Used by the Scan Data View to find readings without knowing the upload ID.
+    """
+    site = session.get(Site, site_id)
+    if not site:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Site {site_id} not found",
+        )
+
+    latest = session.exec(
+        select(Upload)
+        .where(col(Upload.site_id) == site_id)
+        .order_by(col(Upload.uploaded_at).desc())
+        .limit(1)
+    ).first()
+
+    if not latest:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No uploads found for site {site_id}",
+        )
+
+    return {
+        "upload_id": latest.id,
+        "site_id": site_id,
+        "site_name": site.name,
+    }
+
+
 def _find_standard_id_for_finding(finding, session: Session) -> str | None:
     """Find the reference_source.id linked to this finding.
 
