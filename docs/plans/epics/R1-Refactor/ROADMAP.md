@@ -128,6 +128,16 @@ per-standard evaluation, tenant scoping.
 - **Testing**: Enum has 15 metrics (verified), build passes, ruff lint passes
 - **Dependencies**: None (documentation + config only)
 
+### PR-R1-12: Scan Data View — Raw Metrics Before Certification
+
+- **Plan**: `docs/plans/epics/R1-Refactor/pr12-scan-data-view.md`
+- **Goal**: New page showing raw IAQ metrics as time-series data before certification benchmarks
+- **Scope (in)**: New route `/scan-data/{siteId}`, metric summary strip, time-series chart with zoom/pan, trend comparison, anomaly summary, data export
+- **Scope (out)**: Live uHoo API integration (R2), PDF reports (R3), real-time updates (R2+)
+- **Key Changes**: 6 new components, enhanced readings API, 2 new backend endpoints (trend-comparison, anomalies), restructure `/sites/{siteId}` to focus on certification
+- **Testing**: Manual verification, build passes, TypeScript passes
+- **Dependencies**: PR-R1-10 (Multi-Site CSV), PR-R1-09 (UI Refresh), PR-R1-11 (API Consistency)
+
 ## 5. Milestones & Sequence
 
 ```text
@@ -152,6 +162,8 @@ PR-R1-09 (UI Refresh)              → ✅ Complete (2026-05-03)
 PR-R1-10 (Multi-Site CSV Split)    → ✅ Complete (2026-05-04)
     ↓
 PR-R1-11 (API Consistency Audit)   → ✅ Complete (2026-05-04)
+    ↓
+PR-R1-12 (Scan Data View)           → Planned
     ↓
 Remaining estimated: R1-06 (Testing) + R2 (Continuous Monitoring)
 ```
