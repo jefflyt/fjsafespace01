@@ -654,6 +654,8 @@ async def list_uploads(
     or site scan history.
 
     Supports single site_id or multiple site_ids (comma-separated).
+    Each upload includes `scan_date` (from CSV reading timestamps) and
+    `uploaded_at` (when the file was received).
     """
     query = select(Upload)
     if site_ids:

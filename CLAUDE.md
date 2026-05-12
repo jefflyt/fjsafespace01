@@ -287,6 +287,10 @@ Historical QA gates (QA-G1 to QA-G9) from the compliance model:
   - 015: reference_source_id FK on rulebook_entry (PR-R1-02)
   - 016: tenant email unique constraint
   - 017: upload content hash (dedup support)
+  - 018: upload_batch table + multi-site CSV split (PR-R1-10)
+  - 019: finding.reference_source_id FK
+  - 020: rulebook_entry.threshold_band column
+  - 021: upload.scan_date column (PR-R1-09 fix)
 - `backend/tests/`: Empty — new tests to be built in PR-R1-06.
 - `frontend/components/`: Feature components (see list above).
 - `frontend/lib/api.ts`: Centralized fetch client for backend communication.

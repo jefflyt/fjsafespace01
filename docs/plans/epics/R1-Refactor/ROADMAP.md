@@ -103,9 +103,10 @@ per-standard evaluation, tenant scoping.
 - **Goal**: Restructure navigation so scan results are the primary landing experience
 - **Scope (in)**: Scan Listing home page, site scan results page, upload modal, role-aware Summary nav, backward redirects
 - **Scope (out)**: Full auth integration, tenant user summary view, CM registration
-- **Key Changes**: New routes `/` and `/sites/{siteId}`, enhanced dashboard/sites API, 5 new components, Sidebar added (fixed position, responsive overlay on mobile)
+- **Key Changes**: New routes `/` and `/sites/{siteId}`, enhanced dashboard/sites API, 5 new components, Sidebar added (fixed position, responsive overlay on mobile), dynamic scan count, `scan_date` field for accurate dates, WATCH outcome properly mapped
 - **Testing**: Build passes, TypeScript passes, backend imports verified
 - **Dependencies**: PR-R1-05 (components exist), PR-R1-08 (upload flow stable)
+- **Post-merge fixes**: Sidebar count dynamic (was hardcoded 12), WATCH outcome added to constants.ts, scan_date field + migration 021, executive dashboard uses scan_date not created_at
 
 ### PR-R1-10: Multi-Site CSV Upload Split — ✅ COMPLETE
 

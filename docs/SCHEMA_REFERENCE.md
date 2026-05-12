@@ -182,6 +182,7 @@ These tables form the core operational pipeline: Upload → Readings → Finding
 | `content_hash` | VARCHAR(64) | SHA-256 hash of uploaded CSV for dedup detection. Nullable. |
 | `batch_id` | UUID | Nullable FK → `upload_batch.id` (added by migration 018) |
 | `zone_list` | TEXT | Nullable — which zones this upload covers |
+| `scan_date` | TIMESTAMPTZ | Actual scan date derived from earliest `reading_timestamp` in the CSV. Nullable (migration 021). Replaces `uploaded_at` as the authoritative scan date. |
 
 ### `upload_batch`
 

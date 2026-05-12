@@ -12,6 +12,10 @@ Restructure the dashboard navigation so scan results are the primary landing exp
 - [x] Role-aware "Summary" nav link (replaces separate Executive + Customers links)
 - [x] Backward-compatible redirects for `/ops` URLs
 - [x] Enhanced `GET /api/dashboard/sites` endpoint for site listing data
+- [x] Dynamic sidebar scan count (fetches from API, no hardcoded value)
+- [x] WATCH outcome band properly mapped (was falling through to INSUFFICIENT_EVIDENCE)
+- [x] `scan_date` field added to uploads — derives from CSV reading timestamps, not upload time
+- [x] Executive dashboard uses `scan_date` instead of `Finding.created_at` for last_scan_date
 
 ## 3. Scope (Out)
 
@@ -26,6 +30,9 @@ Restructure the dashboard navigation so scan results are the primary landing exp
 
 - [x] Enhance `GET /api/dashboard/sites` to return: site_name, tenant_name, latest_upload_date, scan_type, wellness_score, standard_scores, status
 - [x] Add `site_id` query filter to `GET /api/uploads`
+- [x] Add `scan_date` field to Upload model (migration 021) — derived from `MIN(reading_timestamp)` per upload
+- [x] Update `GET /api/uploads` to include `scan_date` in response
+- [x] Update aggregation service to use `upload.scan_date` for `last_scan_date` (was using `Finding.created_at`)
 
 ### Frontend Routes
 
@@ -74,12 +81,14 @@ Restructure the dashboard navigation so scan results are the primary landing exp
 
 ### Files Changed (15)
 
-- **Backend**: `dashboard.py`, `uploads.py`
-- **Frontend**: `page.tsx`, `ops/page.tsx`, `sites/[siteId]/page.tsx`, `Navbar.tsx`, `api.ts`
-- **New**: `ScanListingTable.tsx`, `ScanListingFilters.tsx`, `UploadModal.tsx`, `ScanHistoryTable.tsx`, `RegisterCustomerModal.tsx`, `Sidebar.tsx`
+- **Backend**: `dashboard.py`, `uploads.py`, `aggregation.py`, `models/workflow_b.py`, `migrations/versions/021_upload_scan_date.py`
+- **Frontend**: `page.tsx`, `ops/page.tsx`, `sites/[siteId]/page.tsx`, `Navbar.tsx`, `api.ts`, `constants.ts`, `layout/Sidebar.tsx`, `ScanListingTable.tsx`, `ScanListingFilters.tsx`, `UploadModal.tsx`, `ScanHistoryTable.tsx`, `RegisterCustomerModal.tsx`, `Sidebar.tsx`
+- **Docs**: `CLAUDE.md`, `SCHEMA_REFERENCE.md`, `pr09-ui-refresh.md`
 
 ### Known Notes
 
 - N+1 query pattern in `get_sites` (one query per site for tenant/upload lookup) — acceptable at current scale (~5 sites), should optimize if sites grow beyond ~50
 - ScanHistoryTable `onRowClick` logs to console — future enhancement to load specific upload findings
 - "Customers" nav link retained for quick access to admin customer management (deviation from original "Summary-only" concept)
+- **scan_date vs uploaded_at**: All date displays now use `scan_date` (CSV reading timestamp). `uploaded_at` is no longer displayed anywhere. Migration 021 added the field; existing data was backfilled from `reading` table.
+- **WATCH outcome**: Added `WATCH` as a distinct outcome in `OUTCOME_CONFIG` (amber/yellow). Previously mapped to `INSUFFICIENT_EVIDENCE`, causing mixed GOOD+WATCH findings to show incorrectly.
