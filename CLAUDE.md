@@ -12,144 +12,32 @@ traceable reports for operations and executive views.
 - **Frontend:** Next.js 15 (App Router), TypeScript, Tailwind CSS, Shadcn UI, Recharts.
 - **Database:** PostgreSQL (local via Homebrew `postgresql@17`, production via
   Supabase `jertvmbhgehajcrfifwl`).
-- **PDF Engine:** WeasyPrint (native Python HTML-to-PDF).
 - **File Storage:** Supabase Storage (bucket: `iaq-scans`) for raw CSV uploads
-  only. PDFs are NOT stored — generated on-demand from immutable HTML snapshots
-  in PostgreSQL.
+  only.
 - **Environment:** Single `.env` at project root for both backend and frontend.
 - **Workflows:**
   - **Workflow A:** Standards governance (Reference Vault → Citation Units → Rulebook).
-  - **Workflow B:** Scan-to-Report operations (Upload → Readings → Findings → Report).
+  - **Workflow B:** Scan-to-Dashboard operations (Upload → Readings → Findings → Per-standard evaluation).
 
 ---
 
-## Project Status (as of 2026-04-28)
+## Current Status
 
-### PR1-8: Complete — UAT Ready
+PR1-8 complete. R1 refactor in progress — PR-R1-01 through PR-R1-10 complete, PR-R1-11 next.
+See `docs/plans/epics/R1-Refactor/ROADMAP.md` for the full plan and status.
 
-- **PR1**: Layout skeleton & Shadcn UI components
-- **PR2**: Upload ingest, CSV parsing, Supabase Storage
-- **PR3**: Findings panel with rule_version + citation_id traceability
-- **PR4**: Report draft builder & QA checklist (QA-G1 to QA-G8)
-- **PR5**: WeasyPrint PDF generation pipeline (Assessment + Intervention Impact)
-- **PR6**: Executive dashboard, aggregation service, cross-site comparison, Wellness Index
-- **PR7**: Workflow A — Rulebook seed script (WHO AQG 2021 + SS554), read-only API, Alembic migration fix
-- **PR8**: UAT Readiness & Production Hardening — **ALL 6 SUB-PRs COMPLETE**
-  - **PR8.1**: Infrastructure bootstrap (Alembic migrations persisted, docker-compose.yml, `.env.example`)
-  - **PR8.2**: QA gate test fixtures & backend test coverage (55 passed, 47
-    skipped — since deleted per D-R1-08)
-  - **PR8.3**: Dashboard endpoint verification (5 endpoints, error handling, input validation)
-  - **PR8.4**: 6 frontend components + 1 upload detail page
-  - **PR8.5**: Utility scripts (run_qa_audit.py, preview_report.py — since deleted)
-  - **PR8.6**: Frontend Vitest tests + production hardening (since deleted per D-R1-08)
+All migrations (001–021) merged and applied to Supabase.
 
-### R1 Refactor: PR01-05, PR09-10 Complete, PR11 Next
-
-- **Objective**: Transform dashboard from compliance/reporting model to
-  human-friendly IAQ wellness dashboard with per-standard evaluation
-  (SS 554, WELL v2, RESET Viral Index, SafeSpace)
-- **Plans**: `docs/plans/epics/R1-Refactor/ROADMAP.md` + `pr01-auth-tenant.md`
-  through `pr10-multi-site-csv.md`
-- **Sequence**: PR-R1-01 (✅ Auth + Tenant) → PR-R1-02 (✅ Rulebook Reorg)
-  → PR-R1-03 (✅ Schema, merged) → PR-R1-04 (✅ Backend API, merged)
-  → PR-R1-05 (✅ Frontend, merged) → PR-R1-09 (✅ UI Refresh, committed)
-  → PR-R1-10 (✅ Multi-site CSV, committed)
-  → R1-06 (Testing), R1-11 (API Consistency)
-- **Completed**:
-  - PR-R1-01: user_tenant table, Supabase Auth JWT extraction, frontend login,
-    default tenant seeded, sites assigned
-  - PR-R1-02: 4 certification standards seeded, reference_source_id FK on
-    rulebook_entry, fetch_rules_by_standard() service, all rules use
-    rule_version="v2-refactor"
-  - PR-R1-03: Migrations 008-011 (site context, scan type, metric preferences,
-    site standards) — merged to main, applied to Supabase
-  - PR-R1-04: 3 new routers (preferences, standards, interpretations), enhanced
-    upload/findings, tenant scoping, per-standard aggregation. 15 tests pass.
-  - PR-R1-05: 6 new components (SiteOverviewCard, MetricCard, StandardSelector,
-    MetricSelector, ThresholdConfigDialog, ZoneDetailView), refactored UploadForm
-    (removed PR9 fields, added standard selector), refactored /ops and /executive
-    pages, per-standard badges on executive leaderboard. TypeScript + build pass.
-  - PR-R1-08: CSV upload deduplication (content hash, dialog, force flag)
-  - PR-R1-09: UI Refresh — Scan Listing as home page, site scan results, upload modal
-  - PR-R1-10: Multi-Site CSV Upload Split — UploadBatch model, zone extraction, zone
-    assignment UI, preview/confirm endpoints, migration 018
-
-### Simplified Architecture (3 Views)
+### Routes
 
 | View | Route | Purpose |
 | --- | --- | --- |
-| **Scan Listing** | `/` | Site listing with latest scan results (new home page) |
+| **Scan Listing** | `/` | Site listing with latest scan results (home page) |
 | **Site Detail** | `/sites/{siteId}` | All scans, standard selector, zone details, scan history |
-| **Operations** | `/ops` | Upload CSV, review findings, generate reports (3 tabs) — redirect to `/` |
+| **Operations** | `/ops` | Upload CSV, review findings — redirects to `/` |
 | **Executive** | `/executive` | Results summary, top risks/actions, historical scan selector |
 | **Admin** | `/admin/customers` | Customer management (FJ staff) |
-
-### Existing Backend Routes
-
-- **uploads**: `POST /api/uploads`, `POST /api/uploads/preview`, `POST /api/uploads/confirm`, `GET /api/uploads`, `GET /api/uploads/{id}`, `GET /api/uploads/{id}/findings?standard_id=`
-- **tenants**: `GET /api/tenants`, `GET /api/tenants/search?q=<text>`
-- **reports**: `POST /api/reports`, `GET /api/reports`, `GET /api/reports/{id}`, `PATCH /api/reports/{id}/qa-checklist`, `POST /api/reports/{id}/approve`, `GET /api/reports/{id}/export`, `GET /api/reports/{id}/pdf`
-- **dashboard**: `GET /api/dashboard/sites`, `GET /api/dashboard/sites/{id}/zones`, `GET /api/dashboard/comparison`, `GET /api/dashboard/summary`, `GET /api/dashboard/executive`
-- **rulebook**: `GET /api/rulebook/rules`, `GET /api/rulebook/rules/{id}`, `GET /api/rulebook/sources`
-- **notifications**: `GET /api/notifications`, `PATCH /api/notifications/{id}/read`
-- **preferences**: `GET /api/sites/{id}/metric-preferences`,
-  `PATCH /api/sites/{id}/metric-preferences`,
-  `GET /api/sites/{id}/standards`,
-  `POST /api/sites/{id}/standards/{source_id}/activate`,
-  `POST /api/sites/{id}/standards/{source_id}/deactivate`
-- **interpretations**: `GET /api/interpretations/{metric_name}/{threshold_band}`
-
-### Existing Frontend Pages
-
-- `/` — Scan Listing (new home, PR-R1-09)
-- `/sites/[siteId]` — Site Scan Results (PR-R1-09)
-- `/login` — Supabase Auth login (PR-R1-01)
-- `/ops/` — Operations view (Upload, Findings, Reports tabs) — redirects to `/`
-- `/executive/` — Executive dashboard
-- `/admin/customers` — Customer management (PR-R1-09)
-
-### Existing Backend Services
-
-- `backend/app/services/aggregation.py` — Wellness Index calculation, cross-site aggregation
-- `backend/app/services/db_rule_service.py` — Database rule service
-
-### Existing Skills
-
-- `backend/app/skills/data_ingestion/` — CSV parsing modules + Supabase Storage client
-- `backend/app/skills/iaq_rule_governor/` — Rule evaluation engine
-
-### Existing Frontend Components
-
-- **UI** (Shadcn): button, input, card, dialog, label, select, table, badge, dropdown-menu, textarea, checkbox, skeleton
-- **Feature**: UploadForm, UploadQueueTable, WellnessIndexCard, CrossSiteComparisonTable, DailySummaryCard, TrendChart, NotificationBell
-- **PR-R1-09**: ScanListingTable, ScanListingFilters, UploadModal, ScanHistoryTable, RegisterCustomerModal, CustomerDetailsCard, StandardsTable
-- **R1-05**: SiteOverviewCard, MetricCard, StandardSelector, MetricSelector, ThresholdConfigDialog, ZoneDetailView
-- **Multi-site**: ZoneAssignment, CustomerLookup, CustomerManagement
-- **Findings**: MetricChart, TimeSeriesChart, MetricConfig, types
-- **Layout**: Navbar (updated PR-R1-09), Sidebar (added PR-R1-09, fixed position + responsive overlay), AuthProvider
-
-### Frontend Libraries
-
-- `frontend/lib/api.ts` — Fetch client for FastAPI backend
-- `frontend/lib/constants.ts` — Global constants (OUTCOME_CONFIG, BAND_TAILWIND, getScoreColor, BAND_PRIORITY, BAND_TO_OUTCOME, bandToOutcome). **All new components should import from here instead of duplicating.**
-- `frontend/lib/utils.ts` — cn(), formatDate, re-exports OUTCOME_CONFIG/getOutcomeConfig/bandToOutcome from constants.ts
-- `frontend/lib/supabase.ts` — Supabase auth client
-
-### Test Coverage
-
-- **Backend**: `backend/tests/` exists with `__init__.py` only. Old test suite
-  deleted per D-R1-08. New tests will be built fresh in PR-R1-06.
-- **Frontend**: `frontend/tests/` deleted. Vitest config present. New tests
-  will be built fresh in PR-R1-06.
-
-### Existing Scripts & Sample Data
-
-- `scripts/seed_rulebook_v1.py` — Seeds 4 standards: SS 554, WELL v2,
-  RESET Viral Index, SafeSpace (rule_version="v2-refactor")
-- `scripts/seed_default_tenant.py` — Seeds default tenant, assigns sites
-- `scripts/cleanup_test_data.py` — Removes all test data except NPE tenant
-- `assets/sample_uploads/npe_sample.csv` — New Park Estate sample (3 zones, 24 rows, clean PASS)
-- `assets/sample_uploads/cag_sample.csv` — Changi Airport Group sample (3 zones, 30 rows, data gaps + critical CO2)
+| **Login** | `/login` | Supabase Auth login |
 
 ---
 
@@ -178,7 +66,6 @@ pnpm dev                      # Start dev server on port 3000
 ```bash
 brew services start postgresql@17  # Start local PostgreSQL on port 5432
 brew services stop postgresql@17   # Stop local PostgreSQL
-python scripts/seed_rulebook.py  # Seed rulebook data
 ```
 
 ---
@@ -193,22 +80,19 @@ All variables documented in `.env.example`. Config loads via `backend/app/core/c
 | ------ | ------ | ------ |
 | `DATABASE_URL` | Yes | PostgreSQL connection string (app role — SELECT-only on Rulebook tables) |
 | `ADMIN_DATABASE_URL` | Yes | Full-access DB role for Workflow A admin console only |
-| `APPROVER_EMAIL` | Yes | Jay Choy's email — enforced by QA-G8 |
-| `RESEND_API_KEY` | Yes | Email dispatch (Phase 2+) |
+| `APPROVER_EMAIL` | Yes | Jay Choy's email |
 | `SUPABASE_URL` | Yes | Supabase project URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Storage service role key |
 | `SUPABASE_STORAGE_BUCKET` | Yes | Storage bucket name (default: `iaq-scans`) |
-| `SUPABASE_JWT_SECRET` | R1+ | Supabase JWT secret (PR-R1-01 JWT extraction) |
+| `SUPABASE_JWT_SECRET` | Yes | Supabase JWT secret (PR-R1-01 JWT extraction) |
 | `NEXT_PUBLIC_API_URL` | Yes | FastAPI backend base URL |
-| `NEXT_PUBLIC_SUPABASE_URL` | R1+ | Supabase URL for frontend auth client |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | R1+ | Supabase anon key for frontend auth |
-| `CLERK_SECRET_KEY` | Deprecated | Legacy — to be removed |
-| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Deprecated | Legacy — to be removed |
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase URL for frontend auth client |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase anon key for frontend auth |
 
 ### Setup Guides
 
-- **Supabase Storage**: See `docs/setup/SUPABASE_SETUP.md`
-- **Schema Reference**: See `docs/SCHEMA_REFERENCE.md` for all tables, columns, and data flow
+- **Supabase Storage**: `docs/setup/SUPABASE_SETUP.md`
+- **Schema Reference**: `docs/SCHEMA_REFERENCE.md`
 
 ---
 
@@ -221,100 +105,29 @@ All variables documented in `.env.example`. Config loads via `backend/app/core/c
 - **Read-Only Rulebook:** The dashboard (Workflow B) must **never** mutate
   Rulebook tables. Access is `SELECT` only at the DB level. Rule changes
   must use `ADMIN_DATABASE_URL`.
-- **No Manual Overrides:** Threshold overrides in production are strictly prohibited.
 - **Source Currency:** Only `CURRENT_VERIFIED` sources can drive certification-impact rules. Others are marked "Advisory Only".
-
-### QA Gates (Legacy — PR1-8 compliance model)
-
-> **Note**: QA gates apply to existing PR1-8 code only. The R1 refactor pivots
-> from compliance/reporting to human-friendly wellness evaluation. Per-standard
-> evaluation and interpretation layers replace the compliance gate system.
-> New tests for R1 will be built in PR-R1-06.
-
-Historical QA gates (QA-G1 to QA-G9) from the compliance model:
-
-- Citations must link to `rule_version` and `citation_unit_ids`.
-- Findings from non-`CURRENT_VERIFIED` sources must be labeled "Advisory Only".
-- `reviewerName` in `Report` must match authorized approver (Jay Choy).
-- If any gate fails, do NOT generate or export the PDF.
 
 ### Design Principles
 
 - **Evidence Before Aesthetics:** Accuracy and traceability take precedence
   over visual flair.
-- **Synchronous Pipeline:** All processing (parsing and PDF generation) is
-  currently synchronous.
+- **Synchronous Pipeline:** All processing (parsing, evaluation) is synchronous.
 - **Surgical Updates:** When modifying schema or API contracts, ensure the
   TDD version is bumped and recorded in the Decision Log.
 
----
+### Frontend Libraries
 
-## Key Files & Directories
+- `frontend/lib/api.ts` — Fetch client for FastAPI backend
+- `frontend/lib/constants.ts` — Global constants (OUTCOME_CONFIG, BAND_TAILWIND, getScoreColor, BAND_PRIORITY, BAND_TO_OUTCOME, bandToOutcome). **All new components should import from here instead of duplicating.**
+- `frontend/lib/utils.ts` — `cn()`, `formatDate`, re-exports from constants.ts
+- `frontend/lib/supabase.ts` — Supabase auth client
 
-- `docs/`: Authority for PRD, PSD, and TDD specifications.
-- `docs/setup/`: Setup guides (Supabase, etc.)
-- `docs/plans/MASTER_PLAN.md`: Original master plan with 4 phases, PR breakdown.
-- `docs/plans/MASTER_PLAN-Refactor.md`: Refactor master plan with R1-R4 phases.
-- `docs/plans/epics/R1-Refactor/`: R1 epic plans (ROADMAP.md + pr01 through pr06, pr09 through pr11).
-- `docs/PSD-Refactor.md`: Product Specification for refactor.
-- `docs/TDD-Refactor.md`: Technical Design Document for refactor.
-- `.env`: Single environment file at project root for both backend and frontend.
-- `.env.example`: Template with placeholders.
-- `backend/app/core/config.py`: Settings — loads `.env` from project root via pathlib.
-- `backend/app/models/`: SQLModel definitions split by workflow (A, B) +
-  supporting.
-- `backend/app/services/`: Core logic for CSV parsing, rule evaluation,
-  aggregation.
-- `backend/app/api/routers/`: 5 route files — dashboard, notifications, reports, rulebook, uploads.
-- `backend/app/api/dependencies.py`: Supabase JWT extraction, tenant scoping
-  (replaced stub in PR-R1-01).
-- `backend/app/templates/`: WeasyPrint HTML/CSS report templates (Jinja2 syntax).
-- `backend/migrations/versions/`: Alembic migrations (001 through 015).
-  - 001: Core tables (site, upload, reading, finding, report, reference_source,
-    citation_unit, rulebook_entry)
-  - 002: Report QA fields (reviewer_name, qa_checks, certification_outcome)
-  - 003: Indexes for cross-site aggregation queries
-  - 004: Upload report_type column (auto-detected ASSESSMENT vs
-    INTERVENTION_IMPACT)
-  - 005: Replace pdf_url with report_snapshot (immutable JSON for on-demand
-    PDF generation)
-  - 006: Reading zone_name column
-  - 007: Tenant and customer info columns
-  - 008-011: Pending PR-R1-03 (site context, scan type, metric preferences,
-    site standards)
-  - 012-013: Pending R2 (device connection, alert log)
-  - 014: user_tenant table (PR-R1-01)
-  - 015: reference_source_id FK on rulebook_entry (PR-R1-02)
-  - 016: tenant email unique constraint
-  - 017: upload content hash (dedup support)
-  - 018: upload_batch table + multi-site CSV split (PR-R1-10)
-  - 019: finding.reference_source_id FK
-  - 020: rulebook_entry.threshold_band column
-  - 021: upload.scan_date column (PR-R1-09 fix)
-- `backend/tests/`: Empty — new tests to be built in PR-R1-06.
-- `frontend/components/`: Feature components (see list above).
-- `frontend/lib/api.ts`: Centralized fetch client for backend communication.
-- `scripts/`: Utility scripts (seed_rulebook, seed_rulebook_v1).
-- `assets/sample_uploads/`: Sample CSV datasets for QA and testing.
+### Scripts & Sample Data
 
----
-
-## Deferred to Phase 2/3
-
-| Item | Reason | Phase |
-| ------ | ------ | ----- |
-| Playwright E2E tests | Better suited for CI/CD | Phase 2 |
-| CI/CD pipeline | Infrastructure work, separate PR | Phase 2/3 |
-| Clerk auth integration | Replaced by Supabase Auth for R1 | Deprecated |
-
----
-
-**Completed (previously deferred):**
-
-- ~~PDF templates~~ — Implemented in PR5 + PR8.6. Immutable snapshot
-  architecture in place (migration 005).
-- ~~Tenant isolation~~ — user_tenant table + JWT extraction done (PR-R1-01).
-- ~~Rulebook reorganization~~ — 4 standards seeded with v2-refactor (PR-R1-02).
+- `scripts/seed_rulebook_v1.py` — Seeds 4 standards (rule_version="v2-refactor")
+- `scripts/seed_default_tenant.py` — Seeds default tenant, assigns sites
+- `scripts/cleanup_test_data.py` — Removes all test data except NPE tenant
+- `assets/sample_uploads/` — Sample CSV datasets
 
 ---
 
@@ -341,27 +154,36 @@ Governs the Reference Vault → Citation Units → Rulebook pipeline.
 
 ---
 
-## Workflow B: Scan-to-Report (Legacy — compliance model)
+## Workflow B: Per-Standard Evaluation
 
-> **Note**: PDF report generation is deferred to R3. The R1 refactor replaces
-> the compliance/reporting view with a human-friendly IAQ wellness dashboard.
-> Existing PDF templates and QA gate logic remain for historical PR1-8 code
-> but are not the primary UX for R1.
-
-The compliance model generated PDF reports via WeasyPrint from immutable HTML
-snapshots. Key conventions from the original model:
-
-- Templates use `Jinja2` syntax in `backend/app/templates/`.
-- Templates branch for `ASSESSMENT` and `INTERVENTION_IMPACT` report types.
-- Executive brief displayed status: `HEALTHY_WORKPLACE_CERTIFIED`, etc.
-- Preview script (`scripts/preview_report.py`) was deleted — reports are now generated via API endpoints.
-
-### R1 Replacement
-
-The R1 refactor introduces:
+The R1 dashboard replaces the compliance/reporting model with:
 
 - **Per-standard evaluation**: Independent pass/fail per SS 554, WELL v2,
   RESET Viral Index, SafeSpace
 - **Human-readable interpretations**: Threshold bands mapped to plain-language insights
 - **Metric preferences**: Per-site customizable visible metrics and alert thresholds
-- **Wellness scoring**: Weighted scores per standard, not single compliance outcome
+- **Wellness scoring**: Weighted scores per standard
+
+Rule evaluation engine: `backend/app/skills/iaq_rule_governor/`
+CSV parsing: `backend/app/skills/data_ingestion/`
+Aggregation service: `backend/app/services/aggregation.py`
+DB rule service: `backend/app/services/db_rule_service.py`
+
+---
+
+## Deferred to Phase 2/3
+
+| Item | Reason | Phase |
+| ------ | ------ | ----- |
+| Playwright E2E tests | Better suited for CI/CD | Phase 2 |
+| CI/CD pipeline | Infrastructure work, separate PR | Phase 2/3 |
+
+---
+
+## Key Reference Docs
+
+- `docs/plans/epics/R1-Refactor/ROADMAP.md` — Current R1 roadmap
+- `docs/plans/MASTER_PLAN.md` — Original master plan
+- `docs/plans/MASTER_PLAN-Refactor.md` — Refactor master plan (R1-R4)
+- `docs/PSD-Refactor.md` — Product Specification
+- `docs/TDD-Refactor.md` — Technical Design Document

@@ -14,7 +14,7 @@ export interface MetricConfig {
 export const METRIC_CONFIGS: Record<string, MetricConfig> = {
   co2_ppm: {
     key: "co2_ppm",
-    label: "CO2",
+    label: "CO₂",
     symbol: "CO₂",
     unit: "ppm",
     goodBand: [300, 800],
@@ -24,7 +24,7 @@ export const METRIC_CONFIGS: Record<string, MetricConfig> = {
   },
   co_ppb: {
     key: "co_ppb",
-    label: "CO",
+    label: "Carbon Monoxide",
     symbol: "CO",
     unit: "ppb",
     goodBand: [0, 248],
@@ -74,7 +74,7 @@ export const METRIC_CONFIGS: Record<string, MetricConfig> = {
   },
   o3_ppb: {
     key: "o3_ppb",
-    label: "Ozone",
+    label: "O₃",
     symbol: "O₃",
     unit: "ppb",
     goodBand: [0, 50],

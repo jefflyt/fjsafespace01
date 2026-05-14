@@ -288,6 +288,12 @@ export default function SiteDetailPage() {
               onClick={() => router.push('/')}
             />
             <ChevronRight className="h-3 w-3 text-muted-foreground shrink-0" />
+            <BreadcrumbButton
+              icon={Activity}
+              label="Scan Data"
+              onClick={() => router.push(`/scan-data/${siteId}${searchParams.get('batchId') ? `?batchId=${searchParams.get('batchId')}` : ''}`)}
+            />
+            <ChevronRight className="h-3 w-3 text-muted-foreground shrink-0" />
             <BreadcrumbButton icon={ShieldCheck} label="Certification Results" isLast />
           </nav>
 
