@@ -23,7 +23,7 @@ traceable reports for operations and executive views.
 
 ## Current Status
 
-PR1-8 complete. R1 refactor in progress — PR-R1-01 through PR-R1-10 complete, PR-R1-11 next.
+PR1-8 complete. R1 refactor in progress — PR-R1-01 through PR-R1-12 complete, PR-R1-06 (Testing) remaining.
 See `docs/plans/epics/R1-Refactor/ROADMAP.md` for the full plan and status.
 
 All migrations (001–021) merged and applied to Supabase.
@@ -34,6 +34,8 @@ All migrations (001–021) merged and applied to Supabase.
 | --- | --- | --- |
 | **Scan Listing** | `/` | Site listing with latest scan results (home page) |
 | **Site Detail** | `/sites/{siteId}` | All scans, standard selector, zone details, scan history |
+| **Scan Data View** | `/scan-data/{siteId}` | Raw IAQ metrics as time-series data, anomaly summary, trend comparison |
+| **Scan Compare** | `/scan-data/{siteId}/compare` | Side-by-side scan comparison with metric charts |
 | **Operations** | `/ops` | Upload CSV, review findings — redirects to `/` |
 | **Executive** | `/executive` | Results summary, top risks/actions, historical scan selector |
 | **Admin** | `/admin/customers` | Customer management (FJ staff) |
@@ -127,7 +129,6 @@ All variables documented in `.env.example`. Config loads via `backend/app/core/c
 - `scripts/seed_rulebook_v1.py` — Seeds 4 standards (rule_version="v2-refactor")
 - `scripts/seed_default_tenant.py` — Seeds default tenant, assigns sites
 - `scripts/cleanup_test_data.py` — Removes all test data except NPE tenant
-- `assets/sample_uploads/` — Sample CSV datasets
 
 ---
 

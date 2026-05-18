@@ -10,8 +10,8 @@ metrics mean
 
 ## 2. Complexity Assessment
 
-- **Classification**: Multi-PR (8 PRs, sequential)
-- **Estimated PR Count**: 10 (PR-R1-01 through PR-R1-11, PR-R1-06 pending)
+- **Classification**: Multi-PR (12 PRs, sequential)
+- **Total PR Count**: 12 (PR-R1-01 through PR-R1-12, PR-R1-06 in progress)
 - **Rationale**: Auth/tenant infrastructure must precede schema changes, which must precede API changes, which must
   precede frontend refactor, which must precede testing. Customer intake builds on the upload flow. Each layer
   depends on the previous. UI Refresh restructures navigation after all foundational work is complete.
@@ -97,6 +97,16 @@ per-standard evaluation, tenant scoping.
 - **Testing**: Backend integration tests (tenant creation, dedup, listing), frontend form validation tests
 - **Dependencies**: PR-R1-05 (UploadForm must exist)
 
+### PR-R1-08: CSV Upload Deduplication — ✅ COMPLETE
+
+- **Plan**: `docs/plans/epics/R1-Refactor/pr08-upload-dedup.md`
+- **Goal**: Detect duplicate CSV uploads via SHA-256 content hash, show dialog with existing findings
+- **Scope (in)**: content_hash column, dedup logic, force-upload bypass, duplicate dialog
+- **Scope (out)**: Real-time device splitting, continuous monitoring
+- **Key Changes**: `content_hash` on upload table, SHA-256 computation, `GET /api/uploads?content_hash=`, dedup dialog in UploadForm
+- **Testing**: 5/5 upload tests pass, dedup regression tests, build succeeds
+- **Dependencies**: PR-R1-07 (tenant_id flow in place)
+
 ### PR-R1-09: UI Refresh — Scan Results as Home — ✅ COMPLETE
 
 - **Plan**: `docs/plans/epics/R1-Refactor/pr09-ui-refresh.md`
@@ -153,7 +163,7 @@ PR-R1-05 (Frontend Refactor)      → ✅ Complete (2026-04-30)
     ↓
 PR-R1-06 (Testing + Polish)       → In progress
     ↓
-PR-R1-07 (Adhoc Customer Intake)  → ✅ Complete (merged with R1-08)
+PR-R1-07 (Adhoc Customer Intake)  → ✅ Complete (2026-05-02)
     ↓
 PR-R1-08 (Upload Dedup)           → ✅ Complete (2026-05-02)
     ↓
@@ -163,7 +173,7 @@ PR-R1-10 (Multi-Site CSV Split)    → ✅ Complete (2026-05-04)
     ↓
 PR-R1-11 (API Consistency Audit)   → ✅ Complete (2026-05-04)
     ↓
-PR-R1-12 (Scan Data View)           → Planned
+PR-R1-12 (Scan Data View)           → ✅ Complete (2026-05-18)
     ↓
 Remaining estimated: R1-06 (Testing) + R2 (Continuous Monitoring)
 ```
