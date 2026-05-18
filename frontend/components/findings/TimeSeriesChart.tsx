@@ -22,6 +22,17 @@ interface Reading {
   timestamp: string;
   metric_value: number;
   is_outlier: boolean;
+  scanId?: string;
+  relativeMinutes?: number;
+}
+
+export interface CompareOverlayConfig {
+  scanId: string;
+  label: string;
+  dateLabel: string;
+  color: string;
+  dash: string;
+  isPrimary: boolean;
 }
 
 interface TimeSeriesChartProps {
@@ -31,6 +42,7 @@ interface TimeSeriesChartProps {
   zoneColors: Record<string, string>;
   onReadingClick: (reading: Reading) => void;
   showThresholds?: boolean;
+  compareMode?: { overlays: CompareOverlayConfig[] };
 }
 
 function parseTimestamp(raw: string): Date {
@@ -156,6 +168,72 @@ function ChartTooltip({
   );
 }
 
+// Compare mode tooltip: shows per-scan date/time alongside values
+function CompareTooltip({
+  active,
+  payload,
+  label,
+  overlays,
+  unit,
+}: {
+  active?: boolean;
+  payload?: ReadonlyArray<Record<string, unknown>>;
+  label?: string | number;
+  overlays: CompareOverlayConfig[];
+  unit: string;
+}) {
+  if (!active || !payload?.length || label === undefined) return null;
+
+  const relativeMin = typeof label === "number" ? label : Number(label);
+  const h = Math.floor(relativeMin / 60);
+  const m = Math.round(relativeMin % 60);
+  const relStr = h === 0 ? `+${m}m` : m === 0 ? `+${h}h` : `+${h}h${m}m`;
+
+  return (
+    <div
+      style={{
+        backgroundColor: "hsl(var(--card))",
+        border: "1px solid hsl(var(--border))",
+        borderRadius: "8px",
+        padding: "8px 12px",
+        fontSize: "12px",
+        boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
+        fontFamily: "Inter, system-ui, sans-serif",
+      }}
+    >
+      <p style={{ margin: "0 0 4px", fontWeight: 600, fontSize: "12px", color: "hsl(var(--foreground))" }}>
+        {relStr}
+      </p>
+      {payload.map((entry, i) => {
+        const scanId = String(entry.dataKey ?? entry.name ?? "");
+        const overlay = overlays.find((o) => o.scanId === scanId);
+        const fullLabel = entry[`${scanId}_fullLabel`] as string | undefined;
+        return (
+          <div
+            key={`tooltip-${i}`}
+            style={{ display: "flex", alignItems: "center", gap: "6px", padding: "2px 0" }}
+          >
+            <span style={{ color: overlay?.color || "#8884d8", fontSize: "10px" }}>
+              {entry.strokeDasharray ? "╌" : "●"}
+            </span>
+            <span style={{ fontWeight: 500, color: overlay?.color || "#8884d8" }}>
+              {overlay?.label ?? scanId}:
+            </span>
+            <span>
+              {String(entry.value)} {unit}
+            </span>
+            {fullLabel && (
+              <span style={{ color: "hsl(var(--muted-foreground))", fontSize: "10px" }}>
+                ({fullLabel})
+              </span>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 type Threshold = { y: number; color: string; dash: string; width: number; label: string };
 
 // Build threshold lines that fall within the visible Y range
@@ -211,6 +289,14 @@ function CustomTick({ x, y, payload }: { x: number; y: number; payload: { value:
   );
 }
 
+function formatRelativeTick(val: number): string {
+  if (val === 0) return "0";
+  if (val < 60) return `${val}m`;
+  const h = Math.floor(val / 60);
+  const m = val % 60;
+  return m === 0 ? `${h}h` : `${h}h${m}m`;
+}
+
 export function TimeSeriesChart({
   metricKey,
   readings,
@@ -218,13 +304,77 @@ export function TimeSeriesChart({
   zoneColors,
   onReadingClick,
   showThresholds: initialShowThresholds = false,
+  compareMode,
 }: TimeSeriesChartProps) {
   const config = METRIC_CONFIGS[metricKey];
   const [showThresholds, setShowThresholds] = useState(initialShowThresholds);
 
+  // Compare mode: normalize to relative time per scan, merge by relativeMinutes
+  const isCompareMode = !!compareMode && compareMode.overlays.length >= 2;
+
   const chartData = useMemo(() => {
     if (!config) return [];
     const metricReadings = readings.filter((r) => r.metric_name === metricKey);
+
+    if (isCompareMode && compareMode) {
+      // Group readings by scanId
+      const scanDataMap = new Map<string, Array<typeof metricReadings[0]>>();
+      for (const overlay of compareMode.overlays) {
+        const scanReadings = metricReadings.filter((r) => r.scanId === overlay.scanId);
+        if (scanReadings.length > 0) {
+          scanDataMap.set(overlay.scanId, scanReadings);
+        }
+      }
+
+      if (scanDataMap.size === 0) return [];
+
+      // Compute relative minutes per scan
+      const scanRelativeMap = new Map<string, Array<{ relativeMinutes: number; value: number; zone: string; is_outlier: boolean; fullLabel: string }>>();
+      for (const [scanId, scanReadings] of scanDataMap) {
+        const sorted = [...scanReadings].sort((a, b) =>
+          parseTimestamp(a.timestamp).getTime() - parseTimestamp(b.timestamp).getTime()
+        );
+        const scanStart = parseTimestamp(sorted[0].timestamp).getTime();
+        const relative: typeof scanRelativeMap extends Map<string, infer V> ? V : never[] = [];
+        for (const r of sorted) {
+          const elapsed = (parseTimestamp(r.timestamp).getTime() - scanStart) / 60000;
+          const relativeMinutes = Math.round(elapsed * 10) / 10;
+          const d = parseTimestamp(r.timestamp);
+          const fullLabel = d.toLocaleDateString("en-GB", { day: "2-digit", month: "short" }) + " " +
+            d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+          relative.push({
+            relativeMinutes,
+            value: r.metric_value,
+            zone: r.zone_name,
+            is_outlier: r.is_outlier,
+            fullLabel,
+          });
+        }
+        scanRelativeMap.set(scanId, relative);
+      }
+
+      // Merge by relativeMinutes
+      const allMinutes = new Set<number>();
+      for (const readings of scanRelativeMap.values()) {
+        for (const r of readings) allMinutes.add(r.relativeMinutes);
+      }
+      const sortedMinutes = Array.from(allMinutes).sort((a, b) => a - b);
+
+      return sortedMinutes.map((min) => {
+        const row: Record<string, unknown> = { relativeMinutes: min };
+        for (const [scanId, scanReadings] of scanRelativeMap) {
+          const match = scanReadings.find((r) => r.relativeMinutes === min);
+          if (match) {
+            row[scanId] = match.value;
+            row[`${scanId}_fullLabel`] = match.fullLabel;
+            row[`${scanId}_is_outlier`] = match.is_outlier;
+          }
+        }
+        return row;
+      });
+    }
+
+    // Normal mode: single upload, multi-zone
     const byTimestamp = new Map<string, Record<string, unknown>>();
     for (const r of metricReadings) {
       const ts = r.timestamp.trim();
@@ -237,7 +387,7 @@ export function TimeSeriesChart({
     return Array.from(byTimestamp.values()).sort((a, b) =>
       (a.timestamp as string).localeCompare(b.timestamp as string)
     );
-  }, [readings, metricKey, config]);
+  }, [readings, metricKey, config, isCompareMode, compareMode]);
 
   const zoneKeys = Array.from(activeZones);
   const [yMin, yMax] = useMemo(
@@ -278,8 +428,21 @@ export function TimeSeriesChart({
     return result;
   }, [dates, isMultiDay]);
 
-  // Time-based X-axis ticks: 2-minute intervals from first reading
+  // X-axis ticks
   const xTicks = useMemo(() => {
+    if (isCompareMode) {
+      // Compare mode: relative minute ticks at nice intervals
+      if (chartData.length === 0) return [];
+      const maxMin = chartData[chartData.length - 1].relativeMinutes as number;
+      const ticks: number[] = [];
+      const step = maxMin > 120 ? 30 : maxMin > 60 ? 15 : maxMin > 30 ? 10 : 5;
+      for (let m = 0; m <= maxMin; m += step) {
+        ticks.push(m);
+      }
+      return ticks;
+    }
+
+    // Normal mode: time-based X-axis ticks
     if (dates.length === 0) return [];
     const ticks: string[] = [];
     const first = dates[0];
@@ -287,7 +450,6 @@ export function TimeSeriesChart({
     const tick = new Date(first);
     tick.setSeconds(0, 0); // snap to even minute
     while (tick <= last) {
-      // Find the data point closest to this tick time
       let closestIdx = 0;
       let closestDiff = Infinity;
       for (let i = 0; i < dates.length; i++) {
@@ -301,7 +463,7 @@ export function TimeSeriesChart({
       tick.setMinutes(tick.getMinutes() + 2);
     }
     return ticks;
-  }, [dates, chartData]);
+  }, [dates, chartData, isCompareMode]);
 
   if (!config || chartData.length === 0) return null;
 
@@ -344,8 +506,12 @@ export function TimeSeriesChart({
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground) / 0.08)" vertical={false} />
 
               <XAxis
-                dataKey="timestamp"
-                tick={(props: any) => <CustomTick {...props} />}
+                dataKey={isCompareMode ? "relativeMinutes" : "timestamp"}
+                tick={isCompareMode
+                  ? undefined
+                  : (props: any) => <CustomTick {...props} />
+                }
+                tickFormatter={isCompareMode ? formatRelativeTick : undefined}
                 tickLine={false}
                 axisLine={{ stroke: "hsl(var(--muted-foreground) / 0.2)" }}
                 height={40}
@@ -361,15 +527,25 @@ export function TimeSeriesChart({
               />
 
               <Tooltip
-                content={({ active, payload: tipPayload, label }) => (
-                  <ChartTooltip
-                    active={active ?? undefined}
-                    payload={tipPayload as unknown as ReadonlyArray<Record<string, unknown>>}
-                    label={label}
-                    metricConfig={config}
-                    zoneColors={zoneColors}
-                  />
-                )}
+                content={({ active, payload: tipPayload, label }) =>
+                  isCompareMode ? (
+                    <CompareTooltip
+                      active={active ?? undefined}
+                      payload={tipPayload as unknown as ReadonlyArray<Record<string, unknown>>}
+                      label={label}
+                      overlays={compareMode!.overlays}
+                      unit={config.unit}
+                    />
+                  ) : (
+                    <ChartTooltip
+                      active={active ?? undefined}
+                      payload={tipPayload as unknown as ReadonlyArray<Record<string, unknown>>}
+                      label={label}
+                      metricConfig={config}
+                      zoneColors={zoneColors}
+                    />
+                  )
+                }
               />
 
               {/* GOOD band — only if it intersects visible range */}
@@ -403,8 +579,26 @@ export function TimeSeriesChart({
                 </ReferenceLine>
               ))}
 
-              {/* Zone lines with visible dots */}
-              {zoneKeys.map((zone) => (
+              {/* Compare mode: overlay lines per scan */}
+              {isCompareMode && compareMode && compareMode.overlays.map((overlay) => (
+                <Line
+                  key={overlay.scanId}
+                  type="monotone"
+                  dataKey={overlay.scanId}
+                  stroke={overlay.color}
+                  strokeWidth={overlay.isPrimary ? 2.5 : 2}
+                  strokeDasharray={overlay.dash}
+                  dot={overlay.isPrimary ? { r: 3, strokeWidth: 0, fill: overlay.color } : false}
+                  activeDot={{ r: 6, strokeWidth: 2, stroke: "white" }}
+                  name={overlay.label}
+                  isAnimationActive={false}
+                  connectNulls={true}
+                  opacity={overlay.isPrimary ? 1 : 0.8}
+                />
+              ))}
+
+              {/* Normal mode: zone lines with visible dots */}
+              {!isCompareMode && zoneKeys.map((zone) => (
                 <Line
                   key={zone}
                   type="monotone"
@@ -422,8 +616,29 @@ export function TimeSeriesChart({
           </ResponsiveContainer>
         </div>
 
-        {/* Zone color legend */}
-        {zoneKeys.length > 0 && (
+        {/* Legend */}
+        {isCompareMode && compareMode && (
+          <div className="flex items-center gap-4 mt-3 pt-3 border-t border-border/30">
+            {compareMode.overlays.map((overlay) => (
+              <div key={overlay.scanId} className="flex items-center gap-1.5">
+                <div
+                  className="h-2.5 w-8 rounded-sm"
+                  style={{
+                    backgroundColor: overlay.color,
+                    opacity: overlay.isPrimary ? 1 : 0.8,
+                    backgroundImage: overlay.isPrimary ? "none" : `repeating-linear-gradient(90deg, ${overlay.color} 0, ${overlay.color} 4px, transparent 4px, transparent 8px)`,
+                  }}
+                />
+                <span className="text-xs text-muted-foreground">
+                  {overlay.label} ({overlay.dateLabel})
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Zone color legend (normal mode) */}
+        {!isCompareMode && zoneKeys.length > 0 && (
           <div className="flex items-center gap-4 mt-3 pt-3 border-t border-border/30">
             {zoneKeys.map((zone) => (
               <div key={zone} className="flex items-center gap-1.5">

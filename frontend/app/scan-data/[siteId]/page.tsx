@@ -10,6 +10,7 @@ import { apiClient, AnomalyEntry, LatestUploadResponse, TrendComparisonMetric, S
 import { METRIC_CONFIGS, METRIC_KEYS } from "@/components/findings/MetricConfig";
 import { TimeSeriesChart } from "@/components/findings/TimeSeriesChart";
 import { MetricSelectorBar } from "@/components/scan-data/MetricSelectorBar";
+import { ScanHistoryPills } from "@/components/ScanHistoryPills";
 import { TrendComparisonBar } from "@/components/scan-data/TrendComparisonBar";
 import { AnomalySummary } from "@/components/scan-data/AnomalySummary";
 import { ScanDataExport } from "@/components/scan-data/ScanDataExport";
@@ -64,6 +65,7 @@ export default function ScanDataViewPage() {
   const batchIdParam = searchParams.get("batchId");
 
   const [siteDetail, setSiteDetail] = useState<SiteDetail | null>(null);
+  const [uploads, setUploads] = useState<UploadListItem[]>([]);
   const [scanCount, setScanCount] = useState(0);
   const [lastScanDate, setLastScanDate] = useState<string | null>(null);
 
@@ -119,10 +121,11 @@ export default function ScanDataViewPage() {
         }
 
         // Derive scan stats from uploads
-        const uploads = (uploadsRes as UploadListItem[]) || [];
-        if (uploads.length > 0) {
-          setScanCount(uploads.length);
-          const latest = uploads[0];
+        const uploadsList = (uploadsRes as UploadListItem[]) || [];
+        setUploads(uploadsList);
+        if (uploadsList.length > 0) {
+          setScanCount(uploadsList.length);
+          const latest = uploadsList[0];
           if (latest.scan_date) {
             setLastScanDate(
               new Date(latest.scan_date).toLocaleDateString("en-GB", {
@@ -201,6 +204,21 @@ export default function ScanDataViewPage() {
   const handleSelectMetric = useCallback((metric: string) => {
     setActiveMetric(metric);
   }, []);
+
+  // Compute per-upload outcomes from readings (outlier-based)
+  const uploadOutcomes = useMemo(() => {
+    const map: Record<string, string> = {};
+    for (const upload of uploads) {
+      map[upload.id] = upload.parse_status === "COMPLETE" ? "PASS" : "INSUFFICIENT_EVIDENCE";
+    }
+    return map;
+  }, [uploads]);
+
+  const handleScanSelect = useCallback((uploadId: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("uploadId", uploadId);
+    router.push(`/scan-data/${siteId}?${params.toString()}`);
+  }, [siteId, router, searchParams]);
 
   // ── Loading state ───────────────────────────────────────────────
   if (loading) {
@@ -289,6 +307,17 @@ export default function ScanDataViewPage() {
               {uploadId && <ScanDataExport uploadId={uploadId} />}
             </div>
           </div>
+
+          {/* Scan History — compact pill strip */}
+          {uploads.length > 0 && (
+            <ScanHistoryPills
+              uploads={uploads}
+              outcomes={uploadOutcomes}
+              currentUploadId={uploadId ?? undefined}
+              onScanSelect={handleScanSelect}
+              onCompare={() => router.push(`/scan-data/${siteId}/compare`)}
+            />
+          )}
 
           {/* Unified Metric Selector Bar */}
           {readings.length > 0 && (

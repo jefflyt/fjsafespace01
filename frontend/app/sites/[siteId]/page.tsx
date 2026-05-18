@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ZoneDetailView } from '@/components/ZoneDetailView';
-import { ScanHistoryTable } from '@/components/ScanHistoryTable';
+import { ScanHistoryPills } from '@/components/ScanHistoryPills';
 import { StandardsTable } from '@/components/StandardsTable';
 import { CustomerDetailsCard } from '@/components/CustomerDetailsCard';
 import { Sidebar } from '@/components/layout/Sidebar';
@@ -132,15 +132,16 @@ export default function SiteDetailPage() {
     fetchAll();
   }, [fetchAll]);
 
-  // Fetch findings for the latest upload
+  // Fetch findings for the selected upload (or latest if none selected)
   const latestUpload = uploads.length > 0 ? uploads[0] : null;
+  const resolvedUploadId = searchParams.get('uploadId') ?? latestUpload?.id ?? null;
 
   useEffect(() => {
-    if (!latestUpload) return;
+    if (!resolvedUploadId) return;
 
     Promise.all([
-      api.get<Finding[]>(`/api/uploads/${latestUpload.id}/findings`),
-      api.get<{ metrics: Record<string, Reading[]> }>(`/api/uploads/${latestUpload.id}/readings`),
+      api.get<Finding[]>(`/api/uploads/${resolvedUploadId}/findings`),
+      api.get<{ metrics: Record<string, Reading[]> }>(`/api/uploads/${resolvedUploadId}/readings`),
     ])
       .then(([findingsRes, readingsRes]) => {
         setFindings(Array.isArray(findingsRes) ? findingsRes : []);
@@ -153,7 +154,7 @@ export default function SiteDetailPage() {
         setReadings(allReadings);
       })
       .catch(console.error);
-  }, [latestUpload]);
+  }, [resolvedUploadId]);
 
   // Build standards table: merge all rulebook sources with findings data
   const standardsEntries: StandardEntry[] = useMemo(() => {
@@ -213,6 +214,34 @@ export default function SiteDetailPage() {
   }, [findings, activeStandard]);
 
   const zones = useMemo(() => [...new Set(filteredFindings.map((f) => f.zone_name))], [filteredFindings]);
+
+  // Compute per-upload outcome from findings
+  const uploadOutcomes = useMemo(() => {
+    const map: Record<string, string> = {};
+    for (const upload of uploads) {
+      const uploadFindings = findings.filter((f) => f.upload_id === upload.id);
+      if (uploadFindings.length === 0) {
+        map[upload.id] = 'INSUFFICIENT_EVIDENCE';
+        continue;
+      }
+      const outcomes = uploadFindings.map((f) => bandToOutcome(f.threshold_band));
+      map[upload.id] = outcomes.includes('FAIL')
+        ? 'FAIL'
+        : outcomes.every((o) => o === 'PASS')
+          ? 'PASS'
+          : 'WATCH';
+    }
+    return map;
+  }, [uploads, findings]);
+
+  // Current upload from URL query param
+  const selectedUploadId = searchParams.get('uploadId') ?? latestUpload?.id ?? null;
+
+  const handleScanSelect = useCallback((uploadId: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('uploadId', uploadId);
+    router.push(`/sites/${siteId}?${params.toString()}`);
+  }, [siteId, router, searchParams]);
 
   // Handle customer update — refresh site detail
   const handleCustomerUpdate = useCallback(() => {
@@ -420,16 +449,15 @@ export default function SiteDetailPage() {
             </Card>
           )}
 
-          {/* Scan History */}
+          {/* Scan History — compact pill strip */}
           {uploads.length > 0 && (
-            <Card className="animate-fade-in">
-              <CardHeader className="pb-3">
-                <CardTitle className="font-heading text-lg font-semibold">Scan History</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ScanHistoryTable uploads={uploads} onRowClick={() => {}} />
-              </CardContent>
-            </Card>
+            <ScanHistoryPills
+              uploads={uploads}
+              outcomes={uploadOutcomes}
+              currentUploadId={selectedUploadId ?? undefined}
+              onScanSelect={handleScanSelect}
+              onCompare={() => router.push(`/scan-data/${siteId}/compare`)}
+            />
           )}
 
           {/* Zone Details */}
