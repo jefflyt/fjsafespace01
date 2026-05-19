@@ -2,31 +2,26 @@
 
 ## Project Overview
 
-FJDashboard is the operational and reporting interface for the FJ SafeSpace
-Indoor Air Quality (IAQ) platform. It processes rule-based findings into
-traceable reports for operations and executive views.
+FJDashboard is the operational and reporting interface for the FJ SafeSpace Indoor Air Quality (IAQ) platform. It processes rule-based findings into traceable reports for operations and executive views.
 
-### Core Architecture
+### Tech Stack
 
-- **Backend:** FastAPI (Python 3.12+), SQLModel (SQLAlchemy), Alembic for migrations.
-- **Frontend:** Next.js 15 (App Router), TypeScript, Tailwind CSS, Shadcn UI, Recharts.
-- **Database:** PostgreSQL (local via Homebrew `postgresql@17`, production via
-  Supabase `jertvmbhgehajcrfifwl`).
-- **File Storage:** Supabase Storage (bucket: `iaq-scans`) for raw CSV uploads
-  only.
-- **Environment:** Single `.env` at project root for both backend and frontend.
+- **Backend:** FastAPI (Python 3.12+), SQLModel (SQLAlchemy), Alembic for migrations
+- **Frontend:** Next.js 15 (App Router), TypeScript, Tailwind CSS, Shadcn UI, Recharts
+- **Database:** PostgreSQL via Supabase (`jertvmbhgehajcrfifwl`)
+- **File Storage:** Supabase Storage (bucket: `iaq-scans`) for raw CSV uploads only
+- **Environment:** Single `.env` at project root for both backend and frontend
 - **Workflows:**
-  - **Workflow A:** Standards governance (Reference Vault → Citation Units → Rulebook).
-  - **Workflow B:** Scan-to-Dashboard operations (Upload → Readings → Findings → Per-standard evaluation).
+  - **Workflow A:** Standards governance (Reference Vault → Citation Units → Rulebook)
+  - **Workflow B:** Scan-to-Dashboard operations (Upload → Readings → Findings → Per-standard evaluation)
 
 ---
 
 ## Current Status
 
-PR1-8 complete. R1 refactor in progress — PR-R1-01 through PR-R1-12 complete, PR-R1-06 (Testing) remaining.
-See `docs/plans/epics/R1-Refactor/ROADMAP.md` for the full plan and status.
+All R1 PRs (PR-R1-01 through PR-R1-12) are complete. PR-R1-06 (Testing & Polish) is the remaining item. See `docs/plans/epics/R1-Refactor/ROADMAP.md` for full details.
 
-All migrations (001–021) merged and applied to Supabase.
+Migrations 001–021 are merged and applied to Supabase.
 
 ### Routes
 
@@ -34,7 +29,7 @@ All migrations (001–021) merged and applied to Supabase.
 | --- | --- | --- |
 | **Scan Listing** | `/` | Site listing with latest scan results (home page) |
 | **Site Detail** | `/sites/{siteId}` | All scans, standard selector, zone details, scan history |
-| **Scan Data View** | `/scan-data/{siteId}` | Raw IAQ metrics as time-series data, anomaly summary, trend comparison |
+| **Scan Data View** | `/scan-data/{siteId}` | Raw IAQ metrics as time-series, anomaly summary, trend comparison |
 | **Scan Compare** | `/scan-data/{siteId}/compare` | Side-by-side scan comparison with metric charts |
 | **Operations** | `/ops` | Upload CSV, review findings — redirects to `/` |
 | **Executive** | `/executive` | Results summary, top risks/actions, historical scan selector |
@@ -45,7 +40,7 @@ All migrations (001–021) merged and applied to Supabase.
 
 ## Technical Commands
 
-### Backend (Python)
+### Backend
 
 ```bash
 cd backend
@@ -55,7 +50,7 @@ alembic upgrade head          # Apply migrations
 fastapi dev app/main.py       # Start dev server on port 8000
 ```
 
-### Frontend (Next.js)
+### Frontend
 
 ```bash
 cd frontend
@@ -74,27 +69,20 @@ brew services stop postgresql@17   # Stop local PostgreSQL
 
 ## Environment
 
-### Single `.env` at Project Root
+Single `.env` at project root. Config loads via `backend/app/core/config.py` using pathlib resolution. Full list in `.env.example`.
 
-All variables documented in `.env.example`. Config loads via `backend/app/core/config.py` using pathlib resolution.
+Key variables:
 
-| Variable | Required | Description |
-| ------ | ------ | ------ |
-| `DATABASE_URL` | Yes | PostgreSQL connection string (app role — SELECT-only on Rulebook tables) |
-| `ADMIN_DATABASE_URL` | Yes | Full-access DB role for Workflow A admin console only |
-| `APPROVER_EMAIL` | Yes | Jay Choy's email |
-| `SUPABASE_URL` | Yes | Supabase project URL |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Storage service role key |
-| `SUPABASE_STORAGE_BUCKET` | Yes | Storage bucket name (default: `iaq-scans`) |
-| `SUPABASE_JWT_SECRET` | Yes | Supabase JWT secret (PR-R1-01 JWT extraction) |
-| `NEXT_PUBLIC_API_URL` | Yes | FastAPI backend base URL |
-| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase URL for frontend auth client |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase anon key for frontend auth |
+| Variable | Description |
+| --- | --- |
+| `DATABASE_URL` | PostgreSQL (app role — SELECT-only on Rulebook tables) |
+| `ADMIN_DATABASE_URL` | Full-access DB role for Workflow A admin console only |
+| `APPROVER_EMAIL` | Jay Choy's email |
+| `SUPABASE_*` | Supabase URL, service role key, storage bucket, JWT secret |
+| `NEXT_PUBLIC_API_URL` | FastAPI backend base URL |
+| `NEXT_PUBLIC_SUPABASE_*` | Supabase URL + anon key for frontend auth client |
 
-### Setup Guides
-
-- **Supabase Storage**: `docs/setup/SUPABASE_SETUP.md`
-- **Schema Reference**: `docs/SCHEMA_REFERENCE.md`
+Setup guides: `docs/setup/SUPABASE_SETUP.md`, `docs/SCHEMA_REFERENCE.md`
 
 ---
 
@@ -102,89 +90,73 @@ All variables documented in `.env.example`. Config loads via `backend/app/core/c
 
 ### Traceability & Governance
 
-- **Mandatory Metadata:** Every finding **must** include a `rule_version`
-  and `citation_id`.
-- **Read-Only Rulebook:** The dashboard (Workflow B) must **never** mutate
-  Rulebook tables. Access is `SELECT` only at the DB level. Rule changes
-  must use `ADMIN_DATABASE_URL`.
-- **Source Currency:** Only `CURRENT_VERIFIED` sources can drive certification-impact rules. Others are marked "Advisory Only".
+- Every finding **must** include `rule_version` and `citation_id`
+- Dashboard (Workflow B) must **never** mutate Rulebook tables — SELECT-only at DB level. Rule changes must use `ADMIN_DATABASE_URL`
+- Only `CURRENT_VERIFIED` sources drive certification-impact rules; others are marked "Advisory Only"
 
 ### Design Principles
 
-- **Evidence Before Aesthetics:** Accuracy and traceability take precedence
-  over visual flair.
-- **Synchronous Pipeline:** All processing (parsing, evaluation) is synchronous.
-- **Surgical Updates:** When modifying schema or API contracts, ensure the
-  TDD version is bumped and recorded in the Decision Log.
+- Evidence before aesthetics — accuracy and traceability over visual flair
+- Synchronous pipeline — all parsing and evaluation is synchronous
+- Surgical updates — bump TDD version on API/schema changes
 
 ### Frontend Libraries
 
-- `frontend/lib/api.ts` — Fetch client for FastAPI backend
-- `frontend/lib/constants.ts` — Global constants (OUTCOME_CONFIG, BAND_TAILWIND, getScoreColor, BAND_PRIORITY, BAND_TO_OUTCOME, bandToOutcome). **All new components should import from here instead of duplicating.**
-- `frontend/lib/utils.ts` — `cn()`, `formatDate`, re-exports from constants.ts
-- `frontend/lib/supabase.ts` — Supabase auth client
+| File | Purpose |
+| --- | --- |
+| `frontend/lib/api.ts` | Fetch client for FastAPI backend |
+| `frontend/lib/constants.ts` | OUTCOME_CONFIG, BAND_TAILWIND, getScoreColor, BAND_PRIORITY, BAND_TO_OUTCOME, bandToOutcome. Import from here instead of duplicating |
+| `frontend/lib/utils.ts` | `cn()`, `formatDate`, re-exports from constants.ts |
+| `frontend/lib/supabase.ts` | Supabase auth client |
 
 ### Scripts & Sample Data
 
 - `scripts/seed_rulebook_v1.py` — Seeds 4 standards (rule_version="v2-refactor")
 - `scripts/seed_default_tenant.py` — Seeds default tenant, assigns sites
 - `scripts/cleanup_test_data.py` — Removes all test data except NPE tenant
+- `assets/sample_uploads/` — Sample CSV datasets
 
 ---
 
 ## Workflow A: IAQ Rule Governor
 
-Governs the Reference Vault → Citation Units → Rulebook pipeline.
+Governs the Reference Vault → Citation Units → Rulebook pipeline. Models: `backend/app/models/workflow_a.py`
 
 ### Ingesting a New Standard
 
-1. Register `ReferenceSource` with appropriate `source_currency_status`.
-2. Create `CitationUnit` records for specific clauses, ensuring verbatim `exact_excerpt`.
-3. Draft `RulebookEntry` records linked to new citations.
+1. Register `ReferenceSource` with appropriate `source_currency_status`
+2. Create `CitationUnit` records for specific clauses (verbatim `exact_excerpt`)
+3. Draft `RulebookEntry` records linked to new citations
 
 ### Updating Thresholds
 
-1. Locate existing `RulebookEntry`.
-2. Mark old entry as `superseded` and set `effective_to`.
-3. Create new `RulebookEntry` with updated values, increment `rule_version`.
+1. Locate existing `RulebookEntry`
+2. Mark old entry as `superseded`, set `effective_to`
+3. Create new `RulebookEntry` with updated values, increment `rule_version`
 
 ### Guardrails
 
-- No rule can exist without at least one linked `CitationUnit`.
-- Models: `backend/app/models/workflow_a.py`
+- No rule can exist without at least one linked `CitationUnit`
 
 ---
 
 ## Workflow B: Per-Standard Evaluation
 
-The R1 dashboard replaces the compliance/reporting model with:
+The R1 dashboard provides per-standard evaluation (SS 554, WELL v2, RESET Viral Index, SafeSpace), human-readable interpretations, metric preferences, and wellness scoring.
 
-- **Per-standard evaluation**: Independent pass/fail per SS 554, WELL v2,
-  RESET Viral Index, SafeSpace
-- **Human-readable interpretations**: Threshold bands mapped to plain-language insights
-- **Metric preferences**: Per-site customizable visible metrics and alert thresholds
-- **Wellness scoring**: Weighted scores per standard
-
-Rule evaluation engine: `backend/app/skills/iaq_rule_governor/`
-CSV parsing: `backend/app/skills/data_ingestion/`
-Aggregation service: `backend/app/services/aggregation.py`
-DB rule service: `backend/app/services/db_rule_service.py`
-
----
-
-## Deferred to Phase 2/3
-
-| Item | Reason | Phase |
-| ------ | ------ | ----- |
-| Playwright E2E tests | Better suited for CI/CD | Phase 2 |
-| CI/CD pipeline | Infrastructure work, separate PR | Phase 2/3 |
+| Component | Path |
+| --- | --- |
+| Rule evaluation engine | `backend/app/skills/iaq_rule_governor/` |
+| CSV parsing | `backend/app/skills/data_ingestion/` |
+| Aggregation service | `backend/app/services/aggregation.py` |
+| DB rule service | `backend/app/services/db_rule_service.py` |
 
 ---
 
 ## Key Reference Docs
 
-- `docs/plans/epics/R1-Refactor/ROADMAP.md` — Current R1 roadmap
+- `docs/plans/epics/R1-Refactor/ROADMAP.md` — R1 roadmap (current)
 - `docs/plans/MASTER_PLAN.md` — Original master plan
 - `docs/plans/MASTER_PLAN-Refactor.md` — Refactor master plan (R1-R4)
-- `docs/PSD-Refactor.md` — Product Specification
-- `docs/TDD-Refactor.md` — Technical Design Document
+- `docs/PSD-Refactor.md` — Product specification
+- `docs/TDD-Refactor.md` — Technical design document
