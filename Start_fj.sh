@@ -18,6 +18,40 @@ trap cleanup SIGINT SIGTERM
 
 echo "Starting FJDashboard..."
 
+# Kill any existing servers
+echo "Checking for existing servers..."
+
+# Kill backend processes by name
+pids=$(ps aux | grep '[u]vicorn.*app.main:app' | awk '{print $2}')
+if [ -n "$pids" ]; then
+    echo "  Killing backend: $pids"
+    kill $pids 2>/dev/null
+    sleep 0.5
+    pids=$(ps aux | grep '[u]vicorn.*app.main:app' | awk '{print $2}')
+    [ -n "$pids" ] && kill -9 $pids 2>/dev/null
+fi
+
+# Kill frontend processes by name
+pids=$(ps aux | grep '[n]ext.*dev' | grep -v 'grep\|next-server' | awk '{print $2}')
+if [ -n "$pids" ]; then
+    echo "  Killing frontend: $pids"
+    kill $pids 2>/dev/null
+    sleep 0.5
+    pids=$(ps aux | grep '[n]ext.*dev' | grep -v 'grep\|next-server' | awk '{print $2}')
+    [ -n "$pids" ] && kill -9 $pids 2>/dev/null
+fi
+
+# Fallback: kill anything on our ports (fast, avoids lsof hanging)
+for port in 8000 3000; do
+    pids=$(lsof -Pn -ti :$port 2>/dev/null & pid=$!; sleep 1; kill $pid 2>/dev/null; wait $pid 2>/dev/null)
+    if [ -n "$pids" ]; then
+        echo "  Killing leftover port $port processes: $pids"
+        kill $pids 2>/dev/null
+        sleep 0.3
+        kill -9 $pids 2>/dev/null
+    fi
+done
+
 # 1. Start Backend
 echo "Starting Backend (Port 8000)..."
 cd "$SCRIPT_DIR/backend"

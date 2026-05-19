@@ -170,7 +170,8 @@ async def get_sites(session: SessionDep, tenant_id: TenantIdDep):
     for row in grouped.values():
         row["all_site_ids"] = site_ids_by_name.get(row["site_name"], [row["site_id"]])
 
-    return list(grouped.values())
+    # ── Filter out sites with no scans (keep in DB, just hide from listing) ──
+    return [row for row in grouped.values() if row.get("scan_count", 0) > 0]
 
 
 @router.get("/sites/{site_id}", status_code=status.HTTP_200_OK)

@@ -91,11 +91,14 @@ def list_tenants(session: SessionDep):
             .where(Site.tenant_id == tenant.id)
         ).one()
 
-        # Count sites
-        site_count = session.exec(
-            select(func.count(Site.id))
+        # Count sites that have at least one upload
+        sites_with_uploads = session.exec(
+            select(Upload.site_id)
+            .join(Site, Upload.site_id == Site.id)
             .where(Site.tenant_id == tenant.id)
-        ).one()
+            .distinct()
+        ).all()
+        site_count = len(set(sites_with_uploads))
 
         summaries.append(
             TenantSummary(
@@ -139,10 +142,13 @@ def get_tenant(tenant_id: str, session: SessionDep):
         .where(Site.tenant_id == tenant_id)
     ).one()
 
-    site_count = session.exec(
-        select(func.count(Site.id))
+    sites_with_uploads = session.exec(
+        select(Upload.site_id)
+        .join(Site, Upload.site_id == Site.id)
         .where(Site.tenant_id == tenant_id)
-    ).one()
+        .distinct()
+    ).all()
+    site_count = len(set(sites_with_uploads))
 
     return TenantDetail(
         id=str(tenant.id),
