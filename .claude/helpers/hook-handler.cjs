@@ -113,7 +113,8 @@ async function main() {
   const toolName = hookInput.toolName || hookInput.tool_name || '';
 
   // Merge stdin data into prompt resolution: prefer stdin fields, then env, then argv
-  const prompt = hookInput.prompt || hookInput.command || toolInput
+  const prompt = hookInput.prompt || hookInput.command
+    || (typeof toolInput === 'string' ? toolInput : '')
     || process.env.PROMPT || process.env.TOOL_INPUT_command || args.join(' ') || '';
 
 const handlers = {

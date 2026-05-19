@@ -14,7 +14,8 @@ import { ScanHistoryPills } from "@/components/ScanHistoryPills";
 import { TrendComparisonBar } from "@/components/scan-data/TrendComparisonBar";
 import { AnomalySummary } from "@/components/scan-data/AnomalySummary";
 import { ScanDataExport } from "@/components/scan-data/ScanDataExport";
-import { ChevronRight, Home, ArrowLeft, Activity, MapPin, ShieldCheck, ArrowRight } from "lucide-react";
+import { ChevronRight, Home, ArrowLeft, Activity, MapPin, ShieldCheck, ArrowRight, Trash2 } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 // Zone color palette — consistent across charts
 const ZONE_PALETTE = [
@@ -81,6 +82,8 @@ export default function ScanDataViewPage() {
   const [activeZone, setActiveZone] = useState<string>("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deleteUploadId, setDeleteUploadId] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Derive unique zones from readings
   const zones = useMemo(() => {
@@ -220,6 +223,29 @@ export default function ScanDataViewPage() {
     router.push(`/scan-data/${siteId}?${params.toString()}`);
   }, [siteId, router, searchParams]);
 
+  const handleDeleteScan = async () => {
+    if (!deleteUploadId) return;
+    setIsDeleting(true);
+    try {
+      await apiClient.deleteUpload(deleteUploadId);
+      setDeleteUploadId(null);
+      // Re-fetch uploads list
+      const uploadsRes = await apiClient.getUploadsBySiteIds([siteId]).catch(() => []);
+      const uploadsList = (uploadsRes as UploadListItem[]) || [];
+      setUploads(uploadsList);
+      if (uploadsList.length > 0) {
+        setUploadId(uploadsList[0].id);
+      } else {
+        setUploadId(null);
+      }
+    } catch (err) {
+      console.error("Failed to delete scan:", err);
+      alert(err instanceof Error ? err.message : "Failed to delete scan");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   // ── Loading state ───────────────────────────────────────────────
   if (loading) {
     return (
@@ -310,14 +336,56 @@ export default function ScanDataViewPage() {
 
           {/* Scan History — compact pill strip */}
           {uploads.length > 0 && (
-            <ScanHistoryPills
-              uploads={uploads}
-              outcomes={uploadOutcomes}
-              currentUploadId={uploadId ?? undefined}
-              onScanSelect={handleScanSelect}
-              onCompare={() => router.push(`/scan-data/${siteId}/compare`)}
-            />
+            <>
+              <ScanHistoryPills
+                uploads={uploads}
+                outcomes={uploadOutcomes}
+                currentUploadId={uploadId ?? undefined}
+                onScanSelect={handleScanSelect}
+                onCompare={() => router.push(`/scan-data/${siteId}/compare`)}
+              />
+
+              {/* Manage scans — delete controls */}
+              <div className="animate-fade-in">
+                <div className="flex items-center gap-2 mb-2">
+                  <Trash2 className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground">Manage scans</span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {uploads.map((upload) => (
+                    <button
+                      key={upload.id}
+                      onClick={() => setDeleteUploadId(upload.id)}
+                      className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs text-destructive/70 hover:text-destructive hover:bg-destructive/5 transition-colors"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                      {upload.file_name || upload.id.slice(0, 8)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </>
           )}
+
+          {/* Delete confirmation dialog */}
+          <Dialog open={deleteUploadId !== null} onOpenChange={() => !isDeleting && setDeleteUploadId(null)}>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Delete Scan</DialogTitle>
+                <DialogDescription>
+                  This will permanently delete this scan and all associated data, including readings, findings, and reports. This action cannot be undone.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setDeleteUploadId(null)} disabled={isDeleting}>
+                  Cancel
+                </Button>
+                <Button variant="destructive" onClick={handleDeleteScan} disabled={isDeleting}>
+                  {isDeleting ? "Deleting..." : "Delete Scan"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
           {/* Unified Metric Selector Bar */}
           {readings.length > 0 && (

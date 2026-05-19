@@ -57,6 +57,16 @@ export default function ScanListingPage() {
     [router],
   );
 
+  const handleDeleteSite = useCallback(async (siteId: string) => {
+    // Fetch all uploads for this site and delete each one
+    const uploads = await apiClient.getUploadsBySiteIds([siteId]).catch(() => []);
+    for (const upload of uploads as { id: string }[]) {
+      await apiClient.deleteUpload(upload.id).catch(() => {});
+    }
+    // Refresh the listing
+    fetchSites();
+  }, [fetchSites]);
+
   // Derived KPIs
   const uniqueSites = useMemo(() => new Set(filtered.map((s) => s.site_id)).size, [filtered]);
   const avgWellness = useMemo(() => {
@@ -154,7 +164,7 @@ export default function ScanListingPage() {
               </CardContent>
             </Card>
           ) : (
-            <ScanListingTable data={filtered} loading={loading} onRowClick={handleRowClick} />
+            <ScanListingTable data={filtered} loading={loading} onRowClick={handleRowClick} onDeleteScan={handleDeleteSite} />
           )}
         </div>
       </div>

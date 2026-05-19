@@ -306,7 +306,6 @@ async def create_upload(
     tenant_id: str | None = Form(default=None),
     site_id: str | None = Form(default=None),
     standards: str | None = Form(default=None),
-    force: bool = Form(default=False),
 ):
     """
     Accept a CSV export from uHoo, parse, validate, evaluate against the
@@ -335,15 +334,16 @@ async def create_upload(
     # Determine or create site
     _site_id = _resolve_site(session, _tenant_id, site_id, file.filename)
 
-    # Dedup check
+    # Dedup check — strict block (must delete existing scan first)
     content_hash = hashlib.sha256(file_bytes).hexdigest()
     if _tenant_id:
         existing = _check_dedup_with_session(session, _tenant_id, content_hash)
         if existing:
-            if force:
-                _delete_upload_and_children(session, existing)
-            else:
-                return _build_duplicate_response(existing, _tenant_id, session)
+            uploaded_date = existing.uploaded_at.strftime("%d %b %Y") if existing.uploaded_at else "a previous date"
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"This CSV has already been uploaded on {uploaded_date}. Delete the existing scan first to re-upload.",
+            )
 
     # Parse optional standards
     standards_evaluated = None
@@ -424,6 +424,16 @@ async def confirm_upload(
     content_hash = hashlib.sha256(file_bytes).hexdigest()
 
     _tenant_id = tenant_id or jwt_tenant_id
+
+    # Dedup check — strict block (must delete existing scan first)
+    if _tenant_id:
+        existing = _check_dedup_with_session(session, _tenant_id, content_hash)
+        if existing:
+            uploaded_date = existing.uploaded_at.strftime("%d %b %Y") if existing.uploaded_at else "a previous date"
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"This CSV has already been uploaded on {uploaded_date}. Delete the existing scan first to re-upload.",
+            )
 
     try:
         mapping = json.loads(zone_mapping)
@@ -682,6 +692,64 @@ async def list_uploads(
         }
         for u in uploads
     ]
+
+
+@router.delete("/uploads/{upload_id}", status_code=status.HTTP_200_OK)
+async def delete_upload(upload_id: str, session: SessionDep):
+    """
+    Delete an upload and all its associated data (findings, readings, report).
+    If the upload is the last child of a batch, the batch is also deleted.
+    """
+    upload = session.get(Upload, upload_id)
+    if not upload:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Upload {upload_id} not found",
+        )
+
+    # Delete associated findings and readings (raw SQL to avoid cascade issues)
+    session.execute(
+        text("DELETE FROM finding WHERE upload_id = :uid"),
+        {"uid": upload_id},
+    )
+    session.execute(
+        text("DELETE FROM reading WHERE upload_id = :uid"),
+        {"uid": upload_id},
+    )
+
+    # Delete associated report if it exists
+    from app.models.workflow_b import Report
+    report = session.exec(
+        select(Report).where(col(Report.upload_id) == upload_id)
+    ).first()
+    if report:
+        session.delete(report)
+
+    # Track batch membership before deleting upload
+    batch_id = upload.batch_id
+
+    session.delete(upload)
+    session.commit()
+
+    # Clean up batch if this was the last child
+    if batch_id:
+        batch = session.get(UploadBatch, batch_id)
+        if batch and (not batch.child_upload_ids or len(batch.child_upload_ids) <= 1):
+            session.delete(batch)
+            session.commit()
+
+    # Best-effort storage cleanup (non-blocking)
+    try:
+        storage = SupabaseStorage()
+        storage_prefix = f"uploads/{upload_id}"
+        # Delete all files under this upload's prefix
+        files = storage.list_files(storage_prefix)
+        for f in files:
+            storage.delete_file(f)
+    except Exception:
+        pass  # Non-critical if storage cleanup fails
+
+    return {"deleted": True, "upload_id": upload_id}
 
 
 @router.get("/uploads/{upload_id}", status_code=status.HTTP_200_OK)

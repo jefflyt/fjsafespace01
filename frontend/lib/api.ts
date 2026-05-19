@@ -470,4 +470,9 @@ export const apiClient = {
 
   getLatestUploadForSite: (siteId: string, options?: FetchOptions) =>
     api.get<LatestUploadResponse>(`/api/sites/${siteId}/latest-upload`, options),
+
+  // ── Upload Deletion ──────────────────────────────────────────────────────
+
+  deleteUpload: (uploadId: string, options?: FetchOptions) =>
+    api.delete<{ deleted: boolean; upload_id: string }>(`/api/uploads/${uploadId}`, options),
 };

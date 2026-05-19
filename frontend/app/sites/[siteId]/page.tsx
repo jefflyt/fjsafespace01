@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ZoneDetailView } from '@/components/ZoneDetailView';
 import { ScanHistoryPills } from '@/components/ScanHistoryPills';
@@ -12,7 +13,7 @@ import { CustomerDetailsCard } from '@/components/CustomerDetailsCard';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { api, apiClient, MetricPreferences, UploadListItem, SiteDetail, ReferenceSource } from '@/lib/api';
 import { getScoreColor, getOutcomeConfig, formatDate, bandToOutcome } from '@/lib/utils';
-import { ChevronRight, Home, Activity, BarChart3, ShieldCheck } from 'lucide-react';
+import { ChevronRight, Home, Activity, BarChart3, ShieldCheck, Trash2 } from 'lucide-react';
 import type { Finding } from '@/components/findings/types';
 
 // ── Breadcrumb Button ────────────────────────────────────────────────────────
@@ -90,6 +91,8 @@ export default function SiteDetailPage() {
   const [uploads, setUploads] = useState<UploadListItem[]>([]);
   const [activeStandard, setActiveStandard] = useState<string>('');
   const [loading, setLoading] = useState(true);
+  const [deleteUploadId, setDeleteUploadId] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Fetch all data in parallel
   const fetchAll = useCallback(async () => {
@@ -247,6 +250,22 @@ export default function SiteDetailPage() {
   const handleCustomerUpdate = useCallback(() => {
     fetchAll();
   }, [fetchAll]);
+
+  // Handle scan deletion
+  const handleDeleteScan = async () => {
+    if (!deleteUploadId) return;
+    setIsDeleting(true);
+    try {
+      await apiClient.deleteUpload(deleteUploadId);
+      setDeleteUploadId(null);
+      fetchAll();
+    } catch (err) {
+      console.error('Failed to delete scan:', err);
+      alert(err instanceof Error ? err.message : 'Failed to delete scan');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   // ── Loading skeleton ──────────────────────────────────────────────
   if (loading) {
@@ -459,6 +478,26 @@ export default function SiteDetailPage() {
               onCompare={() => router.push(`/scan-data/${siteId}/compare`)}
             />
           )}
+
+          {/* Delete confirmation dialog */}
+          <Dialog open={deleteUploadId !== null} onOpenChange={() => !isDeleting && setDeleteUploadId(null)}>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Delete Scan</DialogTitle>
+                <DialogDescription>
+                  This will permanently delete this scan and all associated data, including readings, findings, and reports. This action cannot be undone.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setDeleteUploadId(null)} disabled={isDeleting}>
+                  Cancel
+                </Button>
+                <Button variant="destructive" onClick={handleDeleteScan} disabled={isDeleting}>
+                  {isDeleting ? 'Deleting...' : 'Delete Scan'}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
           {/* Zone Details */}
           {zones.length === 0 ? (

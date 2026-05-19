@@ -154,7 +154,7 @@ export function UploadForm({ onUploadComplete }: UploadFormProps) {
       setPreviewResult(result);
 
       if (result.is_duplicate) {
-        setError("This CSV has been uploaded before.");
+        setError("This CSV has already been uploaded. Delete the existing scan first to re-upload.");
         setDuplicateResult({
           upload_id: "",
           file_name: result.file_name,
@@ -234,33 +234,6 @@ export function UploadForm({ onUploadComplete }: UploadFormProps) {
       );
 
       onUploadComplete?.(result);
-      resetForm();
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Upload failed";
-      setError(message);
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const handleForceUpload = async () => {
-    if (!file) return;
-
-    setIsUploading(true);
-    setDuplicateResult(null);
-    setError(null);
-
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("force", "true");
-      if (selectedTenantId) {
-        formData.append("tenant_id", selectedTenantId);
-      }
-
-      const response = await api.upload<UploadResult>("/api/uploads", formData);
-
-      onUploadComplete?.(response);
       resetForm();
     } catch (err) {
       const message = err instanceof Error ? err.message : "Upload failed";
@@ -504,19 +477,12 @@ export function UploadForm({ onUploadComplete }: UploadFormProps) {
                   Cancel
                 </Button>
                 <Button
-                  variant="outline"
-                  onClick={handleForceUpload}
-                  disabled={isUploading}
-                >
-                  {isUploading ? "Uploading..." : "Upload Anyway"}
-                </Button>
-                <Button
                   onClick={() => {
                     onUploadComplete?.(duplicateResult);
                     resetForm();
                   }}
                 >
-                  View Existing Findings
+                  View Existing Scan
                 </Button>
               </div>
             </DialogContent>
